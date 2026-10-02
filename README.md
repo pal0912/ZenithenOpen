@@ -1,36 +1,135 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ZenithenOpen 🚀
+### Production-Grade Open-Source Community Platform for S-VYASA University & IST-ZenithenLab
 
-## Getting Started
+[![ZenithenOpen CI](https://github.com/IST-ZenithenLab/ZenithenOpen/actions/workflows/ci.yml/badge.svg)](https://github.com/IST-ZenithenLab/ZenithenOpen/actions/workflows/ci.yml)
+[![Next.js](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma)](https://www.prisma.io/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
 
-First, run the development server:
+---
 
+## 📖 Overview
+
+**ZenithenOpen** is the official open-source engineering and community platform designed for **S-VYASA University** and **IST-ZenithenLab**, empowering 2,000+ student developers, contributors, and alumni to:
+- 📊 Track live community impact metrics, merged pull requests, and repository health.
+- 🏆 Compete on contributor leaderboards with monthly and all-time rankings.
+- 🎯 Discover beginner-friendly, triaged **Good First Issues** across campus open-source projects.
+- 🌟 Celebrate the **First PR Hall of Fame**, inspiring newcomers to make their first commit.
+- 📚 Master open-source skills through structured **Curriculum Roadmaps** (Full-Stack, AI/ML, Cloud DevOps, GSoC Prep).
+- 🤝 Connect via peer **Mentorship Matching** for GSoC and open-source guidance.
+- 📄 Generate verified **GitHub-Powered Resumes** with one-click PDF and Markdown export.
+- 🛡️ Manage members, projects, and announcements via a centralized **Admin Dashboard**.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technology | Description |
+| :--- | :--- | :--- |
+| **Framework** | Next.js 16 (App Router) | Server Components, Route Handlers, Turbopack |
+| **Language** | TypeScript 5 | Strict end-to-end typing |
+| **Styling** | Tailwind CSS v4 | Cutting-edge utility design with PostCSS |
+| **Animations** | Framer Motion 14 | Fluid micro-interactions and page transitions |
+| **Icons** | Lucide React + Custom SVGs | Modern iconography & brand logos |
+| **Database** | PostgreSQL 16 | Relational persistence with 12 Prisma models |
+| **ORM** | Prisma | Schema migrations & type-safe data access |
+| **Caching** | Redis (Upstash) | GitHub API rate-limit caching & fast lookups |
+| **Container** | Docker & Docker Compose | Isolated multi-container environments |
+| **CI/CD** | GitHub Actions | Automated lint, type-check, and build pipeline |
+
+---
+
+## 🚀 Quick Start (Local Development)
+
+### 1. Prerequisites
+- **Node.js**: `v20.x` or higher
+- **npm**: `v10.x` or higher
+- **Docker** (optional, for running PostgreSQL and Redis)
+
+### 2. Clone and Setup
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/IST-ZenithenLab/ZenithenOpen.git
+cd ZenithenOpen
+
+# Install dependencies
+npm install
+
+# Setup environment variables
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Run the Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Running with Docker Compose
+To run the full stack with PostgreSQL and Redis in isolated containers:
+```bash
+docker compose up --build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 📁 Project Architecture & Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+ZenithenOpen/
+├── app/                  # Next.js App Router (Pages, Layouts, API Routes)
+│   ├── page.tsx          # Homepage with Hero, Metrics & Highlights
+│   ├── members/          # Member directory and spotlights
+│   ├── projects/         # Open-source project showcases
+│   ├── leaderboard/      # Contributor leaderboard & rankings
+│   ├── opportunities/    # Curated good-first-issues
+│   ├── achievements/     # Hall of fame & badges
+│   ├── learning/         # Curriculum roadmaps & modules
+│   ├── mentorship/       # Student-mentor matchmaking
+│   ├── resume/           # GitHub-powered resume builder
+│   └── admin/            # Administrative management console
+├── components/           # Reusable UI & Layout components
+├── docs/                 # Engineering documentation & dev logs
+├── lib/                  # Utilities, mock datasets, and database clients
+├── modules/              # Modular monolith domain logic
+└── prisma/               # Database schema definition
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🧪 Testing & Validation
 
-## Deploy on Vercel
+```bash
+# Type checking
+npx tsc --noEmit
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Linting
+npm run lint
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Production build test
+npm run build
+```
+
+---
+
+## 📜 Documentation
+
+- [Architecture Specification](docs/architecture.md)
+- [Development Log](docs/development-log.md)
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from students, mentors, and open-source enthusiasts!
+1. Check out the [Opportunities Board](/opportunities) for beginner-friendly tasks.
+2. Fork the repository and create your feature branch: `git checkout -b feature/amazing-feature`.
+3. Verify your changes pass `npm run build` and `npm run lint`.
+4. Submit a Pull Request targeting the `development` branch.
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. Built with ❤️ by [IST-ZenithenLab](https://github.com/IST-ZenithenLab) and the S-VYASA Open Source Community.
