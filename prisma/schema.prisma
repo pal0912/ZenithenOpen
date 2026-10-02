@@ -1,0 +1,303 @@
+// Prisma Schema for ZenithenOpen Community Platform
+// S-VYASA Deemed University, Bengaluru
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MENTOR
+  MEMBER
+  GUEST
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ContributionType {
+  PULL_REQUEST
+  ISSUE
+  CODE_REVIEW
+  COMMIT
+  DOCUMENTATION
+}
+
+enum MentorshipStatus {
+  PENDING
+  ACCEPTED
+  COMPLETED
+  DECLINED
+}
+
+model User {
+  id              String           @id @default(cuid())
+  name            String
+  email           String           @unique
+  emailVerified   DateTime?
+  image           String?
+  role            Role             @default(MEMBER)
+  bio             String?          @db.Text
+  department      String?
+  yearOfStudy     String?
+  linkedinUrl     String?
+  portfolioUrl    String?
+  isMentor        Boolean          @default(false)
+  mentorshipTopics String[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  githubAccount   GitHubAccount?
+  skills          MemberSkill[]
+  contributions   Contribution[]
+  projectMembers  ProjectMaintainer[]
+  achievements    UserAchievement[]
+  learningProgress UserLearningProgress[]
+  mentorshipsAsMentor Mentorship[] @relation("MentorRelation")
+  mentorshipsAsMentee Mentorship[] @relation("MenteeRelation")
+  firstPrStory    FirstPrStory?
+  eventSignups    EventSignup[]
+
+  @@index([role])
+  @@index([email])
+}
+
+model GitHubAccount {
+  id                    String    @id @default(cuid())
+  userId                String    @unique
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  githubId              String    @unique
+  username              String    @unique
+  avatarUrl             String
+  profileUrl            String
+  publicRepos           Int       @default(0)
+  followers             Int       @default(0)
+  totalStarsEarned      Int       @default(0)
+  prsMergedCount        Int       @default(0)
+  contributionsThisYear Int       @default(0)
+  lastSyncedAt          DateTime  @default(now())
+
+  @@index([username])
+}
+
+model MemberSkill {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  category  String
+  level     String   @default("Intermediate")
+
+  @@unique([userId, name])
+  @@index([name])
+}
+
+model Project {
+  id                   String              @id @default(cuid())
+  slug                 String              @unique
+  name                 String
+  tagline              String
+  description          String              @db.Text
+  repositoryUrl        String
+  demoUrl              String?
+  primaryLanguage      String
+  starsCount           Int                 @default(0)
+  forksCount           Int                 @default(0)
+  openIssuesCount      Int                 @default(0)
+  goodFirstIssuesCount Int                 @default(0)
+  isFeatured           Boolean             @default(false)
+  status               String              @default("Active")
+  tags                 String[]
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  maintainers          ProjectMaintainer[]
+  contributions        Contribution[]
+  opportunities        Opportunity[]
+
+  @@index([slug])
+  @@index([isFeatured])
+  @@index([primaryLanguage])
+}
+
+model ProjectMaintainer {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String   @default("Maintainer")
+
+  @@unique([projectId, userId])
+}
+
+model Contribution {
+  id           String           @id @default(cuid())
+  userId       String
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId    String?
+  project      Project?         @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  type         ContributionType
+  title        String
+  url          String
+  prNumber     Int?
+  linesAdded   Int              @default(0)
+  linesRemoved Int              @default(0)
+  mergedAt     DateTime?
+  createdAt    DateTime         @default(now())
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([type])
+}
+
+model Opportunity {
+  id           String     @id @default(cuid())
+  projectId    String?
+  project      Project?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  repoFullName String
+  issueNumber  Int
+  title        String
+  issueUrl     String
+  language     String
+  difficulty   Difficulty @default(BEGINNER)
+  labels       String[]
+  isOpen       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([repoFullName, issueNumber])
+  @@index([difficulty])
+  @@index([language])
+  @@index([isOpen])
+}
+
+model FirstPrStory {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repoName     String
+  repoUrl      String
+  prNumber     Int
+  prTitle      String
+  prUrl        String
+  mergedDate   DateTime
+  quote        String    @db.Text
+  category     String
+  createdAt    DateTime  @default(now())
+}
+
+model LearningPath {
+  id             String          @id @default(cuid())
+  slug           String          @unique
+  title          String
+  description    String          @db.Text
+  level          Difficulty      @default(BEGINNER)
+  estimatedWeeks Int             @default(4)
+  iconName       String
+  color          String
+  targetSkills   String[]
+  modulesJson    Json
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  progress       UserLearningProgress[]
+
+  @@index([slug])
+}
+
+model UserLearningProgress {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  learningPathId String
+  learningPath   LearningPath @relation(fields: [learningPathId], references: [id], onDelete: Cascade)
+  currentWeek    Int          @default(1)
+  completedWeeks Int[]
+  isCompleted    Boolean      @default(false)
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([userId, learningPathId])
+}
+
+model Mentorship {
+  id          String           @id @default(cuid())
+  mentorId    String
+  mentor      User             @relation("MentorRelation", fields: [mentorId], references: [id], onDelete: Cascade)
+  menteeId    String
+  mentee      User             @relation("MenteeRelation", fields: [menteeId], references: [id], onDelete: Cascade)
+  topic       String
+  message     String           @db.Text
+  status      MentorshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([mentorId])
+  @@index([menteeId])
+  @@index([status])
+}
+
+model Achievement {
+  id          String            @id @default(cuid())
+  code        String            @unique
+  title       String
+  description String
+  badgeIcon   String
+  category    String
+  users       UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  unlockedAt    DateTime    @default(now())
+
+  @@unique([userId, achievementId])
+}
+
+model CommunityMetricSnapshot {
+  id                    String   @id @default(cuid())
+  totalMembers          Int
+  totalContributors     Int
+  prsMerged             Int
+  activeRepositories    Int
+  openSourceProjects    Int
+  firstPrsMerged        Int
+  contributionsThisMonth Int
+  snapshotDate          DateTime @default(now())
+
+  @@index([snapshotDate])
+}
+
+model Event {
+  id          String        @id @default(cuid())
+  title       String
+  description String        @db.Text
+  date        DateTime
+  location    String
+  isVirtual   Boolean       @default(true)
+  meetUrl     String?
+  signups     EventSignup[]
+}
+
+model EventSignup {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+}
