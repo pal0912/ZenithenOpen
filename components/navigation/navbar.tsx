@@ -14,11 +14,13 @@ import {
   FileText,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 import { GithubIcon } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth/auth-context";
 
 const NAV_LINKS = [
   { name: "Projects", href: "/projects", icon: FolderGit2 },
@@ -33,6 +35,7 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const { user, openLoginModal, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
 
@@ -116,11 +119,36 @@ export function Navbar() {
             <span>GitHub</span>
           </a>
 
-          <Link href="/members">
-            <Button size="sm" variant="default" className="shadow-blue-600/30">
-              Join Community
+          {user ? (
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 rounded-xl border border-white/[0.1] bg-white/[0.03] px-2.5 py-1 text-xs">
+                <img
+                  src={user.avatarUrl}
+                  alt={user.githubUsername}
+                  className="h-6 w-6 rounded-full object-cover ring-1 ring-blue-500"
+                />
+                <div className="flex flex-col text-left">
+                  <span className="font-semibold text-white leading-tight">@{user.githubUsername}</span>
+                  <span className="text-[10px] text-emerald-400 font-mono leading-tight">{user.usn}</span>
+                </div>
+              </div>
+              <button
+                onClick={logout}
+                title="Sign Out"
+                className="rounded-lg p-1.5 text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <Button
+              size="sm"
+              onClick={openLoginModal}
+              className="bg-blue-600 hover:bg-blue-500 text-xs font-semibold shadow-lg shadow-blue-600/20"
+            >
+              Sign In
             </Button>
-          </Link>
+          )}
         </div>
 
         {/* Mobile menu trigger */}
@@ -171,11 +199,39 @@ export function Navbar() {
               <GithubIcon className="h-4 w-4" />
               <span>GitHub Organization</span>
             </a>
-            <Link href="/members" onClick={() => setMobileMenuOpen(false)}>
-              <Button className="w-full" size="sm">
-                Join ZenithenOpen
+            {user ? (
+              <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.08]">
+                <div className="flex items-center space-x-2.5">
+                  <img src={user.avatarUrl} alt="" className="h-7 w-7 rounded-full ring-1 ring-blue-500" />
+                  <div className="text-left">
+                    <p className="text-xs font-semibold text-white">@{user.githubUsername}</p>
+                    <p className="text-[10px] text-emerald-400 font-mono">{user.usn}</p>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-xs text-red-400 hover:text-red-300 hover:bg-red-950/20"
+                >
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  openLoginModal();
+                }}
+                className="w-full bg-blue-600 hover:bg-blue-500 text-xs py-2"
+                size="sm"
+              >
+                Sign In (Verify USN)
               </Button>
-            </Link>
+            )}
           </div>
         </div>
       )}

@@ -89,4 +89,34 @@ Linear/Vercel-Grade Design System Overhaul & Authentic Zero-State Sanitization
 * `npm run build` — 14/14 pages compiled cleanly with Turbopack.
 * Docker Compose — Rebuilt `zenithenopen-app` container and verified HTTP 200 OK on `http://localhost:3000`.
 
+---
+
+## Entry: 2026-10-02 — Milestone 3: 2-Step USN Verification, GitHub Auth Modal & Open-Source Database Abstraction
+
+### Milestone
+S-VYASA Student USN Verification, GitHub SSO Link Modal, and Decoupled Database Layer
+
+### Files Changed
+* `lib/auth/usn-verification.ts` — Implemented algorithmic S-VYASA enrollment validator (`^(1SV|SV)\d{2}[A-Z]{2,4}\d{3}$`) with branch decoding, year of study inference, and pluggable DB hooks. Zero hardcoded student records committed to git.
+* `lib/db/index.ts` — Created clean database layer abstraction interface with `isDatabaseConfigured()` check and plug-and-play PostgreSQL / Prisma hooks.
+* `app/api/auth/verify-usn/route.ts` — Dynamic Next.js API route verifying student USN via async verification service.
+* `components/auth/auth-context.tsx` — Global client-side authentication provider managing student enrollment state, GitHub link status, and session persistence in `localStorage`.
+* `components/auth/login-modal.tsx` — High-tech 2-step modal dialog:
+  - Step 1: Enters USN, triggers API verification, dynamically renders student's department, admission year, and university badge.
+  - Step 2: Links GitHub profile (`@username`) or executes OAuth redirect.
+* `components/navigation/navbar.tsx` — Added responsive "Sign In" button opening the modal; renders student badge (`@githubUsername` + USN) with session sign-out dropdown when authenticated.
+* `app/layout.tsx` — Mounted `AuthProvider` and global `LoginModal` at root.
+* `app/login/page.tsx` — Direct fallback authentication page for deep links and bookmarking.
+* `docs/open-source-and-database-guide.md` — Guide documenting open-source privacy compliance and step-by-step database connection.
+
+### Architecture & Open-Source Decisions
+1. **Public Repository Privacy**: In accordance with open-source hygiene, zero private student rosters or mock student names exist in source control. The validation layer operates algorithmically today, and seamlessly connects to PostgreSQL or Supabase as soon as `DATABASE_URL` is set in production.
+2. **Decoupled 2-Step Workflow**: Prevents unauthorized GitHub linking by ensuring only S-VYASA University students can register.
+3. **Pluggable DB Adapter**: Allows the frontend to be fully tested and deployed on open-source platforms while leaving database integration as a drop-in hook in `lib/db/index.ts`.
+
+### Verification
+* `npx tsc --noEmit` — 0 TypeScript errors.
+* `npm run build` — 16/16 routes compiled successfully.
+
+
 
