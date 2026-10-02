@@ -38,3 +38,22 @@ Phase 0 Foundation & Phase 3/4 UI Compilation Fixes
 
 ### Next Step
 Verify all remaining frontend features (leaderboard filters, project tags, learning modules, mentorship request forms) and commit Milestone 0 to `development` branch, then push to GitHub.
+
+---
+
+## Entry: 2026-10-02 — Milestone 1: Container Orchestration & Port Isolation
+
+### Milestone
+Docker Compose Multi-Container Orchestration & Port De-confliction
+
+### Files Changed
+* `docker-compose.yml` — Removed deprecated Compose `version` key and mapped host PostgreSQL to port `5433` (`5433:5432`) to prevent collision with pre-existing host database services on port `5432`.
+
+### Architecture & Networking Decisions
+1. **Container Port Mapping vs Internal Network**: The Next.js web application (`zenithen-open-app`) connects to `zenithen-postgres:5432` through the internal bridge network (`zenithen-network`). Mapping the host port to `5433` provides host machine tool access without blocking local developer workflows.
+2. **Web Port**: Exposed port `3000:3000` for public browser access at `http://localhost:3000`.
+
+### Git Operations
+* Branch: `development`
+* Committing and pushing Docker port isolation fix to `origin/development`.
+
