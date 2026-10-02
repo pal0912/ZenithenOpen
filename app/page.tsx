@@ -7,28 +7,31 @@ import {
   Compass,
   GraduationCap,
   Users2,
-  Star,
   ExternalLink,
   Flame,
   Award,
   BookOpen,
+  GitPullRequest,
+  CheckCircle2,
+  GitBranch,
 } from "lucide-react";
 import { HeroSection } from "@/components/dashboard/hero-section";
 import { LiveMetricsDashboard } from "@/components/dashboard/live-metrics";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { GithubIcon } from "@/components/ui/icons";
 import {
   MOCK_PROJECTS,
   MOCK_MEMBERS,
   MOCK_OPPORTUNITIES,
   MOCK_FIRST_PR_STORIES,
   MOCK_LEADERBOARD,
+  MOCK_LEARNING_PATHS,
 } from "@/lib/data/mock-data";
 
 export default function HomePage() {
-  const featuredProjects = MOCK_PROJECTS.filter((p) => p.featured).slice(0, 4);
-  const spotlightMembers = MOCK_MEMBERS.filter((m) => m.featured).slice(0, 3);
+  const featuredProjects = MOCK_PROJECTS.slice(0, 4);
   const featuredOpportunities = MOCK_OPPORTUNITIES.slice(0, 3);
   const topContributors = MOCK_LEADERBOARD.slice(0, 4);
 
@@ -41,309 +44,138 @@ export default function HomePage() {
       <LiveMetricsDashboard />
 
       {/* 3. Featured Open-Source Projects */}
-      <section className="py-16 border-t border-slate-800/60 bg-slate-950/40">
+      <section className="py-20 border-t border-white/[0.06] bg-[#070a12]/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
             <div>
-              <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-blue-400">
+              <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-blue-400 font-mono">
                 <FolderGit2 className="h-4 w-4" />
                 <span>Ecosystem Repositories</span>
               </div>
-              <h2 className="text-3xl font-bold tracking-tight text-white mt-1">
-                Featured Open-Source Projects
+              <h2 className="text-3xl font-extrabold tracking-tight text-white mt-1">
+                Campus Project Catalog
               </h2>
               <p className="text-sm text-slate-400 mt-1 max-w-xl">
-                Built and maintained by ZenithenOpen engineers at S-VYASA. Production systems solving real-world challenges.
+                Open-source software maintained by S-VYASA engineers and student contributors.
               </p>
             </div>
             <Link href="/projects">
-              <Button variant="outline" size="sm" className="group">
-                <span>View All 26 Projects</span>
+              <Button variant="outline" size="sm" className="group border-white/[0.1] bg-white/[0.02] text-xs">
+                <span>View Project Directory</span>
                 <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {featuredProjects.map((project) => (
-              <Card
-                key={project.id}
-                className="group relative overflow-hidden glass-panel glass-panel-hover flex flex-col justify-between"
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <CardTitle className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
-                          {project.name}
-                        </CardTitle>
-                        <Badge variant="outline" className="text-[10px]">
-                          {project.status}
-                        </Badge>
-                      </div>
-                      <CardDescription className="mt-1 line-clamp-1 text-slate-400">
-                        {project.tagline}
-                      </CardDescription>
-                    </div>
-
-                    <div className="flex items-center space-x-1 text-xs text-amber-400 bg-slate-900/90 px-2 py-1 rounded-md border border-slate-800 shrink-0">
-                      <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                      <span className="font-semibold text-slate-200">{project.stars}</span>
-                    </div>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-4">
-                  <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
-                    {project.description}
-                  </p>
-
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="flex items-center space-x-1 text-xs text-slate-300 mr-2 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: project.languageColor }}
-                      />
-                      <span className="font-medium">{project.primaryLanguage}</span>
-                    </span>
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-400"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800/40">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-[11px] text-slate-400">Maintainers:</span>
-                      <div className="flex -space-x-1.5">
-                        {project.maintainers.map((m) => (
-                          <img
-                            key={m.username}
-                            src={m.avatarUrl}
-                            alt={m.name}
-                            title={`${m.name} (@${m.username})`}
-                            className="h-5 w-5 rounded-full ring-1 ring-slate-800 object-cover"
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    {project.goodFirstIssuesCount > 0 && (
-                      <Badge variant="beginner" className="text-[10px] font-medium">
-                        {project.goodFirstIssuesCount} Good First Issues
-                      </Badge>
-                    )}
-                  </div>
-                </CardContent>
-
-                <CardFooter className="flex items-center justify-between">
-                  <a
-                    href={project.repositoryUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-1 text-xs text-slate-400 hover:text-white transition-colors"
-                  >
-                    <span>github.com/zenithenopen/{project.slug}</span>
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                  <Link href={`/projects`}>
-                    <Button variant="ghost" size="sm" className="text-xs text-blue-400 hover:text-blue-300">
-                      Explore Repo →
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+          {featuredProjects.length === 0 ? (
+            /* Clean, high-tech empty state */
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-12 text-center backdrop-blur-xl">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 mb-4">
+                <FolderGit2 className="h-7 w-7" />
+              </div>
+              <h3 className="text-lg font-bold text-white">No Repositories Synced Yet</h3>
+              <p className="mt-2 text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                Connect the <code className="text-blue-300 font-mono">IST-ZenithenLab</code> GitHub organization or add repository URLs in the admin governance console to populate the catalog.
+              </p>
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <a
+                  href="https://github.com/IST-ZenithenLab"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button size="sm" variant="default" className="gap-2 text-xs bg-blue-600 hover:bg-blue-500">
+                    <GithubIcon className="h-3.5 w-3.5" />
+                    <span>View GitHub Organization</span>
+                  </Button>
+                </a>
+                <Link href="/admin">
+                  <Button size="sm" variant="outline" className="text-xs border-white/[0.1]">
+                    Open Admin Console
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {featuredProjects.map((project) => (
+                <Card
+                  key={project.id}
+                  className="group relative overflow-hidden glass-panel glass-panel-hover flex flex-col justify-between"
+                >
+                  <CardHeader>
+                    <CardTitle className="text-lg font-bold text-white">
+                      {project.name}
+                    </CardTitle>
+                    <CardDescription className="text-xs text-slate-400">
+                      {project.tagline}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* 4. Opportunity Board Highlight */}
-      <section className="py-16 border-t border-slate-800/60 bg-[#090d16]">
+      <section className="py-20 border-t border-white/[0.06] bg-[#06080e]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
             <div>
-              <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
+              <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-emerald-400 font-mono">
                 <Compass className="h-4 w-4" />
-                <span>Beginner Friendly Gateway</span>
+                <span>Beginner Gateway</span>
               </div>
-              <h2 className="text-3xl font-bold tracking-tight text-white mt-1">
-                Curated First Contributions
+              <h2 className="text-3xl font-extrabold tracking-tight text-white mt-1">
+                Good First Issues
               </h2>
-              <p className="text-sm text-slate-400 mt-1">
-                Hand-picked GitHub issues with mentor guidance, clear reproduction steps, and friendly reviews.
+              <p className="text-sm text-slate-400 mt-1 max-w-xl">
+                Triaged GitHub issues curated for first-time open-source contributors with mentor assistance.
               </p>
             </div>
             <Link href="/opportunities">
-              <Button variant="emerald" size="sm" className="group">
-                <span>View All 45+ Issues</span>
+              <Button variant="outline" size="sm" className="group border-white/[0.1] bg-white/[0.02] text-xs">
+                <span>Browse Opportunities</span>
                 <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {featuredOpportunities.map((opp) => (
-              <Card
-                key={opp.id}
-                className="p-5 glass-panel glass-panel-hover flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="font-mono text-xs text-blue-400">
-                      {opp.repository} #{opp.issueNumber}
-                    </span>
-                    <Badge variant="beginner" className="text-[10px] capitalize">
-                      {opp.difficulty}
-                    </Badge>
-                  </div>
-
-                  <h3 className="text-sm font-semibold text-white line-clamp-2 leading-snug">
-                    {opp.title}
-                  </h3>
-
-                  <div className="flex flex-wrap gap-1.5 mt-3">
-                    {opp.labels.map((l) => (
-                      <span
-                        key={l.name}
-                        className="rounded px-2 py-0.5 text-[10px] font-medium"
-                        style={{
-                          backgroundColor: `${l.color}20`,
-                          color: l.color,
-                          border: `1px solid ${l.color}40`,
-                        }}
-                      >
-                        {l.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="pt-4 mt-4 border-t border-slate-800/60 flex items-center justify-between text-xs">
-                  {opp.mentorAssigned && (
-                    <div className="flex items-center space-x-2">
-                      <img
-                        src={opp.mentorAssigned.avatarUrl}
-                        alt={opp.mentorAssigned.name}
-                        className="h-5 w-5 rounded-full object-cover ring-1 ring-emerald-500"
-                      />
-                      <span className="text-slate-400 text-[11px]">
-                        Mentor: <strong className="text-slate-200">{opp.mentorAssigned.name}</strong>
-                      </span>
-                    </div>
-                  )}
-                  <a
-                    href={opp.issueUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 flex items-center space-x-1 font-medium"
-                  >
-                    <span>Start Issue</span>
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Member Spotlights */}
-      <section className="py-16 border-t border-slate-800/60 bg-slate-950/40">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-            <div>
-              <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-blue-400">
-                <Sparkles className="h-4 w-4" />
-                <span>Student Leaders & Maintainers</span>
+          {featuredOpportunities.length === 0 ? (
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-12 text-center backdrop-blur-xl">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-4">
+                <Compass className="h-7 w-7" />
               </div>
-              <h2 className="text-3xl font-bold tracking-tight text-white mt-1">
-                Member Spotlights
-              </h2>
-              <p className="text-sm text-slate-400 mt-1 max-w-xl">
-                Highlighting our core project maintainers, GSoC scholars, and active open-source mentors.
+              <h3 className="text-lg font-bold text-white">No Open Issues Ingested Yet</h3>
+              <p className="mt-2 text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                Once repositories are connected and issues are labeled with <code className="text-emerald-300 font-mono">good-first-issue</code> on GitHub, they will appear dynamically here.
               </p>
+              <div className="mt-6">
+                <Link href="/learning">
+                  <Button size="sm" variant="default" className="text-xs bg-emerald-600 hover:bg-emerald-500">
+                    Prepare with Roadmaps
+                  </Button>
+                </Link>
+              </div>
             </div>
-            <Link href="/members">
-              <Button variant="outline" size="sm" className="group">
-                <span>View All 2,140+ Members</span>
-                <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {spotlightMembers.map((member) => (
-              <Card key={member.id} className="p-6 glass-panel glass-panel-hover flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center space-x-3.5 mb-4">
-                    <img
-                      src={member.avatarUrl}
-                      alt={member.name}
-                      className="h-12 w-12 rounded-full object-cover ring-2 ring-blue-500/60"
-                    />
-                    <div>
-                      <h3 className="font-bold text-white text-base">
-                        {member.name}
-                      </h3>
-                      <p className="text-xs text-slate-400 font-mono">
-                        @{member.username} • {member.department}
-                      </p>
-                    </div>
-                  </div>
-
-                  {member.spotlightQuote && (
-                    <div className="p-3 rounded-lg bg-blue-950/30 border border-blue-900/40 text-xs italic text-blue-200 mb-3">
-                      &ldquo;{member.spotlightQuote}&rdquo;
-                    </div>
-                  )}
-
-                  <p className="text-xs text-slate-300 leading-relaxed line-clamp-2">
-                    {member.bio}
-                  </p>
-
-                  <div className="mt-4 flex flex-wrap gap-1.5">
-                    {member.skills.slice(0, 3).map((s) => (
-                      <span
-                        key={s.name}
-                        className="rounded bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-300 font-medium border border-slate-700/50"
-                      >
-                        {s.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-5 pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-400">
-                  <span>{member.mergedPrCount} PRs merged</span>
-                  <Link href="/members" className="text-blue-400 hover:text-blue-300 font-medium">
-                    Profile →
-                  </Link>
-                </div>
-              </Card>
-            ))}
-          </div>
+          ) : null}
         </div>
       </section>
 
-      {/* 6. Contributor Leaderboard & Spotlight Section */}
-      <section className="py-16 border-t border-slate-800/60 bg-slate-950/60">
+      {/* 5. Contributor Leaderboard & Hall of Fame */}
+      <section className="py-20 border-t border-white/[0.06] bg-[#070a12]/70">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
             {/* Leaderboard Column */}
             <div className="lg:col-span-7 space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-purple-400">
+                  <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-purple-400 font-mono">
                     <Trophy className="h-4 w-4" />
-                    <span>Community Leaderboard</span>
+                    <span>Contributor Standings</span>
                   </div>
                   <h2 className="text-2xl font-bold tracking-tight text-white mt-1">
-                    Top Contributors This Month
+                    Monthly Leaderboard
                   </h2>
                 </div>
                 <Link href="/leaderboard">
@@ -353,165 +185,94 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              <div className="space-y-3">
-                {topContributors.map((entry) => (
-                  <div
-                    key={entry.member.id}
-                    className="flex items-center justify-between p-3.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-900 transition-colors"
-                  >
-                    <div className="flex items-center space-x-3.5">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800 font-mono text-xs font-bold text-slate-300">
-                        #{entry.rank}
-                      </div>
-                      <img
-                        src={entry.member.avatarUrl}
-                        alt={entry.member.name}
-                        className="h-10 w-10 rounded-full object-cover ring-2 ring-slate-800"
-                      />
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-semibold text-white">
-                            {entry.member.name}
-                          </span>
-                          <span className="text-xs text-slate-400 font-mono">
-                            @{entry.member.username}
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2 mt-0.5">
-                          <Badge variant="outline" className="text-[10px] py-0">
-                            {entry.badge}
-                          </Badge>
-                          <span className="text-[11px] text-slate-400 flex items-center">
-                            <Flame className="h-3 w-3 text-orange-400 mr-1" />
-                            {entry.streakDays}d streak
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      <span className="text-sm font-bold text-blue-400">
-                        {entry.prsMerged} PRs
-                      </span>
-                      <p className="text-[11px] text-slate-400">
-                        {entry.codeReviews} reviews
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {topContributors.length === 0 ? (
+                <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-8 text-center backdrop-blur-xl">
+                  <Trophy className="mx-auto h-8 w-8 text-purple-400/60 mb-2" />
+                  <p className="text-sm font-semibold text-white">Leaderboard Awaiting First Pull Request</p>
+                  <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+                    Contributions will be ranked automatically by merged PRs and code reviews once GitHub accounts are linked.
+                  </p>
+                  <Link href="/learning" className="inline-block mt-4">
+                    <Button size="sm" variant="outline" className="text-xs border-white/[0.1]">
+                      Start First Roadmap
+                    </Button>
+                  </Link>
+                </div>
+              ) : null}
             </div>
 
-            {/* Member Spotlight Column */}
+            {/* Hall of Fame Column */}
             <div className="lg:col-span-5 space-y-6">
               <div>
-                <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
+                <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-amber-400 font-mono">
                   <Sparkles className="h-4 w-4" />
-                  <span>Member Stories</span>
+                  <span>Recognition</span>
                 </div>
                 <h2 className="text-2xl font-bold tracking-tight text-white mt-1">
                   First PR Hall of Fame
                 </h2>
               </div>
 
-              {MOCK_FIRST_PR_STORIES.slice(0, 2).map((story) => (
-                <Card
-                  key={story.id}
-                  className="p-5 glass-panel border-l-4 border-l-purple-500 space-y-3"
-                >
-                  <p className="text-xs text-slate-300 italic leading-relaxed">
-                    &ldquo;{story.quote}&rdquo;
-                  </p>
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-800/60">
-                    <div className="flex items-center space-x-2.5">
-                      <img
-                        src={story.memberAvatar}
-                        alt={story.memberName}
-                        className="h-7 w-7 rounded-full object-cover"
-                      />
-                      <div>
-                        <p className="text-xs font-semibold text-white">
-                          {story.memberName}
-                        </p>
-                        <p className="text-[10px] text-slate-400">
-                          Merged PR #{story.prNumber} in {story.repoName}
-                        </p>
-                      </div>
-                    </div>
-                    <Badge variant="beginner" className="text-[10px]">
-                      {story.category}
-                    </Badge>
-                  </div>
-                </Card>
-              ))}
-
-              <Link href="/achievements" className="block">
-                <Button variant="outline" className="w-full text-xs">
-                  Read More First PR Journeys →
-                </Button>
-              </Link>
+              <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-8 text-center backdrop-blur-xl">
+                <Sparkles className="mx-auto h-8 w-8 text-amber-400/60 mb-2" />
+                <p className="text-sm font-semibold text-white">Celebrate Your First Contribution</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Every student who merges their first pull request receives permanent recognition in the community Hall of Fame.
+                </p>
+                <Link href="/achievements" className="inline-block mt-4">
+                  <Button size="sm" variant="outline" className="text-xs border-white/[0.1]">
+                    View Hall of Fame
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* 6. Learning Paths Teaser */}
-      <section className="py-16 border-t border-slate-800/60 bg-[#090d16]">
+      <section className="py-20 border-t border-white/[0.06] bg-[#06080e]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center space-x-2 rounded-full border border-purple-500/30 bg-purple-950/40 px-3.5 py-1 text-xs text-purple-300 mb-4">
+          <div className="inline-flex items-center space-x-2 rounded-full border border-purple-500/20 bg-purple-950/30 px-3.5 py-1 text-xs text-purple-300 mb-4">
             <GraduationCap className="h-3.5 w-3.5 text-purple-400" />
-            <span>Structured Open Source Curriculums</span>
+            <span>Structured Curriculums</span>
           </div>
 
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
             From First Commit to Google Summer of Code
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-slate-300">
-            Follow battle-tested learning roadmaps created by S-VYASA alumni who have contributed to global open-source foundations.
+          <p className="mx-auto mt-3 max-w-2xl text-sm text-slate-400">
+            Guided roadmaps curated for S-VYASA students to master open source and distributed software development.
           </p>
 
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-left">
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 hover:border-blue-500/40 transition-colors">
-              <div className="h-9 w-9 rounded-lg bg-blue-900/60 border border-blue-700/50 flex items-center justify-center text-blue-400 mb-3">
-                <BookOpen className="h-5 w-5" />
+            {MOCK_LEARNING_PATHS.map((path) => (
+              <div
+                key={path.id}
+                className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6 hover:border-blue-500/40 transition-all hover:-translate-y-1 glass-panel"
+              >
+                <div
+                  className="h-10 w-10 rounded-xl flex items-center justify-center mb-4"
+                  style={{ backgroundColor: `${path.color}15`, border: `1px solid ${path.color}30` }}
+                >
+                  <BookOpen className="h-5 w-5" style={{ color: path.color }} />
+                </div>
+                <h3 className="font-bold text-white text-base">{path.title}</h3>
+                <p className="text-xs text-slate-400 mt-2 leading-relaxed">{path.description}</p>
+                <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-mono">{path.estimatedWeeks} Weeks</span>
+                  <Badge variant="outline" className="text-[10px] border-white/[0.1]">
+                    {path.level}
+                  </Badge>
+                </div>
               </div>
-              <h3 className="font-semibold text-white text-base">React & Next.js</h3>
-              <p className="text-xs text-slate-400 mt-1">App router, server actions, design systems & accessibility standards.</p>
-              <span className="inline-block mt-3 text-xs text-blue-400 font-medium">6 Weeks • 480 Enrolled</span>
-            </div>
-
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 hover:border-purple-500/40 transition-colors">
-              <div className="h-9 w-9 rounded-lg bg-purple-900/60 border border-purple-700/50 flex items-center justify-center text-purple-400 mb-3">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <h3 className="font-semibold text-white text-base">Python + Open AI</h3>
-              <p className="text-xs text-slate-400 mt-1">PyTorch modules, Hugging Face pipelines, and bio-signal data science.</p>
-              <span className="inline-block mt-3 text-xs text-purple-400 font-medium">8 Weeks • 520 Enrolled</span>
-            </div>
-
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 hover:border-emerald-500/40 transition-colors">
-              <div className="h-9 w-9 rounded-lg bg-emerald-900/60 border border-emerald-700/50 flex items-center justify-center text-emerald-400 mb-3">
-                <FolderGit2 className="h-5 w-5" />
-              </div>
-              <h3 className="font-semibold text-white text-base">DevOps & Cloud</h3>
-              <p className="text-xs text-slate-400 mt-1">Docker internals, Kubernetes clusters, and GitHub Actions CI/CD.</p>
-              <span className="inline-block mt-3 text-xs text-emerald-400 font-medium">6 Weeks • 310 Enrolled</span>
-            </div>
-
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 hover:border-amber-500/40 transition-colors">
-              <div className="h-9 w-9 rounded-lg bg-amber-900/60 border border-amber-700/50 flex items-center justify-center text-amber-400 mb-3">
-                <Award className="h-5 w-5" />
-              </div>
-              <h3 className="font-semibold text-white text-base">GSoC Playbook</h3>
-              <p className="text-xs text-slate-400 mt-1">Proposal drafting, org selection, maintainer networking, and interview prep.</p>
-              <span className="inline-block mt-3 text-xs text-amber-400 font-medium">8 Weeks • 650 Enrolled</span>
-            </div>
+            ))}
           </div>
 
-          <div className="mt-8">
+          <div className="mt-10">
             <Link href="/learning">
-              <Button size="lg" variant="default" className="shadow-blue-600/30">
-                Explore All Learning Roadmaps
+              <Button size="lg" className="shadow-lg shadow-blue-600/25 bg-blue-600 hover:bg-blue-500">
+                Explore All Curriculum Modules
               </Button>
             </Link>
           </div>
@@ -519,26 +280,26 @@ export default function HomePage() {
       </section>
 
       {/* 7. Bottom Call to Action */}
-      <section className="py-20 border-t border-slate-800/80 bg-gradient-to-b from-slate-950 to-blue-950/20">
+      <section className="py-24 border-t border-white/[0.06] bg-gradient-to-b from-[#070a12] to-[#04060a]">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center space-y-6">
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
             Ready to ship your first commit?
           </h2>
-          <p className="text-base text-slate-300 max-w-xl mx-auto leading-relaxed">
-            Join S-VYASA University&apos;s open-source engineering movement.
-            Get paired with a student mentor, pick up an issue, and see your code merged into production.
+          <p className="text-base text-slate-400 max-w-xl mx-auto leading-relaxed">
+            Join S-VYASA University&apos;s open-source engineering chapter.
+            Connect with campus mentors, choose a roadmap, and see your code merged into production.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <Link href="/opportunities">
-              <Button size="lg" variant="emerald" className="gap-2">
+            <Link href="/learning">
+              <Button size="lg" className="gap-2 bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/20">
                 <Compass className="h-5 w-5" />
-                <span>Browse Starter Issues</span>
+                <span>Start Learning</span>
               </Button>
             </Link>
             <Link href="/mentorship">
-              <Button size="lg" variant="outline" className="gap-2">
+              <Button size="lg" variant="outline" className="gap-2 border-white/[0.1] bg-white/[0.02]">
                 <Users2 className="h-5 w-5" />
-                <span>Request a Mentor</span>
+                <span>Mentorship Program</span>
               </Button>
             </Link>
           </div>

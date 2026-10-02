@@ -9,14 +9,19 @@ import {
   MapPin,
   Globe,
   Sparkles,
+  Edit3,
+  RefreshCw,
 } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { MOCK_RESUME_DATA } from "@/lib/data/mock-data";
+import { ResumeProfileData } from "@/types";
 
 export default function ResumeBuilderPage() {
   const [copied, setCopied] = React.useState(false);
-  const data = MOCK_RESUME_DATA;
+  const [editMode, setEditMode] = React.useState(false);
+  const [data, setData] = React.useState<ResumeProfileData>(MOCK_RESUME_DATA);
 
   const handlePrint = () => {
     window.print();
@@ -30,27 +35,14 @@ ${data.email} | ${data.location} | GitHub: @${data.githubUsername}
 ## Summary
 ${data.summary}
 
-## Skills
+## Technical Proficiencies
 - **Languages:** ${data.skills.languages.join(", ")}
 - **Frameworks:** ${data.skills.frameworks.join(", ")}
-- **Tools:** ${data.skills.tools.join(", ")}
+- **Tools & DevOps:** ${data.skills.tools.join(", ")}
 - **Databases:** ${data.skills.databases.join(", ")}
 
-## Open Source Projects & Impact
-${data.highlightedRepos
-  .map(
-    (r) =>
-      `### ${r.name} (${r.language}) - ${r.stars} Stars, ${r.prsAuthored} Merged PRs
-${r.description}
-* ${r.impactDescription}`
-  )
-  .join("\n\n")}
-
 ## Education
-**${data.education.institution}** - ${data.education.degree} in ${data.education.field} (${data.education.graduationYear}) - GPA: ${data.education.gpa}
-
-## Notable Achievements
-${data.achievements.map((a) => `- ${a}`).join("\n")}
+${data.education.degree} in ${data.education.field} — ${data.education.institution} (Grad: ${data.education.graduationYear})
 `;
     navigator.clipboard.writeText(md);
     setCopied(true);
@@ -58,78 +50,134 @@ ${data.achievements.map((a) => `- ${a}`).join("\n")}
   };
 
   return (
-    <div className="py-12 bg-grid-pattern min-h-screen">
+    <div className="py-16 bg-grid-pattern min-h-screen">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        {/* Screen Controls Header (hidden during print) */}
-        <div className="print:hidden border-b border-slate-800/80 pb-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Controls Toolbar (hidden during print) */}
+        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/[0.06] pb-6 print:hidden">
           <div>
-            <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
+            <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-blue-400 font-mono">
               <Sparkles className="h-4 w-4" />
-              <span>Verified Developer Identity</span>
+              <span>Interactive Resume Engine</span>
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight text-white mt-1">
-              GitHub-Powered ATS Resume Builder
+              Open-Source Developer Resume
             </h1>
             <p className="text-xs text-slate-400 mt-1">
-              Generates a clean, ATS-optimized software engineer resume backed by verified pull requests, commits, and campus contributions.
+              Edit your details live, then export to Markdown or Print to PDF.
             </p>
           </div>
 
-          <div className="flex items-center space-x-2.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              onClick={() => setEditMode(!editMode)}
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs border-white/[0.1] bg-white/[0.02]"
+            >
+              <Edit3 className="h-3.5 w-3.5 text-blue-400" />
+              <span>{editMode ? "Close Editor" : "Edit Profile"}</span>
+            </Button>
+
             <Button
               onClick={handleCopyMarkdown}
               variant="outline"
               size="sm"
-              className="gap-1.5 text-xs"
+              className="gap-1.5 text-xs border-white/[0.1] bg-white/[0.02]"
             >
-              {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
-              <span>{copied ? "Copied Markdown" : "Copy Markdown"}</span>
+              {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+              <span>{copied ? "Copied!" : "Copy Markdown"}</span>
             </Button>
 
             <Button
               onClick={handlePrint}
-              variant="default"
               size="sm"
-              className="gap-1.5 text-xs shadow-blue-600/30"
+              className="gap-1.5 text-xs bg-blue-600 hover:bg-blue-500 shadow-md shadow-blue-600/20"
             >
-              <Printer className="h-4 w-4" />
+              <Printer className="h-3.5 w-3.5" />
               <span>Print / Save PDF</span>
             </Button>
           </div>
         </div>
 
+        {/* Live Interactive Edit Panel */}
+        {editMode && (
+          <div className="mb-8 rounded-2xl border border-blue-500/30 bg-blue-950/20 p-6 backdrop-blur-xl print:hidden space-y-4">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <Edit3 className="h-4 w-4 text-blue-400" />
+              <span>Quick Profile Editor</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label className="block text-slate-400 mb-1">Full Name</label>
+                <Input
+                  value={data.fullName}
+                  onChange={(e) => setData({ ...data, fullName: e.target.value })}
+                  className="bg-white/[0.04] border-white/[0.1] text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-400 mb-1">Headline</label>
+                <Input
+                  value={data.headline}
+                  onChange={(e) => setData({ ...data, headline: e.target.value })}
+                  className="bg-white/[0.04] border-white/[0.1] text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-400 mb-1">Email</label>
+                <Input
+                  value={data.email}
+                  onChange={(e) => setData({ ...data, email: e.target.value })}
+                  className="bg-white/[0.04] border-white/[0.1] text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-400 mb-1">GitHub Username</label>
+                <Input
+                  value={data.githubUsername}
+                  onChange={(e) => setData({ ...data, githubUsername: e.target.value })}
+                  className="bg-white/[0.04] border-white/[0.1] text-xs font-mono"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-slate-400 mb-1">Professional Summary</label>
+                <textarea
+                  rows={2}
+                  value={data.summary}
+                  onChange={(e) => setData({ ...data, summary: e.target.value })}
+                  className="w-full rounded-md bg-white/[0.04] border border-white/[0.1] p-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* The Printable Resume Canvas */}
-        <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-8 sm:p-12 shadow-2xl text-slate-200 print:bg-white print:text-black print:p-0 print:border-none print:shadow-none">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0c101c] p-8 sm:p-12 shadow-2xl text-slate-200 print:bg-white print:text-black print:p-0 print:border-none print:shadow-none">
           {/* Header */}
-          <div className="border-b border-slate-800 print:border-black pb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white print:text-black">
+          <div className="border-b border-white/[0.08] print:border-black pb-6">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white print:text-black">
               {data.fullName}
             </h1>
-            <p className="text-sm font-medium text-blue-400 print:text-gray-800 mt-0.5">
+            <p className="text-sm font-semibold text-blue-400 print:text-gray-800 mt-1">
               {data.headline}
             </p>
 
             <div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-400 print:text-gray-600">
-              <span className="flex items-center space-x-1">
+              <span className="flex items-center space-x-1.5">
                 <Mail className="h-3.5 w-3.5" />
                 <span>{data.email}</span>
               </span>
-              <span className="flex items-center space-x-1">
+              <span className="flex items-center space-x-1.5">
                 <MapPin className="h-3.5 w-3.5" />
                 <span>{data.location}</span>
               </span>
-              <span className="flex items-center space-x-1">
+              <span className="flex items-center space-x-1.5">
                 <GithubIcon className="h-3.5 w-3.5" />
                 <span>github.com/{data.githubUsername}</span>
               </span>
-              {data.linkedinUrl && (
-                <span className="flex items-center space-x-1">
-                  <LinkedinIcon className="h-3.5 w-3.5" />
-                  <span>linkedin.com/in/{data.githubUsername}</span>
-                </span>
-              )}
               {data.portfolioUrl && (
-                <span className="flex items-center space-x-1">
+                <span className="flex items-center space-x-1.5">
                   <Globe className="h-3.5 w-3.5" />
                   <span>{data.portfolioUrl}</span>
                 </span>
@@ -139,7 +187,7 @@ ${data.achievements.map((a) => `- ${a}`).join("\n")}
 
           {/* Professional Summary */}
           <div className="mt-6">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 print:text-black border-b border-slate-800 print:border-black pb-1 mb-2">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 print:text-black border-b border-white/[0.08] print:border-black pb-1 mb-2 font-mono">
               Professional Summary
             </h2>
             <p className="text-xs leading-relaxed text-slate-300 print:text-gray-800">
@@ -149,7 +197,7 @@ ${data.achievements.map((a) => `- ${a}`).join("\n")}
 
           {/* Technical Skills */}
           <div className="mt-6">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 print:text-black border-b border-slate-800 print:border-black pb-1 mb-2">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 print:text-black border-b border-white/[0.08] print:border-black pb-1 mb-2 font-mono">
               Technical Proficiencies
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -166,13 +214,13 @@ ${data.achievements.map((a) => `- ${a}`).join("\n")}
                 </span>
               </p>
               <p>
-                <strong className="text-white print:text-black">DevOps & Tools:</strong>{" "}
+                <strong className="text-white print:text-black">Tools & DevOps:</strong>{" "}
                 <span className="text-slate-300 print:text-gray-700">
                   {data.skills.tools.join(", ")}
                 </span>
               </p>
               <p>
-                <strong className="text-white print:text-black">Databases & Storage:</strong>{" "}
+                <strong className="text-white print:text-black">Databases:</strong>{" "}
                 <span className="text-slate-300 print:text-gray-700">
                   {data.skills.databases.join(", ")}
                 </span>
@@ -180,41 +228,9 @@ ${data.achievements.map((a) => `- ${a}`).join("\n")}
             </div>
           </div>
 
-          {/* Verified Open Source Repositories & Engineering Work */}
-          <div className="mt-6">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 print:text-black border-b border-slate-800 print:border-black pb-1 mb-3">
-              Open-Source Engineering & Impact
-            </h2>
-
-            <div className="space-y-4">
-              {data.highlightedRepos.map((repo) => (
-                <div key={repo.name} className="text-xs">
-                  <div className="flex items-center justify-between font-semibold">
-                    <span className="text-white print:text-black text-sm">
-                      {repo.name}{" "}
-                      <span className="font-normal text-slate-400 print:text-gray-600 text-xs">
-                        ({repo.language})
-                      </span>
-                    </span>
-                    <span className="text-slate-400 print:text-gray-600 font-mono text-[11px]">
-                      ★ {repo.stars} stars • {repo.prsAuthored} Merged PRs
-                    </span>
-                  </div>
-                  <p className="text-slate-400 print:text-gray-600 mt-0.5">
-                    {repo.description}
-                  </p>
-                  <p className="mt-1 text-slate-300 print:text-gray-800 flex items-start space-x-1.5">
-                    <span className="text-blue-400 print:text-black">▸</span>
-                    <span>{repo.impactDescription}</span>
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Education */}
           <div className="mt-6">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 print:text-black border-b border-slate-800 print:border-black pb-1 mb-2">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 print:text-black border-b border-white/[0.08] print:border-black pb-1 mb-2 font-mono">
               Education
             </h2>
             <div className="flex items-start justify-between text-xs">
@@ -231,21 +247,6 @@ ${data.achievements.map((a) => `- ${a}`).join("\n")}
                 <p>GPA: {data.education.gpa}</p>
               </div>
             </div>
-          </div>
-
-          {/* Achievements */}
-          <div className="mt-6">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 print:text-black border-b border-slate-800 print:border-black pb-1 mb-2">
-              Key Achievements & Fellowships
-            </h2>
-            <ul className="text-xs space-y-1 text-slate-300 print:text-gray-800">
-              {data.achievements.map((a, i) => (
-                <li key={i} className="flex items-center space-x-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-400 print:bg-black" />
-                  <span>{a}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </div>

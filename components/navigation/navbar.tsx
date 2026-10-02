@@ -107,16 +107,13 @@ export function Navbar() {
         {/* Right Action buttons */}
         <div className="hidden sm:flex items-center space-x-3">
           <a
-            href="https://github.com/zenithenopen"
+            href="https://github.com/IST-ZenithenLab"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center space-x-1.5 rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-slate-700 hover:bg-slate-800 transition-colors"
+            className="flex items-center space-x-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-white/[0.15] hover:bg-white/[0.06] transition-colors"
           >
             <GithubIcon className="h-3.5 w-3.5 text-slate-300" />
             <span>GitHub</span>
-            <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
-              ★ 1.8k
-            </span>
           </a>
 
           <Link href="/members">
@@ -166,13 +163,13 @@ export function Navbar() {
 
           <div className="flex flex-col space-y-2 pt-2 border-t border-slate-800">
             <a
-              href="https://github.com/zenithenopen"
+              href="https://github.com/IST-ZenithenLab"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-2 rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-xs font-medium text-slate-200"
+              className="flex items-center justify-center space-x-2 rounded-lg border border-white/[0.08] bg-white/[0.03] p-2.5 text-xs font-medium text-slate-200"
             >
               <GithubIcon className="h-4 w-4" />
-              <span>Star on GitHub (1.8k)</span>
+              <span>GitHub Organization</span>
             </a>
             <Link href="/members" onClick={() => setMobileMenuOpen(false)}>
               <Button className="w-full" size="sm">
