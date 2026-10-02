@@ -12,11 +12,10 @@ import {
   Users2,
   Sparkles,
   FileText,
-  Github,
   Menu,
   X,
-  Search,
 } from "lucide-react";
+import { GithubIcon } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -113,7 +112,7 @@ export function Navbar() {
             rel="noopener noreferrer"
             className="flex items-center space-x-1.5 rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-slate-700 hover:bg-slate-800 transition-colors"
           >
-            <Github className="h-3.5 w-3.5 text-slate-300" />
+            <GithubIcon className="h-3.5 w-3.5 text-slate-300" />
             <span>GitHub</span>
             <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
               ★ 1.8k
@@ -172,7 +171,7 @@ export function Navbar() {
               rel="noopener noreferrer"
               className="flex items-center justify-center space-x-2 rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-xs font-medium text-slate-200"
             >
-              <Github className="h-4 w-4" />
+              <GithubIcon className="h-4 w-4" />
               <span>Star on GitHub (1.8k)</span>
             </a>
             <Link href="/members" onClick={() => setMobileMenuOpen(false)}>

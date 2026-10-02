@@ -3,13 +3,11 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  Github,
   Sparkles,
-  GitPullRequest,
   Terminal,
-  ShieldCheck,
   CheckCircle2,
 } from "lucide-react";
+import { GithubIcon } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MOCK_MEMBERS } from "@/lib/data/mock-data";
@@ -76,7 +74,7 @@ export function HeroSection() {
             rel="noopener noreferrer"
           >
             <Button size="lg" variant="outline" className="gap-2">
-              <Github className="h-5 w-5" />
+              <GithubIcon className="h-5 w-5" />
               <span>GitHub Org</span>
             </Button>
           </a>

@@ -1,0 +1,68 @@
+version: "3.9"
+
+services:
+  # Next.js Full-Stack Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zenithen-open-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:zenithen_secret@postgres:5432/zenithen_open?schema=public
+      - AUTH_SECRET=docker-local-secret-key-32-chars-length
+      - NEXTAUTH_URL=http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - zenithen-network
+
+  # Relational Database: PostgreSQL 16
+  postgres:
+    image: postgres:16-alpine
+    container_name: zenithen-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: zenithen_secret
+      POSTGRES_DB: zenithen_open
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d zenithen_open"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zenithen-network
+
+  # In-Memory Cache: Redis 7
+  redis:
+    image: redis:7-alpine
+    container_name: zenithen-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - zenithen-network
+
+volumes:
+  postgres_data:
+    name: zenithen_postgres_data
+  redis_data:
+    name: zenithen_redis_data
+
+networks:
+  zenithen-network:
+    name: zenithen_open_network
+    driver: bridge

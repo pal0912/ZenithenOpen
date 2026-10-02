@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Code2, Github, Heart, Terminal, Sparkles, ShieldCheck } from "lucide-react";
+import { Code2, ShieldCheck } from "lucide-react";
+import { GithubIcon } from "@/components/ui/icons";
 
 export function Footer() {
   return (
@@ -106,7 +107,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="flex items-center space-x-1.5 hover:text-blue-400 transition-colors"
                 >
-                  <Github className="h-3.5 w-3.5" />
+                  <GithubIcon className="h-3.5 w-3.5" />
                   <span>GitHub Organization</span>
                 </a>
               </li>
