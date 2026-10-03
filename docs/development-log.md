@@ -118,5 +118,31 @@ S-VYASA Student USN Verification, GitHub SSO Link Modal, and Decoupled Database 
 * `npx tsc --noEmit` — 0 TypeScript errors.
 * `npm run build` — 16/16 routes compiled successfully.
 
+---
+
+## Entry: 2026-10-03 — Milestone 4: 3D Interactive Background (GitHub Top 100 Organizations with Cursor Repulsion)
+
+### Milestone
+Three.js WebGL Interactive 3D Sphere Galaxy with Real-Time Cursor Repulsion Physics and GitHub Top 100 Organizations
+
+### Files Changed
+* `lib/data/github-top-orgs.ts` — Authentic dataset of GitHub's top 100 open-source organizations (Meta, Microsoft, OpenAI, Google, Linux, Vercel, HuggingFace, Supabase, Rust, etc.) with star counts, language metadata, descriptions, and language color tokens.
+* `components/3d/github-orgs-background.tsx` — Full-viewport 3D WebGL canvas powered by Three.js:
+  - 3D icospheres dynamically sized by global star prominence.
+  - Custom emissive shaders and wireframe glowing halos.
+  - Multi-layer orbital trajectories with vertical harmonic bobbing.
+  - Smooth entrance animation fly-in over 2.2 seconds.
+  - Real-time cursor repulsion physics with quadratic falloff and spring-damped orbit return.
+  - Interactive raycasting: hovered sphere glows, scales up 1.25x, and displays dynamic glassmorphic HUD tooltip showing org details, language badge, and star metrics.
+  - Click-through navigation opening official GitHub organization pages in new tabs.
+  - Responsive density scaling (100 spheres on desktop, 65 on tablet, 32 on mobile).
+  - Accessibility: Respects `prefers-reduced-motion` and includes screen reader alternative.
+* `components/dashboard/hero-section.tsx` — Mounted the 3D background behind hero headlines and terminal preview with selective `pointer-events` pass-through.
+* `package.json` & `package-lock.json` — Added `three` and `@types/three`.
+
+### Performance & Quality Metrics
+* Render Target: 60 FPS requestAnimationFrame with GPU-accelerated buffers and geometry reuse.
+* Build Verification: `npx tsc --noEmit` passed with 0 errors; `npm run build` Turbopack production compilation passed for all 16 routes.
+
 
 

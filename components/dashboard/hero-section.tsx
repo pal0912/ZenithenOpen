@@ -13,17 +13,21 @@ import {
 import { GithubIcon } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { GitHubOrgs3DBackground } from "@/components/3d/github-orgs-background";
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden pt-20 pb-20 lg:pt-28 lg:pb-32 bg-grid-pattern">
-      {/* Ambient background glow */}
+    <section className="relative overflow-hidden pt-20 pb-20 lg:pt-28 lg:pb-32 min-h-[820px] flex items-center justify-center bg-gradient-to-b from-[#090d16] via-[#080c14] to-[#06080e]">
+      {/* 3D Interactive GitHub Top 100 Organizations Background */}
+      <GitHubOrgs3DBackground />
+
+      {/* Ambient background glow highlights */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[360px] bg-gradient-to-tr from-blue-600/15 via-purple-600/15 to-emerald-500/10 blur-[130px] pointer-events-none rounded-full" />
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-600/10 blur-[120px] pointer-events-none rounded-full" />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative z-10 pointer-events-none mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
         {/* Status Pill */}
-        <div className="inline-flex items-center space-x-2.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-1.5 text-xs text-slate-300 backdrop-blur-xl shadow-lg mb-8">
+        <div className="inline-flex pointer-events-auto items-center space-x-2.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-1.5 text-xs text-slate-300 backdrop-blur-xl shadow-lg mb-8">
           <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="font-medium text-slate-200">S-VYASA University Open Source Chapter</span>
           <span className="text-slate-600">/</span>
@@ -45,7 +49,7 @@ export function HeroSection() {
         </p>
 
         {/* Action Buttons */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-8 flex pointer-events-auto flex-wrap items-center justify-center gap-4">
           <a
             href="https://github.com/IST-ZenithenLab"
             target="_blank"
@@ -67,7 +71,7 @@ export function HeroSection() {
         </div>
 
         {/* High-Tech Terminal Console Card */}
-        <div className="mx-auto mt-16 max-w-3xl rounded-2xl border border-white/[0.08] bg-[#090d16]/90 p-5 shadow-2xl backdrop-blur-2xl text-left font-mono text-xs">
+        <div className="mx-auto mt-16 max-w-3xl pointer-events-auto rounded-2xl border border-white/[0.08] bg-[#090d16]/90 p-5 shadow-2xl backdrop-blur-2xl text-left font-mono text-xs">
           <div className="flex items-center justify-between border-b border-white/[0.06] pb-3 text-slate-400">
             <div className="flex items-center space-x-2">
               <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
