@@ -2,95 +2,131 @@
 
 @layer base {
   :root {
-    --background: #090d16;
-    --foreground: #f1f5f9;
-    --card: #0f172a;
+    --background: #06080e;
+    --foreground: #f8fafc;
+    --card: #0b0f19;
     --card-foreground: #f8fafc;
-    --popover: #0f172a;
+    --popover: #0b0f19;
     --popover-foreground: #f8fafc;
-    --primary: #1e40af;
+    --primary: #3b82f6;
     --primary-foreground: #ffffff;
-    --secondary: #9333ea;
+    --secondary: #8b5cf6;
     --secondary-foreground: #ffffff;
-    --muted: #1e293b;
+    --muted: #131b2e;
     --muted-foreground: #94a3b8;
     --accent: #10b981;
     --accent-foreground: #ffffff;
     --destructive: #ef4444;
     --destructive-foreground: #ffffff;
-    --border: #1e293b;
-    --input: #1e293b;
+    --border: rgba(255, 255, 255, 0.08);
+    --input: rgba(255, 255, 255, 0.08);
     --ring: #3b82f6;
-    --radius: 0.75rem;
+    --radius: 0.85rem;
   }
 }
 
 body {
-  background-color: #090d16;
-  color: #f1f5f9;
-  font-feature-settings: "rlig" 1, "calt" 1;
+  background-color: #06080e;
+  color: #f8fafc;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   overflow-x: hidden;
+  letter-spacing: -0.011em;
 }
 
-/* Developer-grade glowing gradients and subtle grid lines */
+/* Linear-grade ambient grid and micro dot backgrounds */
 .bg-grid-pattern {
-  background-size: 40px 40px;
+  background-size: 48px 48px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
 }
 
 .bg-dot-pattern {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Subtle chromatic radial lights */
+.glow-spotlight {
+  background: radial-gradient(circle 600px at 50% 0%, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.08), transparent 70%);
 }
 
 .glow-blue {
-  box-shadow: 0 0 50px -10px rgba(30, 64, 175, 0.35);
+  box-shadow: 0 0 60px -15px rgba(59, 130, 246, 0.3);
 }
 
 .glow-purple {
-  box-shadow: 0 0 50px -10px rgba(147, 51, 234, 0.35);
+  box-shadow: 0 0 60px -15px rgba(139, 92, 246, 0.3);
 }
 
 .glow-emerald {
-  box-shadow: 0 0 50px -10px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 60px -15px rgba(16, 185, 129, 0.3);
 }
 
-/* Glassmorphism card utility */
+/* Ultra-premium glassmorphism card primitives */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(11, 15, 25, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
 }
 
 .glass-panel-hover {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-panel-hover:hover {
-  background: rgba(15, 23, 42, 0.92);
-  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(59, 130, 246, 0.45);
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(59, 130, 246, 0.15);
 }
 
-/* Custom scrollbars */
+/* Shimmer highlight for buttons and cards */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.shimmer-active {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-active::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.15) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2.5s infinite;
+}
+
+/* Custom premium scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090d16;
+  background: #06080e;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 4px;
+  background: #1a2235;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #2a3754;
 }

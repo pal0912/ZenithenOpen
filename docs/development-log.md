@@ -38,3 +38,55 @@ Phase 0 Foundation & Phase 3/4 UI Compilation Fixes
 
 ### Next Step
 Verify all remaining frontend features (leaderboard filters, project tags, learning modules, mentorship request forms) and commit Milestone 0 to `development` branch, then push to GitHub.
+
+---
+
+## Entry: 2026-10-02 — Milestone 1: Container Orchestration & Port Isolation
+
+### Milestone
+Docker Compose Multi-Container Orchestration & Port De-confliction
+
+### Files Changed
+* `docker-compose.yml` — Removed deprecated Compose `version` key and mapped host PostgreSQL to port `5433` (`5433:5432`) to prevent collision with pre-existing host database services on port `5432`.
+
+### Architecture & Networking Decisions
+1. **Container Port Mapping vs Internal Network**: The Next.js web application (`zenithen-open-app`) connects to `zenithen-postgres:5432` through the internal bridge network (`zenithen-network`). Mapping the host port to `5433` provides host machine tool access without blocking local developer workflows.
+2. **Web Port**: Exposed port `3000:3000` for public browser access at `http://localhost:3000`.
+
+### Git Operations
+* Branch: `development`
+* Committing and pushing Docker port isolation fix to `origin/development`.
+
+---
+
+## Entry: 2026-10-02 — Milestone 2: UI/UX Elevation & Fake Data Purge
+
+### Milestone
+Linear/Vercel-Grade Design System Overhaul & Authentic Zero-State Sanitization
+
+### Files Changed
+* `lib/data/mock-data.ts` — Purged all fake user profiles, fake PR stories, fake repository metrics, and fake star counts. Preserved authentic, high-value curriculum roadmaps and zero-initialized metrics.
+* `app/globals.css` — Upgraded to Linear-grade styling tokens: pure obsidian backdrop (`#06080e`), subtle border highlights (`border-white/[0.06]`), micro-grid textures, chromatic ambient glow spotlights, and refined scrollbars.
+* `components/dashboard/hero-section.tsx` — Replaced fake avatars and inflated numbers with an authentic developer hero, live daemon status pill, and high-tech terminal preview.
+* `components/dashboard/live-metrics.tsx` — Transitioned telemetry counters to real baseline zeros with live query triggers.
+* `app/page.tsx` — Redesigned homepage sections with state-of-the-art empty state cards and direct GitHub actions.
+* `app/members/page.tsx` — Introduced authentic "Founding Contributor" zero-state with interactive GitHub OAuth linking modal.
+* `app/projects/page.tsx` — Upgraded to a sleek repository directory with real GitHub organization sync CTAs.
+* `app/opportunities/page.tsx` — Implemented clean zero-state awaiting `good-first-issue` webhook tagging.
+* `app/leaderboard/page.tsx` — Modernized standings view with real zero-state and contributor philosophy.
+* `app/achievements/page.tsx` — Kept permanent milestone badges and interactive confetti celebration without fake stories.
+* `app/resume/page.tsx` — Transformed static resume into a live, interactive open-source CV generator with real-time editing.
+* `app/mentorship/page.tsx` — Authentic mentor network application with working dispatch form.
+* `app/admin/page.tsx` — Clean administrative console with real zero metrics and GitHub sync trigger.
+* `components/navigation/navbar.tsx` & `components/navigation/footer.tsx` — Removed hardcoded fake star and member counts; updated all links to the official `IST-ZenithenLab` organization.
+
+### Architecture & Design Decisions
+1. **Zero Fake Data Discipline**: Per project principles, fabricated user identities and metrics were completely purged. The platform now operates in true zero-state readiness, populating only as real students link their GitHub accounts.
+2. **Elevated Visual Language**: Replaced generic high-contrast badges with translucent, muted border styles, subtle typography tracking, and ambient light meshes.
+
+### Verification & Deployment
+* `npx tsc --noEmit` — 0 TypeScript errors.
+* `npm run build` — 14/14 pages compiled cleanly with Turbopack.
+* Docker Compose — Rebuilt `zenithenopen-app` container and verified HTTP 200 OK on `http://localhost:3000`.
+
+

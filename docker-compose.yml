@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   # Next.js Full-Stack Application
   app:
@@ -33,7 +31,7 @@ services:
       POSTGRES_PASSWORD: zenithen_secret
       POSTGRES_DB: zenithen_open
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

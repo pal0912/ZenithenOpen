@@ -29,7 +29,7 @@ export function Footer() {
             <div className="flex items-center space-x-3 text-xs text-slate-400">
               <span className="flex items-center space-x-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>2,140+ active members</span>
+                <span>Open to All Students</span>
               </span>
               <span>•</span>
               <span className="text-slate-300">Bengaluru, Karnataka</span>
@@ -102,7 +102,7 @@ export function Footer() {
             <ul className="space-y-2 text-xs">
               <li>
                 <a
-                  href="https://github.com/zenithenopen"
+                  href="https://github.com/IST-ZenithenLab"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center space-x-1.5 hover:text-blue-400 transition-colors"
