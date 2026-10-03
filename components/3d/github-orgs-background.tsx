@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { GITHUB_ORG_AVATARS, GitHubOrgAvatar } from "@/lib/data/github-org-avatars";
+import { GITHUB_TOP_100_ORGS, GitHubOrgAvatar } from "@/lib/data/github-org-avatars";
 
 interface SphereEntity {
   sprite: THREE.Sprite;
@@ -21,10 +21,10 @@ interface SphereEntity {
 }
 
 /**
- * Creates a clean circular avatar texture from official GitHub profile images.
- * Image is clipped into a smooth circle with a subtle clean border (NO neon color rings).
+ * Converts a GitHub organization logo into a clean circular avatar.
+ * Renders the real logo clipped to a smooth circle with a subtle crisp border.
  */
-function createCircularAvatarTexture(org: GitHubOrgAvatar): THREE.CanvasTexture {
+function createCircularOrgTexture(org: GitHubOrgAvatar): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = 128;
   canvas.height = 128;
@@ -36,35 +36,34 @@ function createCircularAvatarTexture(org: GitHubOrgAvatar): THREE.CanvasTexture 
 
   if (!ctx) return texture;
 
+  // Placeholder while loading
   const renderPlaceholder = () => {
     ctx.clearRect(0, 0, 128, 128);
 
-    // Dark sleek circle
     ctx.save();
     ctx.beginPath();
     ctx.arc(64, 64, 58, 0, Math.PI * 2);
     ctx.clip();
-    ctx.fillStyle = "#161b22";
+    ctx.fillStyle = "#182030";
     ctx.fill();
 
-    ctx.fillStyle = "#e6edf3";
-    ctx.font = "bold 40px Inter, system-ui, sans-serif";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 38px Inter, system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(org.login.charAt(0).toUpperCase(), 64, 64);
     ctx.restore();
 
-    // Subtle clean border ring
     ctx.beginPath();
     ctx.arc(64, 64, 58, 0, Math.PI * 2);
     ctx.lineWidth = 2.5;
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
     ctx.stroke();
   };
 
   renderPlaceholder();
 
-  // Load official 200px GitHub avatar
+  // Load the real GitHub organization avatar
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.src = `https://github.com/${org.login}.png?size=200`;
@@ -72,18 +71,18 @@ function createCircularAvatarTexture(org: GitHubOrgAvatar): THREE.CanvasTexture 
   img.onload = () => {
     ctx.clearRect(0, 0, 128, 128);
 
-    // 1. Clean circular clip
+    // 1. Clip exactly into a circle
     ctx.save();
     ctx.beginPath();
     ctx.arc(64, 64, 58, 0, Math.PI * 2);
     ctx.closePath();
     ctx.clip();
 
-    // White base for transparent logos like PyTorch
+    // Solid white backing ensures transparent PNGs remain crisp and clear
     ctx.fillStyle = "#ffffff";
     ctx.fill();
 
-    // Draw avatar inside the circular clip
+    // Draw the organization logo inside the circle
     ctx.drawImage(img, 4, 4, 120, 120);
     ctx.restore();
 
@@ -91,7 +90,7 @@ function createCircularAvatarTexture(org: GitHubOrgAvatar): THREE.CanvasTexture 
     ctx.beginPath();
     ctx.arc(64, 64, 58, 0, Math.PI * 2);
     ctx.lineWidth = 2.5;
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
     ctx.stroke();
 
     texture.needsUpdate = true;
@@ -114,21 +113,21 @@ export function GitHubOrgs3DBackground() {
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
 
-    // Accessibility: Check reduced motion preference
+    // Accessibility: Reduced motion check
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const width = container.clientWidth;
     const height = container.clientHeight;
 
-    // Responsive density: 65 on desktop, 42 on tablet, 22 on mobile
-    let orgCount = 65;
+    // Responsive density: 85 on desktop, 55 on tablet, 28 on mobile
+    let orgCount = 85;
     if (width < 640) {
-      orgCount = 22;
+      orgCount = 28;
     } else if (width < 1024) {
-      orgCount = 42;
+      orgCount = 55;
     }
 
-    const orgsList = GITHUB_ORG_AVATARS.slice(0, orgCount);
+    const orgsList = GITHUB_TOP_100_ORGS.slice(0, orgCount);
 
     // 1. Three.js Scene, Camera, & High-Performance Renderer
     const scene = new THREE.Scene();
@@ -147,46 +146,43 @@ export function GitHubOrgs3DBackground() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     scene.add(ambientLight);
 
-    // 2. Build 3D Organization Spheres / Sprites
+    // 2. Build 3D Circular Organization Sprites
     const sphereEntities: SphereEntity[] = [];
     const galaxyGroup = new THREE.Group();
     scene.add(galaxyGroup);
 
-    // Texture cache to prevent redundant image requests
+    // Texture cache prevents duplicate network requests
     const textureCache = new Map<string, THREE.CanvasTexture>();
-
-    const maxStars = 405000;
 
     orgsList.forEach((org, index) => {
       let texture = textureCache.get(org.login);
       if (!texture) {
-        texture = createCircularAvatarTexture(org);
+        texture = createCircularOrgTexture(org);
         textureCache.set(org.login, texture);
       }
 
       const material = new THREE.SpriteMaterial({
         map: texture,
         transparent: true,
-        opacity: 0.94,
+        opacity: 0.95,
         depthWrite: false,
       });
 
       const sprite = new THREE.Sprite(material);
 
-      // Size formula based on importance: radius = 15 + (stars / maxStars) * 45
-      // Mapped to 3D world units: 28px to 62px
-      const importanceRatio = Math.sqrt(org.stars / maxStars);
-      const baseScale = 28 + importanceRatio * 34;
+      // Sizing scaled by rank importance (top ranked orgs are slightly larger)
+      const rankRatio = (orgCount - org.rank) / orgCount;
+      const baseScale = 34 + rankRatio * 22; // 34px to 56px
       sprite.scale.set(baseScale, baseScale, 1);
 
-      // Orbital parameters around center
-      const angle = (index / orgCount) * Math.PI * 4 + (Math.random() * 0.5);
+      // Layered orbital distribution around center
+      const angle = (index / orgCount) * Math.PI * 4 + (Math.random() * 0.4);
       const orbitLayer = index % 5;
-      const orbitRadius = 190 + orbitLayer * 68 + (Math.random() * 30);
+      const orbitRadius = 180 + orbitLayer * 68 + (Math.random() * 30);
       const baseY = ((index % 7) - 3) * 58 + (Math.sin(index * 2) * 35);
       const baseZ = ((index % 5) - 2) * 85 + (Math.cos(index * 1.5) * 40);
 
-      // Entrance animation initial offset (fly in from edge)
+      // Entrance animation initial offset
       const entranceDistance = prefersReducedMotion ? 1 : 1.9;
       sprite.position.set(
         Math.cos(angle) * orbitRadius * entranceDistance,
@@ -210,11 +206,11 @@ export function GitHubOrgs3DBackground() {
         repelY: 0,
         repelZ: 0,
         baseScale,
-        entranceDelay: (index * 0.035), // Staggered entrance
+        entranceDelay: (index * 0.025), // Staggered entrance
       });
     });
 
-    // 3. Mouse Tracking & Raycasting for Cursor Repulsion
+    // 3. Mouse Tracking & Raycasting for Cursor Repulsion (NO POPUPS)
     const raycaster = new THREE.Raycaster();
     const mouseNDC = new THREE.Vector2(-9999, -9999);
     const mouse3D = new THREE.Vector3(0, 0, 0);
@@ -247,7 +243,7 @@ export function GitHubOrgs3DBackground() {
       mouseNDC.set(-9999, -9999);
     };
 
-    // Mobile touch handling (with scroll detection to prevent jank)
+    // Mobile touch handling (disables during scrolling)
     let isScrolling = false;
     let scrollTimeout: NodeJS.Timeout;
 
@@ -272,7 +268,7 @@ export function GitHubOrgs3DBackground() {
       mouseNDC.set(-9999, -9999);
     };
 
-    // Optional click on sphere opens GitHub org page without any popups
+    // Optional click on circle opens official GitHub org without any popups
     const handleClick = () => {
       if (mouseNDC.x < -100) return;
       raycaster.setFromCamera(mouseNDC, camera);
@@ -319,7 +315,7 @@ export function GitHubOrgs3DBackground() {
         galaxyGroup.rotation.x = Math.sin(elapsedTime * 0.015) * 0.06;
       }
 
-      // Check cursor hover to toggle pointer cursor style (NO INFO POPUPS)
+      // Cursor pointer toggle on hover (NO INFO POPUPS)
       raycaster.setFromCamera(mouseNDC, camera);
       const intersects = isMouseInside
         ? raycaster.intersectObjects(
@@ -332,13 +328,13 @@ export function GitHubOrgs3DBackground() {
       for (let i = 0; i < sphereEntities.length; i++) {
         const entity = sphereEntities[i];
 
-        // 1. Calculate base orbital position
+        // 1. Calculate orbital position
         entity.angle += entity.orbitSpeed;
         const targetOrbitX = Math.cos(entity.angle) * entity.orbitRadius;
         const targetOrbitY = entity.baseY + Math.sin(elapsedTime * 1.57 + entity.bobPhase) * 18; // 4s cycle bobbing
         const targetOrbitZ = entity.baseZ + Math.sin(entity.angle) * (entity.orbitRadius * 0.28);
 
-        // Staggered entrance animation (fly in over 1.5s to 2s)
+        // Staggered entrance animation
         const entityElapsed = Math.max(0, entranceTimer - entity.entranceDelay);
         const entranceProgress = Math.min(1, entityElapsed / 1.6);
         const easeOut = 1 - Math.pow(1 - entranceProgress, 3);
@@ -358,7 +354,7 @@ export function GitHubOrgs3DBackground() {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < REPULSION_RADIUS) {
-            // Push sphere away from cursor
+            // Push circle away from cursor
             const pushRatio = (REPULSION_RADIUS - dist) / REPULSION_RADIUS;
             const pushMagnitude = pushRatio * pushRatio * MAX_PUSH_FORCE;
             const dirX = dist > 0.001 ? dx / dist : 1;
@@ -432,14 +428,14 @@ export function GitHubOrgs3DBackground() {
     <div
       ref={containerRef}
       className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-auto"
-      aria-label="Interactive 3D background with GitHub organization circular avatars and cursor repulsion"
+      aria-label="Interactive 3D background with top 100 GitHub organization circular icons and cursor repulsion"
     >
       {/* Three.js Canvas */}
       <canvas ref={canvasRef} className="block w-full h-full" />
 
       {/* Screen Reader Alternative */}
       <span className="sr-only">
-        Interactive 3D galaxy visualization of GitHub organization circular icons with cursor repulsion.
+        Interactive 3D galaxy visualization of top 100 GitHub organization circular icons with cursor repulsion.
       </span>
     </div>
   );
