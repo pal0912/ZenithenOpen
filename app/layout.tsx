@@ -38,6 +38,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { AuthProvider } from "@/components/auth/auth-context";
+import { LoginModal } from "@/components/auth/login-modal";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -48,10 +51,13 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#090d16] text-slate-100 selection:bg-blue-600 selection:text-white">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+      <body className="min-h-full flex flex-col bg-[#06080e] text-slate-100 selection:bg-blue-600 selection:text-white">
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <LoginModal />
+        </AuthProvider>
       </body>
     </html>
   );
