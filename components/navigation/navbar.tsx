@@ -66,14 +66,9 @@ export function Navbar() {
               </div>
             </div>
             <div className="flex flex-col">
-              <div className="flex items-center space-x-1.5">
-                <span className="text-lg font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors">
-                  Zenithen<span className="text-blue-500">Open</span>
-                </span>
-                <span className="rounded bg-blue-900/60 px-1.5 py-0.2 text-[10px] font-semibold text-blue-300 border border-blue-700/40">
-                  S-VYASA
-                </span>
-              </div>
+              <span className="text-lg font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors">
+                Zenithen<span className="text-blue-500">Open</span>
+              </span>
               <span className="text-[10px] font-medium text-slate-400">
                 Open Source Community
               </span>
