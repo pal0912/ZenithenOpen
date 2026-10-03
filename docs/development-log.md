@@ -165,5 +165,28 @@ Real Open-Source Vector Logos (PyTorch, Docker, React, Linux, Kubernetes, etc.) 
 * Turbopack production compilation: 16/16 routes compiled cleanly with 0 TypeScript errors.
 * 60 FPS performance maintained via canvas texture caching and GPU sprite rendering.
 
+---
+
+## Entry: 2026-10-03 — Milestone 6: GitHub Organization Circular Avatars with Pure Cursor Repulsion (No Info Popups)
+
+### Milestone
+Official GitHub Organization Avatars (PyTorch, IST-ZenithenLab, TWBS, DeepChem, Excalidraw, etc.) in Clean Circles with Smooth Orbital Repulsion Physics and Zero Popups
+
+### Files Changed
+* `lib/data/github-org-avatars.ts` — Curated dataset of GitHub organizations with verified login handles and star metrics for proportional scaling (`radius = 15 + (stars / maxStars) * 45`).
+* `components/3d/github-orgs-background.tsx` — Clean 3D avatar rendering pipeline:
+  - Fetches and renders official high-resolution GitHub organization profile avatars (`https://github.com/${login}.png?size=200`).
+  - Circular clipping with subtle crisp borders; removed colored neon rings and wireframes.
+  - Multi-layer orbital trajectories with vertical harmonic bobbing.
+  - Real-time cursor repulsion physics (260px influence radius, 150px max push distance) with 0.05 lerp factor return.
+  - Complete removal of info cards, tooltips, and text popups for an unobtrusive, tech-forward background.
+  - Mobile touch support with scroll detection to prevent jank.
+  - Responsive density (65 desktop, 42 tablet, 22 mobile).
+
+### Verification
+* `npx tsc --noEmit` — 0 TypeScript errors.
+* `npm run build` — 16/16 routes compiled successfully.
+
+
 
 

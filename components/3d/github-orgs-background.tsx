@@ -4,29 +4,27 @@ import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GITHUB_ORG_AVATARS, GitHubOrgAvatar } from "@/lib/data/github-org-avatars";
 
-interface AvatarSpriteEntity {
+interface SphereEntity {
   sprite: THREE.Sprite;
   org: GitHubOrgAvatar;
-  baseX: number;
+  orbitRadius: number;
+  orbitSpeed: number;
+  angle: number;
   baseY: number;
   baseZ: number;
-  vx: number;
-  vy: number;
-  vz: number;
   bobPhase: number;
-  bobSpeed: number;
   repelX: number;
   repelY: number;
   repelZ: number;
-  scale: number;
-  currentScale: number;
+  baseScale: number;
+  entranceDelay: number;
 }
 
 /**
- * Creates a circular avatar texture for a GitHub organization.
- * Renders the real organization avatar inside a clean circular clip.
+ * Creates a clean circular avatar texture from official GitHub profile images.
+ * Image is clipped into a smooth circle with a subtle clean border (NO neon color rings).
  */
-function createOrgAvatarTexture(org: GitHubOrgAvatar): THREE.CanvasTexture {
+function createCircularAvatarTexture(org: GitHubOrgAvatar): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = 128;
   canvas.height = 128;
@@ -38,57 +36,60 @@ function createOrgAvatarTexture(org: GitHubOrgAvatar): THREE.CanvasTexture {
 
   if (!ctx) return texture;
 
-  // Initial placeholder while loading
-  const drawPlaceholder = () => {
+  const renderPlaceholder = () => {
     ctx.clearRect(0, 0, 128, 128);
 
+    // Dark sleek circle
     ctx.save();
     ctx.beginPath();
-    ctx.arc(64, 64, 60, 0, Math.PI * 2);
+    ctx.arc(64, 64, 58, 0, Math.PI * 2);
     ctx.clip();
-    ctx.fillStyle = "#111827";
+    ctx.fillStyle = "#161b22";
     ctx.fill();
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.font = "bold 38px Inter, system-ui, sans-serif";
+    ctx.fillStyle = "#e6edf3";
+    ctx.font = "bold 40px Inter, system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(org.login.charAt(0).toUpperCase(), 64, 64);
     ctx.restore();
 
+    // Subtle clean border ring
     ctx.beginPath();
-    ctx.arc(64, 64, 60, 0, Math.PI * 2);
+    ctx.arc(64, 64, 58, 0, Math.PI * 2);
     ctx.lineWidth = 2.5;
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
     ctx.stroke();
   };
 
-  drawPlaceholder();
+  renderPlaceholder();
 
-  // Load real GitHub organization avatar
+  // Load official 200px GitHub avatar
   const img = new Image();
   img.crossOrigin = "anonymous";
-  img.src = `https://github.com/${org.login}.png?size=128`;
+  img.src = `https://github.com/${org.login}.png?size=200`;
 
   img.onload = () => {
     ctx.clearRect(0, 0, 128, 128);
 
-    // 1. Clip image into a clean circle
+    // 1. Clean circular clip
     ctx.save();
     ctx.beginPath();
-    ctx.arc(64, 64, 60, 0, Math.PI * 2);
+    ctx.arc(64, 64, 58, 0, Math.PI * 2);
     ctx.closePath();
     ctx.clip();
 
+    // White base for transparent logos like PyTorch
     ctx.fillStyle = "#ffffff";
     ctx.fill();
 
+    // Draw avatar inside the circular clip
     ctx.drawImage(img, 4, 4, 120, 120);
     ctx.restore();
 
-    // 2. Subtle, clean circular border
+    // 2. Crisp subtle outer border ring
     ctx.beginPath();
-    ctx.arc(64, 64, 60, 0, Math.PI * 2);
+    ctx.arc(64, 64, 58, 0, Math.PI * 2);
     ctx.lineWidth = 2.5;
     ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
     ctx.stroke();
@@ -97,8 +98,7 @@ function createOrgAvatarTexture(org: GitHubOrgAvatar): THREE.CanvasTexture {
   };
 
   img.onerror = () => {
-    // Keep placeholder on error
-    drawPlaceholder();
+    renderPlaceholder();
     texture.needsUpdate = true;
   };
 
@@ -114,26 +114,26 @@ export function GitHubOrgs3DBackground() {
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
 
-    // Accessibility: reduced motion check
+    // Accessibility: Check reduced motion preference
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const width = container.clientWidth;
     const height = container.clientHeight;
 
-    // Density based on viewport size
-    let count = 48;
+    // Responsive density: 65 on desktop, 42 on tablet, 22 on mobile
+    let orgCount = 65;
     if (width < 640) {
-      count = 22;
+      orgCount = 22;
     } else if (width < 1024) {
-      count = 34;
+      orgCount = 42;
     }
 
-    const orgsList = GITHUB_ORG_AVATARS.slice(0, count);
+    const orgsList = GITHUB_ORG_AVATARS.slice(0, orgCount);
 
     // 1. Three.js Scene, Camera, & High-Performance Renderer
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(55, width / height, 1, 3000);
-    camera.position.set(0, 0, 650);
+    camera.position.set(0, 0, 680);
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -147,25 +147,20 @@ export function GitHubOrgs3DBackground() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     scene.add(ambientLight);
 
-    // 2. Build Circular Avatar Sprites
-    const avatarEntities: AvatarSpriteEntity[] = [];
-    const avatarGroup = new THREE.Group();
-    scene.add(avatarGroup);
+    // 2. Build 3D Organization Spheres / Sprites
+    const sphereEntities: SphereEntity[] = [];
+    const galaxyGroup = new THREE.Group();
+    scene.add(galaxyGroup);
 
-    // Cache textures by organization login
+    // Texture cache to prevent redundant image requests
     const textureCache = new Map<string, THREE.CanvasTexture>();
 
-    // Totally random 3D spatial distribution bounds
-    const rangeX = Math.min(width * 0.95, 980);
-    const rangeY = Math.min(height * 0.85, 620);
-    const rangeZ = 280;
+    const maxStars = 405000;
 
-    for (let i = 0; i < orgsList.length; i++) {
-      const org = orgsList[i];
-
+    orgsList.forEach((org, index) => {
       let texture = textureCache.get(org.login);
       if (!texture) {
-        texture = createOrgAvatarTexture(org);
+        texture = createCircularAvatarTexture(org);
         textureCache.set(org.login, texture);
       }
 
@@ -178,48 +173,57 @@ export function GitHubOrgs3DBackground() {
 
       const sprite = new THREE.Sprite(material);
 
-      // Random circular badge scale (38px to 54px)
-      const baseScale = 38 + Math.random() * 16;
+      // Size formula based on importance: radius = 15 + (stars / maxStars) * 45
+      // Mapped to 3D world units: 28px to 62px
+      const importanceRatio = Math.sqrt(org.stars / maxStars);
+      const baseScale = 28 + importanceRatio * 34;
       sprite.scale.set(baseScale, baseScale, 1);
 
-      // Totally random positions across 3D hero space
-      const baseX = (Math.random() - 0.5) * rangeX;
-      const baseY = (Math.random() - 0.5) * rangeY;
-      const baseZ = (Math.random() - 0.5) * rangeZ;
+      // Orbital parameters around center
+      const angle = (index / orgCount) * Math.PI * 4 + (Math.random() * 0.5);
+      const orbitLayer = index % 5;
+      const orbitRadius = 190 + orbitLayer * 68 + (Math.random() * 30);
+      const baseY = ((index % 7) - 3) * 58 + (Math.sin(index * 2) * 35);
+      const baseZ = ((index % 5) - 2) * 85 + (Math.cos(index * 1.5) * 40);
 
-      sprite.position.set(baseX, baseY, baseZ);
-      avatarGroup.add(sprite);
+      // Entrance animation initial offset (fly in from edge)
+      const entranceDistance = prefersReducedMotion ? 1 : 1.9;
+      sprite.position.set(
+        Math.cos(angle) * orbitRadius * entranceDistance,
+        baseY + (prefersReducedMotion ? 0 : 250),
+        baseZ - (prefersReducedMotion ? 0 : 450)
+      );
 
-      avatarEntities.push({
+      sprite.userData = { org };
+      galaxyGroup.add(sprite);
+
+      sphereEntities.push({
         sprite,
         org,
-        baseX,
+        orbitRadius,
+        orbitSpeed: (0.0006 + (index % 4) * 0.00028) * (index % 2 === 0 ? 1 : -0.85),
+        angle,
         baseY,
         baseZ,
-        // Organic random drift velocities
-        vx: (Math.random() - 0.5) * 0.28,
-        vy: (Math.random() - 0.5) * 0.24,
-        vz: (Math.random() - 0.5) * 0.15,
         bobPhase: Math.random() * Math.PI * 2,
-        bobSpeed: 0.0014 + Math.random() * 0.001,
         repelX: 0,
         repelY: 0,
         repelZ: 0,
-        scale: baseScale,
-        currentScale: baseScale,
+        baseScale,
+        entranceDelay: (index * 0.035), // Staggered entrance
       });
-    }
+    });
 
-    // 3. Mouse Tracking for 3D Repulsion
+    // 3. Mouse Tracking & Raycasting for Cursor Repulsion
     const raycaster = new THREE.Raycaster();
     const mouseNDC = new THREE.Vector2(-9999, -9999);
     const mouse3D = new THREE.Vector3(0, 0, 0);
     let isMouseInside = false;
 
-    // Plane at Z=0 for cursor 3D projection
+    // Plane at Z=0 to calculate 3D world mouse position
     const planeZ0 = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 
-    const updateMouse3D = (clientX: number, clientY: number) => {
+    const updateMouseCoords = (clientX: number, clientY: number) => {
       const rect = container.getBoundingClientRect();
       const x = ((clientX - rect.left) / rect.width) * 2 - 1;
       const y = -(((clientY - rect.top) / rect.height) * 2 - 1);
@@ -235,7 +239,7 @@ export function GitHubOrgs3DBackground() {
 
     const handlePointerMove = (e: PointerEvent) => {
       isMouseInside = true;
-      updateMouse3D(e.clientX, e.clientY);
+      updateMouseCoords(e.clientX, e.clientY);
     };
 
     const handlePointerLeave = () => {
@@ -243,99 +247,149 @@ export function GitHubOrgs3DBackground() {
       mouseNDC.set(-9999, -9999);
     };
 
+    // Mobile touch handling (with scroll detection to prevent jank)
+    let isScrolling = false;
+    let scrollTimeout: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      isScrolling = true;
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+      }, 150);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isScrolling) return;
+      if (e.touches.length > 0) {
+        isMouseInside = true;
+        updateMouseCoords(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      isMouseInside = false;
+      mouseNDC.set(-9999, -9999);
+    };
+
+    // Optional click on sphere opens GitHub org page without any popups
+    const handleClick = () => {
+      if (mouseNDC.x < -100) return;
+      raycaster.setFromCamera(mouseNDC, camera);
+      const intersects = raycaster.intersectObjects(
+        sphereEntities.map((e) => e.sprite),
+        false
+      );
+
+      if (intersects.length > 0) {
+        const clickedOrg = intersects[0].object.userData.org as GitHubOrgAvatar;
+        if (clickedOrg?.login) {
+          window.open(`https://github.com/${clickedOrg.login}`, "_blank", "noopener,noreferrer");
+        }
+      }
+    };
+
     container.addEventListener("pointermove", handlePointerMove);
     container.addEventListener("pointerleave", handlePointerLeave);
+    container.addEventListener("click", handleClick);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
 
-    // 4. Animation Loop with Organic Random Drift & Smooth Cursor Repulsion
+    // 4. Animation Loop: Orbital Movement + Cursor Repulsion Physics (NO POPUPS)
     let animationFrameId: number;
     const clock = new THREE.Clock();
-    const repulsionRadius = 220; // 3D units influence radius
-    const maxRepulsionForce = 140; // Max repulsion impulse
+    let entranceTimer = prefersReducedMotion ? 3.0 : 0;
+    const REPULSION_RADIUS = 260; // Distance at which repulsion starts
+    const MAX_PUSH_FORCE = 150; // Maximum push distance
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
 
       const elapsedTime = clock.getElapsedTime();
+      const delta = Math.min(clock.getDelta(), 0.05);
 
-      // Check hovered sprite for subtle scale highlight (NO info card)
+      if (entranceTimer < 3.0) {
+        entranceTimer += delta;
+      }
+
+      // Orbital galaxy slow drift
+      if (!prefersReducedMotion) {
+        galaxyGroup.rotation.y = elapsedTime * 0.025;
+        galaxyGroup.rotation.x = Math.sin(elapsedTime * 0.015) * 0.06;
+      }
+
+      // Check cursor hover to toggle pointer cursor style (NO INFO POPUPS)
       raycaster.setFromCamera(mouseNDC, camera);
       const intersects = isMouseInside
         ? raycaster.intersectObjects(
-            avatarEntities.map((e) => e.sprite),
+            sphereEntities.map((e) => e.sprite),
             false
           )
         : [];
-      const topHoveredSprite = intersects.length > 0 ? intersects[0].object : null;
+      container.style.cursor = intersects.length > 0 ? "pointer" : "default";
 
-      for (let i = 0; i < avatarEntities.length; i++) {
-        const entity = avatarEntities[i];
+      for (let i = 0; i < sphereEntities.length; i++) {
+        const entity = sphereEntities[i];
 
-        // Totally random organic slow drifting
-        if (!prefersReducedMotion) {
-          entity.baseX += entity.vx;
-          entity.baseY += entity.vy;
-          entity.baseZ += entity.vz;
+        // 1. Calculate base orbital position
+        entity.angle += entity.orbitSpeed;
+        const targetOrbitX = Math.cos(entity.angle) * entity.orbitRadius;
+        const targetOrbitY = entity.baseY + Math.sin(elapsedTime * 1.57 + entity.bobPhase) * 18; // 4s cycle bobbing
+        const targetOrbitZ = entity.baseZ + Math.sin(entity.angle) * (entity.orbitRadius * 0.28);
 
-          // Boundary bounce / wrap
-          const halfX = rangeX / 2 + 30;
-          const halfY = rangeY / 2 + 30;
-          const halfZ = rangeZ / 2 + 25;
+        // Staggered entrance animation (fly in over 1.5s to 2s)
+        const entityElapsed = Math.max(0, entranceTimer - entity.entranceDelay);
+        const entranceProgress = Math.min(1, entityElapsed / 1.6);
+        const easeOut = 1 - Math.pow(1 - entranceProgress, 3);
 
-          if (entity.baseX > halfX) entity.vx = -Math.abs(entity.vx);
-          if (entity.baseX < -halfX) entity.vx = Math.abs(entity.vx);
-          if (entity.baseY > halfY) entity.vy = -Math.abs(entity.vy);
-          if (entity.baseY < -halfY) entity.vy = Math.abs(entity.vy);
-          if (entity.baseZ > halfZ) entity.vz = -Math.abs(entity.vz);
-          if (entity.baseZ < -halfZ) entity.vz = Math.abs(entity.vz);
-        }
+        const currentBaseX = targetOrbitX * (0.3 + 0.7 * easeOut);
+        const currentBaseY = targetOrbitY + (1 - easeOut) * 200;
+        const currentBaseZ = targetOrbitZ - (1 - easeOut) * 350;
 
-        // Gentle sinusoidal bobbing
-        const currentBob = Math.sin(elapsedTime * 1.5 + entity.bobPhase) * 6;
+        // Transform base position into world space considering galaxy rotation
+        const worldPos = new THREE.Vector3(currentBaseX, currentBaseY, currentBaseZ);
+        worldPos.applyMatrix4(galaxyGroup.matrixWorld);
 
-        const currentX = entity.baseX;
-        const currentY = entity.baseY + currentBob;
-        const currentZ = entity.baseZ;
+        // 2. Cursor Repulsion Effect (NO INFO CARDS, JUST SMOOTH MOVEMENT)
+        if (isMouseInside && !isScrolling) {
+          const dx = worldPos.x - mouse3D.x;
+          const dy = worldPos.y - mouse3D.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
 
-        // Cursor Repulsion Calculation
-        if (isMouseInside) {
-          const dx = currentX - mouse3D.x;
-          const dy = currentY - mouse3D.y;
-          const dist2D = Math.sqrt(dx * dx + dy * dy);
+          if (dist < REPULSION_RADIUS) {
+            // Push sphere away from cursor
+            const pushRatio = (REPULSION_RADIUS - dist) / REPULSION_RADIUS;
+            const pushMagnitude = pushRatio * pushRatio * MAX_PUSH_FORCE;
+            const dirX = dist > 0.001 ? dx / dist : 1;
+            const dirY = dist > 0.001 ? dy / dist : 0;
 
-          if (dist2D < repulsionRadius) {
-            // Quadratic falloff: closer = stronger push
-            const forceRatio = 1 - dist2D / repulsionRadius;
-            const pushMagnitude = forceRatio * forceRatio * maxRepulsionForce;
-            const dirX = dist2D > 0.001 ? dx / dist2D : 1;
-            const dirY = dist2D > 0.001 ? dy / dist2D : 0;
-
-            entity.repelX += (dirX * pushMagnitude - entity.repelX) * 0.22;
-            entity.repelY += (dirY * pushMagnitude - entity.repelY) * 0.22;
-            entity.repelZ += (forceRatio * 50 - entity.repelZ) * 0.18;
+            entity.repelX += (dirX * pushMagnitude - entity.repelX) * 0.25;
+            entity.repelY += (dirY * pushMagnitude - entity.repelY) * 0.25;
+            entity.repelZ += (pushRatio * 50 - entity.repelZ) * 0.2;
           } else {
-            // Smooth ease-out float back to base position
-            entity.repelX += (0 - entity.repelX) * 0.06;
-            entity.repelY += (0 - entity.repelY) * 0.06;
-            entity.repelZ += (0 - entity.repelZ) * 0.06;
+            // Return smoothly to orbital position with 0.05 lerp
+            entity.repelX += (0 - entity.repelX) * 0.05;
+            entity.repelY += (0 - entity.repelY) * 0.05;
+            entity.repelZ += (0 - entity.repelZ) * 0.05;
           }
         } else {
-          entity.repelX += (0 - entity.repelX) * 0.06;
-          entity.repelY += (0 - entity.repelY) * 0.06;
-          entity.repelZ += (0 - entity.repelZ) * 0.06;
+          // Smooth return to orbit when mouse is outside
+          entity.repelX += (0 - entity.repelX) * 0.05;
+          entity.repelY += (0 - entity.repelY) * 0.05;
+          entity.repelZ += (0 - entity.repelZ) * 0.05;
         }
 
         // Apply position
         entity.sprite.position.set(
-          currentX + entity.repelX,
-          currentY + entity.repelY,
-          currentZ + entity.repelZ
+          currentBaseX + entity.repelX,
+          currentBaseY + entity.repelY,
+          currentBaseZ + entity.repelZ
         );
 
-        // Subtle scale highlight on hover (NO info card)
-        const isHovered = entity.sprite === topHoveredSprite;
-        const targetScale = isHovered ? entity.scale * 1.2 : entity.scale;
-        entity.currentScale += (targetScale - entity.currentScale) * 0.18;
-        entity.sprite.scale.set(entity.currentScale, entity.currentScale, 1);
+        // Scale entrance
+        const renderScale = entity.baseScale * (0.2 + 0.8 * easeOut);
+        entity.sprite.scale.set(renderScale, renderScale, 1);
       }
 
       renderer.render(scene, camera);
@@ -343,7 +397,7 @@ export function GitHubOrgs3DBackground() {
 
     animate();
 
-    // 5. Responsive Resize Handling
+    // 5. Responsive Resize
     const handleResize = () => {
       if (!container) return;
       const w = container.clientWidth;
@@ -359,10 +413,14 @@ export function GitHubOrgs3DBackground() {
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
       container.removeEventListener("pointermove", handlePointerMove);
       container.removeEventListener("pointerleave", handlePointerLeave);
+      container.removeEventListener("click", handleClick);
 
-      avatarEntities.forEach((entity) => {
+      sphereEntities.forEach((entity) => {
         entity.sprite.material.dispose();
       });
       textureCache.forEach((tex) => tex.dispose());
@@ -374,14 +432,14 @@ export function GitHubOrgs3DBackground() {
     <div
       ref={containerRef}
       className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-auto"
-      aria-label="Interactive 3D background with real GitHub organization circular avatars and cursor repulsion"
+      aria-label="Interactive 3D background with GitHub organization circular avatars and cursor repulsion"
     >
       {/* Three.js Canvas */}
       <canvas ref={canvasRef} className="block w-full h-full" />
 
       {/* Screen Reader Alternative */}
       <span className="sr-only">
-        Interactive 3D galaxy visualization of GitHub organization avatars with cursor repulsion.
+        Interactive 3D galaxy visualization of GitHub organization circular icons with cursor repulsion.
       </span>
     </div>
   );
