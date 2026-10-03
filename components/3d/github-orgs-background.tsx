@@ -2,11 +2,11 @@
 
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { GITHUB_TOP_100_ORGS, GitHubOrgAvatar } from "@/lib/data/github-org-avatars";
+import { TOP_100_ORG_LOGOS, OrgLogoBadge } from "@/lib/data/top-100-org-logos";
 
 interface SphereEntity {
   sprite: THREE.Sprite;
-  org: GitHubOrgAvatar;
+  org: OrgLogoBadge;
   orbitRadius: number;
   orbitSpeed: number;
   angle: number;
@@ -21,13 +21,14 @@ interface SphereEntity {
 }
 
 /**
- * Converts a GitHub organization logo into a clean circular avatar.
- * Renders the real logo clipped to a smooth circle with a subtle crisp border.
+ * Creates a clean circular logo badge texture for an organization.
+ * Renders a crisp solid white circle with subtle border and centered official vector logo.
+ * 100% self-contained data URI with ZERO CORS errors, zero network delays, and instant 60 FPS loading.
  */
-function createCircularOrgTexture(org: GitHubOrgAvatar): THREE.CanvasTexture {
+function createCircularOrgTexture(org: OrgLogoBadge): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
-  canvas.width = 128;
-  canvas.height = 128;
+  canvas.width = 256;
+  canvas.height = 256;
   const ctx = canvas.getContext("2d");
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -36,70 +37,48 @@ function createCircularOrgTexture(org: GitHubOrgAvatar): THREE.CanvasTexture {
 
   if (!ctx) return texture;
 
-  // Placeholder while loading
-  const renderPlaceholder = () => {
-    ctx.clearRect(0, 0, 128, 128);
+  // Immediate solid white circular disc (ensures zero frame flicker)
+  ctx.clearRect(0, 0, 256, 256);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(128, 128, 120, 0, Math.PI * 2);
+  ctx.fillStyle = "#ffffff";
+  ctx.fill();
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = "rgba(226, 232, 240, 0.95)";
+  ctx.stroke();
+  ctx.restore();
 
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(64, 64, 58, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.fillStyle = "#182030";
-    ctx.fill();
+  // Prepare full SVG badge containing the official logo centered within the circle
+  const innerSvg = org.svg.replace(/^<svg[^>]*>|<\/svg>$/gi, "");
+  const fullSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+    <defs>
+      <clipPath id="circleBadgeClip_${org.rank}">
+        <circle cx="128" cy="128" r="120"/>
+      </clipPath>
+    </defs>
+    <!-- Solid white disc base -->
+    <circle cx="128" cy="128" r="120" fill="#ffffff"/>
+    <!-- Centered logo inside circle -->
+    <g clip-path="url(#circleBadgeClip_${org.rank})">
+      <g transform="translate(50, 50)">
+        <svg width="156" height="156" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet">
+          ${innerSvg}
+        </svg>
+      </g>
+    </g>
+    <!-- Crisp subtle border ring -->
+    <circle cx="128" cy="128" r="120" fill="none" stroke="rgba(226, 232, 240, 0.95)" stroke-width="4"/>
+  </svg>`;
 
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 38px Inter, system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(org.login.charAt(0).toUpperCase(), 64, 64);
-    ctx.restore();
-
-    ctx.beginPath();
-    ctx.arc(64, 64, 58, 0, Math.PI * 2);
-    ctx.lineWidth = 2.5;
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-    ctx.stroke();
-  };
-
-  renderPlaceholder();
-
-  // Load the real GitHub organization avatar
   const img = new Image();
-  img.crossOrigin = "anonymous";
-  img.src = `https://github.com/${org.login}.png?size=200`;
-
   img.onload = () => {
-    ctx.clearRect(0, 0, 128, 128);
-
-    // 1. Clip exactly into a circle
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(64, 64, 58, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.clip();
-
-    // Solid white backing ensures transparent PNGs remain crisp and clear
-    ctx.fillStyle = "#ffffff";
-    ctx.fill();
-
-    // Draw the organization logo inside the circle
-    ctx.drawImage(img, 4, 4, 120, 120);
-    ctx.restore();
-
-    // 2. Crisp subtle outer border ring
-    ctx.beginPath();
-    ctx.arc(64, 64, 58, 0, Math.PI * 2);
-    ctx.lineWidth = 2.5;
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
-    ctx.stroke();
-
+    ctx.clearRect(0, 0, 256, 256);
+    ctx.drawImage(img, 0, 0, 256, 256);
     texture.needsUpdate = true;
   };
 
-  img.onerror = () => {
-    renderPlaceholder();
-    texture.needsUpdate = true;
-  };
+  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(fullSvg)}`;
 
   return texture;
 }
@@ -127,7 +106,7 @@ export function GitHubOrgs3DBackground() {
       orgCount = 55;
     }
 
-    const orgsList = GITHUB_TOP_100_ORGS.slice(0, orgCount);
+    const orgsList: OrgLogoBadge[] = TOP_100_ORG_LOGOS.slice(0, orgCount);
 
     // 1. Three.js Scene, Camera, & High-Performance Renderer
     const scene = new THREE.Scene();
@@ -154,7 +133,7 @@ export function GitHubOrgs3DBackground() {
     // Texture cache prevents duplicate network requests
     const textureCache = new Map<string, THREE.CanvasTexture>();
 
-    orgsList.forEach((org, index) => {
+    orgsList.forEach((org: OrgLogoBadge, index: number) => {
       let texture = textureCache.get(org.login);
       if (!texture) {
         texture = createCircularOrgTexture(org);
@@ -278,7 +257,7 @@ export function GitHubOrgs3DBackground() {
       );
 
       if (intersects.length > 0) {
-        const clickedOrg = intersects[0].object.userData.org as GitHubOrgAvatar;
+        const clickedOrg = intersects[0].object.userData.org as OrgLogoBadge;
         if (clickedOrg?.login) {
           window.open(`https://github.com/${clickedOrg.login}`, "_blank", "noopener,noreferrer");
         }
