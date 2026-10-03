@@ -144,5 +144,26 @@ Three.js WebGL Interactive 3D Sphere Galaxy with Real-Time Cursor Repulsion Phys
 * Render Target: 60 FPS requestAnimationFrame with GPU-accelerated buffers and geometry reuse.
 * Build Verification: `npx tsc --noEmit` passed with 0 errors; `npm run build` Turbopack production compilation passed for all 16 routes.
 
+---
+
+## Entry: 2026-10-03 — Milestone 5: Authentic Open-Source Tech Logos & Card-Free Smooth Repulsion
+
+### Milestone
+Real Open-Source Vector Logos (PyTorch, Docker, React, Linux, Kubernetes, etc.) on 3D Floating Glass Badges with Organic Random Drift & Pure Cursor Repulsion (No Info Cards)
+
+### Files Changed
+* `lib/data/tech-icons-svg.ts` — Handcrafted high-resolution SVG vector definitions and brand palettes for top technologies: PyTorch, Docker, Kubernetes, Python, React, Next.js, Linux (Tux), Rust, Go, TypeScript, TensorFlow, Redis, PostgreSQL, Tailwind, Bun, Supabase, Git, GitHub, Vue, Svelte, Vite, GraphQL, OpenAI, FastAPI, Neovim, Ollama, etc.
+* `components/3d/github-orgs-background.tsx` — Transformed 3D rendering pipeline:
+  - Replaced solid colored spheres with circular glass badges featuring crisp official tech logos.
+  - Billboarded `THREE.Sprite` ensures all logos remain upright and legible in 3D.
+  - Organic, totally random spatial distribution across 3D coordinates.
+  - Smooth cursor repulsion physics pushes badges smoothly away within a 220px radius.
+  - Removed info cards/tooltips completely for a clean, non-distracting visual experience.
+  - Gentle scale highlight on hover with spring-damped return to baseline.
+
+### Performance & Quality
+* Turbopack production compilation: 16/16 routes compiled cleanly with 0 TypeScript errors.
+* 60 FPS performance maintained via canvas texture caching and GPU sprite rendering.
+
 
 
