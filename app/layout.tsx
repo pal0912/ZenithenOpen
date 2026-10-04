@@ -40,6 +40,9 @@ export const metadata: Metadata = {
 
 import { AuthProvider } from "@/components/auth/auth-context";
 import { LoginModal } from "@/components/auth/login-modal";
+import { ThemeProvider } from "@/components/theme/theme-provider";
+import { ThemeSwitcher } from "@/components/theme/theme-switcher";
+import { ThemeMenu } from "@/components/theme/theme-menu";
 
 export default function RootLayout({
   children,
@@ -49,14 +52,27 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
+      data-theme="obsidian"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-white text-slate-900 selection:bg-blue-600 selection:text-white">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("zenithen-theme")||"obsidian";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","obsidian");}})();`,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
         <AuthProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <LoginModal />
+          <ThemeProvider>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <LoginModal />
+            <ThemeSwitcher />
+            <ThemeMenu />
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>

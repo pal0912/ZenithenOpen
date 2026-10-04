@@ -1,68 +1,64 @@
 @import "tailwindcss";
+@import "../styles/themes.css";
 
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-}
 
-@layer base {
-  :root {
-    --background: #ffffff;
-    --foreground: #090d16;
-    --card: #ffffff;
-    --card-foreground: #090d16;
-    --popover: #ffffff;
-    --popover-foreground: #090d16;
-    --primary: #2563eb;
-    --primary-foreground: #ffffff;
-    --secondary: #7c3aed;
-    --secondary-foreground: #ffffff;
-    --muted: #f1f5f9;
-    --muted-foreground: #64748b;
-    --accent: #10b981;
-    --accent-foreground: #ffffff;
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
-    --border: rgba(0, 0, 0, 0.08);
-    --input: rgba(0, 0, 0, 0.08);
-    --ring: #2563eb;
-    --radius: 0.85rem;
-  }
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
 body {
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #ffffff;
-  color: #090d16;
+  background-color: var(--background);
+  color: var(--foreground);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   overflow-x: hidden;
   letter-spacing: -0.011em;
 }
 
-/* Linear-grade ambient grid and micro dot backgrounds */
+/* Linear-grade ambient grid and micro dot backgrounds responding to theme */
 .bg-grid-pattern {
   background-size: 48px 48px;
   background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line, rgba(255, 255, 255, 0.04)) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line, rgba(255, 255, 255, 0.04)) 1px, transparent 1px);
 }
 
 .bg-dot-pattern {
-  background-image: radial-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+  background-image: radial-gradient(var(--grid-line, rgba(255, 255, 255, 0.06)) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
-/* Subtle chromatic radial lights */
+/* Subtle chromatic radial lights responding to theme glow tokens */
 .glow-spotlight {
-  background: radial-gradient(circle 600px at 50% 0%, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.08), transparent 70%);
+  background: radial-gradient(circle 600px at 50% 0%, var(--glow, rgba(59, 130, 246, 0.2)), var(--glow-secondary, rgba(139, 92, 246, 0.1)), transparent 70%);
 }
 
 .glow-blue {
-  box-shadow: 0 0 60px -15px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 60px -15px var(--glow, rgba(59, 130, 246, 0.3));
 }
 
 .glow-purple {
-  box-shadow: 0 0 60px -15px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 60px -15px var(--glow-secondary, rgba(139, 92, 246, 0.3));
 }
 
 .glow-emerald {
@@ -112,13 +108,13 @@ body {
   animation: float-constellation-3 9s ease-in-out infinite;
 }
 
-/* Ultra-premium glassmorphism card primitives */
+/* Ultra-premium glassmorphism card primitives linked to theme variables */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-bg, rgba(13, 17, 26, 0.85));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.08));
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.35);
 }
 
 .glass-panel-hover {
@@ -126,10 +122,10 @@ body {
 }
 
 .glass-panel-hover:hover {
-  background: #ffffff;
-  border-color: rgba(59, 130, 246, 0.4);
+  background: var(--card);
+  border-color: var(--primary);
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.08), 0 0 16px -4px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.4), 0 0 16px -4px var(--glow);
 }
 
 /* Shimmer highlight for buttons and cards */
@@ -154,8 +150,8 @@ body {
   background-image: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 0,
-    rgba(0, 0, 0, 0.02) 20%,
-    rgba(0, 0, 0, 0.05) 60%,
+    rgba(255, 255, 255, 0.04) 20%,
+    rgba(255, 255, 255, 0.08) 60%,
     rgba(255, 255, 255, 0)
   );
   animation: shimmer 2.5s infinite;
@@ -168,14 +164,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f8fafc;
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--muted);
   border-radius: 9999px;
+  border: 1px solid var(--border);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--muted-foreground);
 }

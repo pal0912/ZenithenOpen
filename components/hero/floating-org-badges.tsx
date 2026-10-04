@@ -1146,7 +1146,7 @@ export function FloatingOrgBadges() {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`@${org.handle} (${org.name}) on GitHub`}
-                className={`group relative flex items-center justify-center ${containerSize} rounded-2xl border border-slate-200/90 bg-white/95 backdrop-blur-md shadow-md shadow-slate-200/70 hover:scale-120 hover:border-blue-500 hover:bg-white hover:shadow-xl hover:shadow-blue-500/20 hover:z-50 transition-all duration-300 cursor-pointer`}
+                className={`group relative flex items-center justify-center ${containerSize} rounded-2xl border border-border/80 bg-card/90 backdrop-blur-md shadow-md shadow-black/20 hover:scale-120 hover:border-primary hover:bg-card hover:shadow-xl hover:shadow-primary/25 hover:z-50 transition-all duration-300 cursor-pointer`}
               >
                 {/* Dynamic GitHub CDN avatar */}
                 <img
