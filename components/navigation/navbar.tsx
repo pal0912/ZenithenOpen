@@ -73,15 +73,9 @@ export function Navbar() {
               </div>
             </div>
             <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="text-lg font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                  Zenithen<span className="text-primary">Open</span>
-                </span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-mono uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary/20 transition-colors">
-                  <Palette className="h-2.5 w-2.5" />
-                  theme
-                </span>
-              </div>
+              <span className="text-lg font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+                Zenithen<span className="text-primary">Open</span>
+              </span>
               <span className="text-[10px] font-medium text-muted-foreground tracking-wider uppercase">
                 Open Source Community
               </span>
@@ -112,6 +106,18 @@ export function Navbar() {
 
         {/* Right Action buttons */}
         <div className="hidden sm:flex items-center flex-1 justify-end space-x-3">
+          {/* Header Theme Switcher Icon */}
+          <button
+            type="button"
+            data-theme-trigger="navbar-icon"
+            onClick={() => toggleMenu("navbar")}
+            aria-label={`Change theme (current: ${theme})`}
+            title={`Switch theme (current: ${theme})`}
+            className="flex items-center justify-center h-8 w-8 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+          >
+            <Palette className="h-4 w-4 text-primary" />
+          </button>
+
           {user ? (
             <div className="flex items-center space-x-2">
               <div className="flex items-center space-x-2 rounded-xl border border-border bg-card px-2.5 py-1 text-xs">
@@ -158,6 +164,16 @@ export function Navbar() {
 
         {/* Mobile menu trigger */}
         <div className="flex lg:hidden items-center space-x-2">
+          <button
+            type="button"
+            data-theme-trigger="mobile-icon"
+            onClick={() => toggleMenu("navbar")}
+            aria-label={`Change theme (current: ${theme})`}
+            className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
+            title="Change theme"
+          >
+            <Palette className="h-5 w-5 text-primary" />
+          </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"

@@ -31,8 +31,8 @@ export function LiveMetricsDashboard() {
       formatted: `${metrics.totalMembers}`,
       subtext: "Students linked via GitHub OAuth",
       icon: Users,
-      glowColor: "from-blue-600/20 to-blue-400/5",
-      iconColor: "text-blue-400",
+      glowColor: "from-primary/20 to-primary/5",
+      iconColor: "text-primary",
     },
     {
       label: "Pull Requests Merged",
@@ -40,8 +40,8 @@ export function LiveMetricsDashboard() {
       formatted: `${metrics.prsMerged}`,
       subtext: "Merged into campus repositories",
       icon: GitPullRequest,
-      glowColor: "from-purple-600/20 to-purple-400/5",
-      iconColor: "text-purple-400",
+      glowColor: "from-secondary/20 to-secondary/5",
+      iconColor: "text-secondary",
     },
     {
       label: "Synced Repositories",
@@ -49,8 +49,8 @@ export function LiveMetricsDashboard() {
       formatted: `${metrics.activeRepositories}`,
       subtext: "Tracked from IST-ZenithenLab",
       icon: FolderGit2,
-      glowColor: "from-indigo-600/20 to-indigo-400/5",
-      iconColor: "text-indigo-400",
+      glowColor: "from-primary/20 to-secondary/5",
+      iconColor: "text-primary",
     },
     {
       label: "Code Reviewers",
@@ -58,8 +58,8 @@ export function LiveMetricsDashboard() {
       formatted: `${metrics.codeReviewsCount}`,
       subtext: "Peer reviews & architectural guidance",
       icon: GitCommit,
-      glowColor: "from-emerald-600/20 to-emerald-400/5",
-      iconColor: "text-emerald-400",
+      glowColor: "from-accent/20 to-accent/5",
+      iconColor: "text-accent",
     },
     {
       label: "First PRs Celebrated",
@@ -67,7 +67,7 @@ export function LiveMetricsDashboard() {
       formatted: `${metrics.firstPrsMerged}`,
       subtext: "First-time open source contributors",
       icon: Sparkles,
-      glowColor: "from-amber-600/20 to-amber-400/5",
+      glowColor: "from-amber-500/20 to-amber-500/5",
       iconColor: "text-amber-400",
     },
     {
@@ -76,17 +76,17 @@ export function LiveMetricsDashboard() {
       formatted: `${metrics.contributionsThisMonth}`,
       subtext: "Commits, reviews & issue triage",
       icon: TrendingUp,
-      glowColor: "from-cyan-600/20 to-cyan-400/5",
-      iconColor: "text-cyan-400",
+      glowColor: "from-accent/20 to-primary/5",
+      iconColor: "text-accent",
     },
   ];
 
   return (
-    <section className="relative w-full py-14">
+    <section className="relative w-full py-14 bg-background transition-colors">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="pb-6 border-b border-slate-200/80 mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+        <div className="pb-6 border-b border-border mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             Our community
           </h2>
         </div>
@@ -98,7 +98,7 @@ export function LiveMetricsDashboard() {
             return (
               <Card
                 key={item.label}
-                className="group relative overflow-hidden p-6 hover:border-slate-300 hover:shadow-md transition-all"
+                className="group relative overflow-hidden p-6 hover:border-primary/40 hover:shadow-md transition-all border-border bg-card"
               >
                 {/* Subtle ambient light */}
                 <div
@@ -107,18 +107,18 @@ export function LiveMetricsDashboard() {
 
                 <div className="relative z-10 flex items-start justify-between">
                   <div>
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       {item.label}
                     </p>
-                    <p className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 font-mono">
+                    <p className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground font-mono">
                       {item.formatted}
                     </p>
-                    <p className="mt-1.5 text-xs text-slate-500">
+                    <p className="mt-1.5 text-xs text-muted-foreground">
                       {item.subtext}
                     </p>
                   </div>
                   <div
-                    className={`rounded-xl bg-slate-50 p-3 border border-slate-200 group-hover:border-blue-300 transition-colors ${item.iconColor}`}
+                    className={`rounded-xl bg-muted/50 p-3 border border-border group-hover:border-primary/40 transition-colors ${item.iconColor}`}
                   >
                     <Icon className="h-5 w-5" />
                   </div>
