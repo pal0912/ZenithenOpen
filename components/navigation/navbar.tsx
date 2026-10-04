@@ -13,11 +13,38 @@ import { useAuth } from "@/components/auth/auth-context";
 import { useTheme } from "@/components/theme/theme-provider";
 import { useNavigation } from "@/components/navigation/navigation-context";
 
+const PAGE_TOP_NAV: Record<string, { label: string; id: string }[]> = {
+  "/programs": [
+    { label: "Open Source", id: "open-source" },
+    { label: "Projects", id: "projects" },
+    { label: "GSoC", id: "gsoc" },
+    { label: "GSSoC Hall of Fame", id: "gssoc" },
+    { label: "ESoC & SOB", id: "esoc-sob" },
+  ],
+  "/community": [
+    { label: "About", id: "about" },
+    { label: "Journey", id: "journey" },
+    { label: "Members", id: "members" },
+    { label: "Rewards", id: "rewards" },
+    { label: "Featured", id: "featured" },
+  ],
+  "/events": [
+    { label: "Upcoming", id: "upcoming" },
+    { label: "Hackathons", id: "hackathons" },
+    { label: "Achievements", id: "achievements" },
+  ],
+  "/resources": [
+    { label: "Learn to PR", id: "learn-to-pr" },
+    { label: "Make First PR", id: "make-first-pr" },
+    { label: "Blog", id: "blog" },
+  ],
+};
+
 export function Navbar() {
   const pathname = usePathname();
   const { user, openLoginModal, logout } = useAuth();
   const { toggleMenu, isMenuOpen, menuAnchor, theme } = useTheme();
-  const { isSidebarOpen, toggleSidebar } = useNavigation();
+  const { isSidebarOpen, toggleSidebar, activeSection, openPopup } = useNavigation();
   const [scrolled, setScrolled] = React.useState(false);
 
   React.useEffect(() => {
@@ -29,6 +56,7 @@ export function Navbar() {
   }, []);
 
   const isThemeActiveOnNavbar = isMenuOpen && menuAnchor === "navbar";
+  const currentNavItems = PAGE_TOP_NAV[pathname] || null;
 
   return (
     <header
@@ -39,9 +67,9 @@ export function Navbar() {
           : "border-b border-transparent bg-background/70 backdrop-blur-md"
       )}
     >
-      <div className="w-full flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="relative w-full flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Area: Hamburger Trigger + Logo Theme Button + Homepage Link */}
-        <div className="flex items-center flex-1 justify-start space-x-2.5">
+        <div className="flex items-center justify-start space-x-2.5 shrink-0 z-10">
           {/* Integrated 3-Line Hamburger Menu Button */}
           <button
             type="button"
@@ -116,8 +144,36 @@ export function Navbar() {
           </Link>
         </div>
 
+        {/* Page-Specific Top Navigation Options - Centered in middle */}
+        {currentNavItems && (
+          <nav
+            aria-label="Page navigation"
+            className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-1 sm:space-x-1.5 overflow-x-auto no-scrollbar py-1 px-2 max-w-[55vw]"
+          >
+            {currentNavItems.map((item) => {
+              const currentActive = activeSection || currentNavItems[0]?.id;
+              const isSelected = currentActive === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => openPopup(item.id)}
+                  className={cn(
+                    "px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all cursor-pointer border",
+                    isSelected
+                      ? "bg-primary text-primary-foreground border-primary shadow-xs font-semibold"
+                      : "bg-card/80 border-border text-muted-foreground hover:text-foreground hover:bg-muted hover:border-border"
+                  )}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+        )}
+
         {/* Right Action buttons */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 shrink-0 z-10">
           {user ? (
             <div className="flex items-center space-x-2">
               <div className="flex items-center space-x-2 rounded-xl border border-border bg-card px-2.5 py-1 text-xs">

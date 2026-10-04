@@ -2,13 +2,13 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   BookOpen,
   GitPullRequest,
   CheckCircle2,
   Terminal,
-  FileCode,
   Newspaper,
   Calendar,
   ExternalLink,
@@ -16,18 +16,15 @@ import {
   Sparkles,
   Copy,
   Check,
-  Filter,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-type ResourceTab = "All" | "Learn to PR" | "Make First PR" | "Blog";
+import { useNavigation } from "@/components/navigation/navigation-context";
 
 export default function ResourcesPage() {
-  const [activeTab, setActiveTab] = React.useState<ResourceTab>("All");
+  const { popupSection, closePopup, openPopup, activeSection } = useNavigation();
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
-
-  const tabs: ResourceTab[] = ["All", "Learn to PR", "Make First PR", "Blog"];
 
   const copyToClipboard = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
@@ -202,196 +199,192 @@ export default function ResourcesPage() {
               &ldquo;Learn to make first PR&rdquo;
             </p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              Step-by-step guidance, git fundamentals, interactive pull request checklists, and in-depth technical blogs written by student developers for student developers.
+              Step-by-step guidance, git fundamentals, interactive pull request checklists, and in-depth technical blogs. Click any resource option in the top navbar to view details.
             </p>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="mt-8 flex flex-wrap items-center gap-2 border-b border-border/80 pb-4">
-          <div className="flex items-center text-xs text-muted-foreground font-mono mr-2">
-            <Filter className="h-3.5 w-3.5 mr-1" />
-            <span>Filter:</span>
-          </div>
-          {tabs.map((tab) => {
-            const isSelected = activeTab === tab;
-            return (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={cn(
-                  "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border",
-                  isSelected
-                    ? "bg-primary text-primary-foreground border-primary shadow-xs font-semibold"
-                    : "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
-              >
-                {tab}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Section Contents */}
-        <div className="mt-8 space-y-12">
+        {/* Section Contents - Clean cards without in-page filter bar */}
+        <div className="mt-10 space-y-12">
           {/* Section: Learn to PR */}
-          {(activeTab === "All" || activeTab === "Learn to PR") && (
-            <section id="learn-to-pr" className="space-y-4">
+          <section id="learn-to-pr" className="space-y-4">
+            <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <GitPullRequest className="h-5 w-5 text-primary" />
                 <h2 className="text-2xl font-bold text-foreground">
                   Learn Pull Requests (Learn to PR)
                 </h2>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openPopup("learn-to-pr")}
+                className="border-border text-xs text-foreground cursor-pointer"
+              >
+                <span>Learn to PR Details</span>
+                <ChevronRight className="ml-1 h-3.5 w-3.5" />
+              </Button>
+            </div>
 
-              <div className="space-y-4">
-                {learnConcepts.map((concept, idx) => (
-                  <div
-                    key={idx}
-                    className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
-                        {concept.category}
-                      </span>
-                    </div>
-
-                    <h3 className="text-lg font-bold text-foreground">
-                      {concept.title}
-                    </h3>
-
-                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                      {concept.description}
-                    </p>
-
-                    <div className="mt-4 pt-3 border-t border-border/80 space-y-2">
-                      {concept.keyTakeaways.map((point, pIdx) => (
-                        <div key={pIdx} className="flex items-start space-x-2 text-xs text-foreground">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
-                          <span className="leading-snug text-muted-foreground">{point}</span>
-                        </div>
-                      ))}
-                    </div>
+            <div className="space-y-4">
+              {learnConcepts.map((concept, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+                      {concept.category}
+                    </span>
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
+
+                  <h3 className="text-lg font-bold text-foreground">
+                    {concept.title}
+                  </h3>
+
+                  <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                    {concept.description}
+                  </p>
+
+                  <div className="mt-4 pt-3 border-t border-border/80 space-y-2">
+                    {concept.keyTakeaways.map((point, pIdx) => (
+                      <div key={pIdx} className="flex items-start space-x-2 text-xs text-foreground">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                        <span className="leading-snug text-muted-foreground">{point}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* Section: Make First PR */}
-          {(activeTab === "All" || activeTab === "Make First PR") && (
-            <section id="make-first-pr" className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Terminal className="h-5 w-5 text-primary" />
-                  <h2 className="text-2xl font-bold text-foreground">
-                    Make Your First PR (Make First PR)
-                  </h2>
-                </div>
-                <span className="text-xs font-mono text-primary font-semibold">
-                  7 Guided Steps
-                </span>
+          <section id="make-first-pr" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Terminal className="h-5 w-5 text-primary" />
+                <h2 className="text-2xl font-bold text-foreground">
+                  Make Your First PR (Make First PR)
+                </h2>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openPopup("make-first-pr")}
+                className="border-border text-xs text-foreground cursor-pointer"
+              >
+                <span>First PR Checklist</span>
+                <ChevronRight className="ml-1 h-3.5 w-3.5" />
+              </Button>
+            </div>
 
-              <div className="grid grid-cols-1 gap-4">
-                {firstPrSteps.map((step, idx) => (
-                  <div
-                    key={idx}
-                    className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-primary/40 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold font-mono">
-                          {step.step}
-                        </span>
-                        <h3 className="text-sm font-bold text-foreground">
-                          {step.title}
-                        </h3>
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-muted-foreground ml-8 leading-relaxed mb-3">
-                      {step.description}
-                    </p>
-
-                    <div className="ml-8 flex items-center justify-between rounded-xl bg-muted/60 border border-border/80 px-3.5 py-2.5 font-mono text-xs text-foreground overflow-x-auto">
-                      <code className="text-[11px] truncate mr-2">{step.command}</code>
-                      <button
-                        type="button"
-                        onClick={() => copyToClipboard(step.command, idx)}
-                        className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
-                        title="Copy command"
-                      >
-                        {copiedIndex === idx ? (
-                          <Check className="h-3.5 w-3.5 text-primary" />
-                        ) : (
-                          <Copy className="h-3.5 w-3.5" />
-                        )}
-                      </button>
+            <div className="grid grid-cols-1 gap-4">
+              {firstPrSteps.map((step, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-primary/40 transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold font-mono">
+                        {step.step}
+                      </span>
+                      <h3 className="text-sm font-bold text-foreground">
+                        {step.title}
+                      </h3>
                     </div>
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
+
+                  <p className="text-xs text-muted-foreground ml-8 leading-relaxed mb-3">
+                    {step.description}
+                  </p>
+
+                  <div className="ml-8 flex items-center justify-between rounded-xl bg-muted/60 border border-border/80 px-3.5 py-2.5 font-mono text-xs text-foreground overflow-x-auto">
+                    <code className="text-[11px] truncate mr-2">{step.command}</code>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(step.command, idx)}
+                      className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
+                      title="Copy command"
+                    >
+                      {copiedIndex === idx ? (
+                        <Check className="h-3.5 w-3.5 text-primary" />
+                      ) : (
+                        <Copy className="h-3.5 w-3.5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* Section: Blog */}
-          {(activeTab === "All" || activeTab === "Blog") && (
-            <section id="blog" className="space-y-4">
+          <section id="blog" className="space-y-4">
+            <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Newspaper className="h-5 w-5 text-primary" />
                 <h2 className="text-2xl font-bold text-foreground">
                   Technical Blog & Engineering Stories
                 </h2>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openPopup("blog")}
+                className="border-border text-xs text-foreground cursor-pointer"
+              >
+                <span>Blog Articles</span>
+                <ChevronRight className="ml-1 h-3.5 w-3.5" />
+              </Button>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {blogPosts.map((post, idx) => (
-                  <div
-                    key={idx}
-                    className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-2.5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
-                          {post.category}
-                        </span>
-                        <span className="text-[10px] font-mono text-muted-foreground">
-                          {post.readTime}
-                        </span>
-                      </div>
-
-                      <h3 className="text-base font-bold text-foreground leading-snug">
-                        {post.title}
-                      </h3>
-
-                      <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                        {post.excerpt}
-                      </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {blogPosts.map((post, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2.5">
+                      <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+                        {post.category}
+                      </span>
+                      <span className="text-[10px] font-mono text-muted-foreground">
+                        {post.readTime}
+                      </span>
                     </div>
 
-                    <div className="mt-5 pt-4 border-t border-border/80 flex items-center justify-between text-xs">
-                      <div className="flex items-center text-muted-foreground font-mono text-[11px]">
-                        <Calendar className="h-3 w-3 mr-1 text-primary" />
-                        <span>{post.date} &bull; {post.author}</span>
-                      </div>
-                      <Link href="https://github.com/IST-ZenithenLab/ZenithenOpen" target="_blank" rel="noreferrer">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 px-2 text-xs text-primary hover:text-primary hover:bg-primary/10 cursor-pointer"
-                        >
-                          <span>Read Article</span>
-                          <ChevronRight className="ml-1 h-3 w-3" />
-                        </Button>
-                      </Link>
-                    </div>
+                    <h3 className="text-base font-bold text-foreground leading-snug">
+                      {post.title}
+                    </h3>
+
+                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                      {post.excerpt}
+                    </p>
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
+
+                  <div className="mt-5 pt-4 border-t border-border/80 flex items-center justify-between text-xs">
+                    <div className="flex items-center text-muted-foreground font-mono text-[11px]">
+                      <Calendar className="h-3 w-3 mr-1 text-primary" />
+                      <span>{post.date} &bull; {post.author}</span>
+                    </div>
+                    <Link href="https://github.com/IST-ZenithenLab/ZenithenOpen" target="_blank" rel="noreferrer">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs text-primary hover:text-primary hover:bg-primary/10 cursor-pointer"
+                      >
+                        <span>Read Article</span>
+                        <ChevronRight className="ml-1 h-3 w-3" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
 
         {/* Bottom Banner */}
@@ -415,6 +408,78 @@ export default function ResourcesPage() {
           </div>
         </div>
       </div>
+
+      {/* Resources Popup Dialog Modal */}
+      <AnimatePresence>
+        {popupSection && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closePopup}
+              aria-hidden="true"
+              className="fixed inset-0 bg-black/75 backdrop-blur-md"
+            />
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative z-10 w-full max-w-2xl rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-2xl text-foreground select-none"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-muted border border-border">
+                    Developer Guides
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-foreground mt-1 capitalize">
+                    {popupSection.replace("-", " ")}
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={closePopup}
+                  aria-label="Close popup"
+                  className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="mt-4 p-4 rounded-xl border border-border/80 bg-muted/40">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {popupSection === "learn-to-pr" && "Master pull request etiquette, Git DAG architecture, atomic commits, conventional commit syntax, and resolving merge conflicts."}
+                  {popupSection === "make-first-pr" && "Follow our 7-step guided checklist: find a beginner issue, fork the repository, clone locally, write code, run verification, and submit your PR."}
+                  {popupSection === "blog" && "Explore student technical blogs covering GSoC scholar retrospectives, Git internals, CSS theme variable architectures, and career acceleration."}
+                </p>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-border/80 flex items-center justify-end space-x-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={closePopup}
+                  className="border-border text-xs text-foreground cursor-pointer"
+                >
+                  Close
+                </Button>
+                <Link href={`#${popupSection}`} onClick={closePopup}>
+                  <Button
+                    size="sm"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer"
+                  >
+                    <span>Jump to Section</span>
+                    <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                  </Button>
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

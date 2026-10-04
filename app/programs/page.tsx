@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   Rocket,
@@ -14,19 +15,18 @@ import {
   CheckCircle2,
   Sparkles,
   ChevronRight,
-  Filter,
+  X,
+  Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-type ProgramCategory = "All" | "Open Source" | "Projects" | "GSoC" | "GSSoC Hall of Fame" | "ESoC & SOB";
+import { useNavigation } from "@/components/navigation/navigation-context";
 
 interface ProgramItem {
   id: string;
-  category: ProgramCategory;
+  category: string;
   title: string;
   badge: string;
-  badgeColor?: string;
   description: string;
   details: string[];
   actionLabel: string;
@@ -53,7 +53,7 @@ const PROGRAMS: ProgramItem[] = [
     icon: Code2,
   },
   {
-    id: "campus-projects",
+    id: "projects",
     category: "Projects",
     title: "Campus Open-Source Projects",
     badge: "Production Repos",
@@ -123,21 +123,17 @@ const PROGRAMS: ProgramItem[] = [
 ];
 
 export default function ProgramsPage() {
-  const [selectedCategory, setSelectedCategory] = React.useState<ProgramCategory>("All");
+  const { popupSection, closePopup, openPopup, activeSection, setActiveSection } = useNavigation();
 
-  const categories: ProgramCategory[] = [
-    "All",
-    "Open Source",
-    "Projects",
-    "GSoC",
-    "GSSoC Hall of Fame",
-    "ESoC & SOB",
-  ];
+  // "make sure that open souce option is default and user see that as a default thing"
+  const defaultProgramId = "open-source";
+  const currentSelectedId = activeSection || defaultProgramId;
+  const currentProgram = PROGRAMS.find((p) => p.id === currentSelectedId) || PROGRAMS[0];
 
-  const filteredPrograms =
-    selectedCategory === "All"
-      ? PROGRAMS
-      : PROGRAMS.filter((item) => item.category === selectedCategory);
+  // Active modal program if popup requested
+  const activeModalProgram = PROGRAMS.find((p) => p.id === popupSection);
+
+  const CurrentIcon = currentProgram.icon;
 
   return (
     <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 transition-colors">
@@ -167,89 +163,137 @@ export default function ProgramsPage() {
               &ldquo;All programs, nothing is big or small&rdquo;
             </p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              Every initiative at ZenithenOpen is treated with equal engineering dedication — whether you are fixing your very first documentation typo or engineering decentralized protocols for global fellowships.
+              Every initiative at ZenithenOpen is treated with equal engineering dedication. Select any program from the top navbar to explore details and view its popup.
             </p>
           </div>
         </div>
 
-        {/* Category Filters */}
-        <div className="mt-8 flex flex-wrap items-center gap-2 border-b border-border/80 pb-4">
-          <div className="flex items-center text-xs text-muted-foreground font-mono mr-2">
-            <Filter className="h-3.5 w-3.5 mr-1" />
-            <span>Filter:</span>
-          </div>
-          {categories.map((category) => {
-            const isSelected = selectedCategory === category;
-            return (
-              <button
-                key={category}
-                type="button"
-                onClick={() => setSelectedCategory(category)}
-                className={cn(
-                  "px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border",
-                  isSelected
-                    ? "bg-primary text-primary-foreground border-primary shadow-xs font-semibold"
-                    : "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
-              >
-                {category}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Programs Listing */}
-        <div className="mt-8 space-y-6">
-          {filteredPrograms.map((program) => {
-            const Icon = program.icon;
-            return (
-              <div
-                key={program.id}
-                className="group rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-xs hover:border-primary/40 hover:shadow-md transition-all"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted border border-border text-primary shrink-0 group-hover:scale-105 transition-transform">
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="text-xl font-bold text-foreground">
-                          {program.title}
-                        </h2>
-                        <span className="rounded-md bg-primary/10 border border-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary uppercase font-mono">
-                          {program.badge}
-                        </span>
-                      </div>
-                      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                        {program.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  <Link href={program.actionHref} className="sm:self-center shrink-0">
-                    <Button
-                      size="sm"
-                      className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer"
-                    >
-                      <span>{program.actionLabel}</span>
-                      <ChevronRight className="ml-1 h-3.5 w-3.5" />
-                    </Button>
-                  </Link>
+        {/* DEFAULT VIEW: Active Program Featured Showcase */}
+        <div className="mt-10">
+          <motion.div
+            key={currentProgram.id}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5 transition-all"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
+              <div className="flex items-start space-x-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 border border-primary/25 text-primary shrink-0 shadow-xs">
+                  <CurrentIcon className="h-7 w-7" />
                 </div>
-
-                {/* Key Bullet Highlights */}
-                <div className="mt-6 pt-5 border-t border-border/70 grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                  {program.details.map((detail, index) => (
-                    <div key={index} className="flex items-start space-x-2 text-xs text-foreground">
-                      <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                      <span className="leading-snug text-muted-foreground">{detail}</span>
-                    </div>
-                  ))}
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-md bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-xs font-semibold text-primary uppercase font-mono">
+                      {currentProgram.badge}
+                    </span>
+                    <span className="rounded-md bg-muted border border-border px-2 py-0.5 text-[10px] font-semibold text-muted-foreground font-mono">
+                      Active Program
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground mt-2">
+                    {currentProgram.title}
+                  </h2>
+                  <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
+                    {currentProgram.description}
+                  </p>
                 </div>
               </div>
-            );
-          })}
+
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0 sm:self-start">
+                <Button
+                  size="sm"
+                  onClick={() => openPopup(currentProgram.id)}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer shadow-md shadow-primary/25"
+                >
+                  <span>Open Popup</span>
+                  <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                </Button>
+                <Link href={currentProgram.actionHref}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-border text-xs text-foreground hover:bg-muted cursor-pointer"
+                  >
+                    <span>{currentProgram.actionLabel}</span>
+                    <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Key Bullet Highlights */}
+            <div className="mt-8 pt-6 border-t border-border/70 space-y-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-primary font-mono">
+                Key Initiatives & Highlights
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {currentProgram.details.map((detail, index) => (
+                  <div key={index} className="flex items-start space-x-2.5 text-xs sm:text-sm text-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                    <span className="leading-snug text-muted-foreground">{detail}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* All Programs Directory Cards */}
+        <div className="mt-12 space-y-4">
+          <div className="flex items-center space-x-2">
+            <Layers className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground font-mono">
+              All Campus Programs
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {PROGRAMS.map((prog) => {
+              const Icon = prog.icon;
+              const isSelected = prog.id === currentSelectedId;
+              return (
+                <div
+                  key={prog.id}
+                  onClick={() => {
+                    setActiveSection(prog.id);
+                    openPopup(prog.id);
+                  }}
+                  className={cn(
+                    "rounded-xl border p-4.5 cursor-pointer transition-all flex flex-col justify-between select-none group",
+                    isSelected
+                      ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                      : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
+                  )}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-primary">
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                        {prog.badge}
+                      </span>
+                    </div>
+
+                    <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                      {prog.title}
+                    </h4>
+                    <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
+                      {prog.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-xs">
+                    <span className="text-[11px] font-medium text-primary font-mono">
+                      {isSelected ? "Currently Viewing" : "Click to View"}
+                    </span>
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Bottom Banner */}
@@ -273,6 +317,100 @@ export default function ProgramsPage() {
           </div>
         </div>
       </div>
+
+      {/* Program Details Popup Modal */}
+      <AnimatePresence>
+        {activeModalProgram && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closePopup}
+              aria-hidden="true"
+              className="fixed inset-0 bg-black/75 backdrop-blur-md"
+            />
+
+            {/* Modal Dialog Content */}
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label={activeModalProgram.title}
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative z-10 w-full max-w-2xl rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-2xl text-foreground select-none"
+            >
+              {/* Header with Close X */}
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-3.5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary shrink-0">
+                    <activeModalProgram.icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-muted border border-border">
+                      {activeModalProgram.badge}
+                    </span>
+                    <h2 className="text-xl sm:text-2xl font-extrabold text-foreground mt-1">
+                      {activeModalProgram.title}
+                    </h2>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={closePopup}
+                  aria-label="Close popup"
+                  className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Description */}
+              <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+                {activeModalProgram.description}
+              </p>
+
+              {/* Key Program Highlights */}
+              <div className="mt-6 space-y-2.5 rounded-xl border border-border/80 bg-muted/40 p-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-primary font-mono">
+                  Program Highlights & Curriculum
+                </p>
+                {activeModalProgram.details.map((detail, idx) => (
+                  <div key={idx} className="flex items-start space-x-2 text-xs text-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                    <span className="leading-snug text-muted-foreground">{detail}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-6 pt-4 border-t border-border/80 flex flex-wrap items-center justify-end gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={closePopup}
+                  className="border-border text-xs text-foreground cursor-pointer"
+                >
+                  Close
+                </Button>
+                <Link href={activeModalProgram.actionHref} onClick={closePopup}>
+                  <Button
+                    size="sm"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer shadow-md shadow-primary/25"
+                  >
+                    <span>{activeModalProgram.actionLabel}</span>
+                    <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                  </Button>
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
