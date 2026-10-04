@@ -16,6 +16,7 @@ import {
 export const COMMUNITY_METRICS: CommunityMetrics = {
   totalMembers: 0,
   totalContributors: 0,
+  qualityPrsMerged: 0,
   prsMerged: 0,
   activeRepositories: 2,
   openSourceProjects: 2,
