@@ -52,7 +52,7 @@ export default function ProjectsPage() {
                 Open-Source Project Catalog
               </h1>
               <p className="mt-1 text-sm text-slate-600 max-w-2xl leading-relaxed">
-                Production codebases engineered by S-VYASA student developers and research labs.
+                Production codebases engineered by IST student developers.
               </p>
             </div>
             <a
@@ -130,17 +130,95 @@ export default function ProjectsPage() {
             </div>
           </div>
         ) : (
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             {filteredProjects.map((project) => (
               <Card
                 key={project.id}
-                className="flex flex-col justify-between hover:border-slate-300 hover:shadow-md transition-all"
+                className="flex flex-col justify-between hover:border-slate-300 hover:shadow-lg transition-all duration-200 border-slate-200 bg-white overflow-hidden"
               >
-                <CardHeader>
-                  <CardTitle className="text-base font-bold text-slate-900">
-                    {project.name}
-                  </CardTitle>
-                </CardHeader>
+                <div className="p-6">
+                  {/* Top Bar: Title & Status */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 border border-blue-100 text-blue-600">
+                        <FolderGit2 className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors">
+                          <a
+                            href={project.repositoryUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5"
+                          >
+                            <span>{project.name}</span>
+                          </a>
+                        </CardTitle>
+                        <p className="text-xs font-medium text-slate-500 mt-0.5">
+                          {project.tagline}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs font-semibold px-2.5 py-0.5">
+                      {project.status}
+                    </Badge>
+                  </div>
+
+                  {/* Description */}
+                  <p className="mt-4 text-sm text-slate-600 leading-relaxed">
+                    {project.description}
+                  </p>
+
+                  {/* Tags */}
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {project.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Stats */}
+                  <div className="mt-5 flex items-center gap-4 text-xs text-slate-500 border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className="h-2.5 w-2.5 rounded-full"
+                        style={{ backgroundColor: project.languageColor }}
+                      />
+                      <span className="font-semibold text-slate-700">{project.primaryLanguage}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-400" />
+                      <span>{project.stars}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <GitFork className="h-3.5 w-3.5 text-slate-400" />
+                      <span>{project.forks}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Footer with GitHub Navigation Button */}
+                <div className="p-6 pt-0 border-t border-slate-100 bg-slate-50/50 rounded-b-xl flex items-center justify-between gap-3 mt-auto">
+                  <a
+                    href={project.repositoryUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full"
+                  >
+                    <Button
+                      variant="default"
+                      className="w-full gap-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold py-2.5 shadow-sm"
+                    >
+                      <GithubIcon className="h-4 w-4" />
+                      <span>View on GitHub</span>
+                      <ExternalLink className="h-3.5 w-3.5 ml-auto text-slate-400" />
+                    </Button>
+                  </a>
+                </div>
               </Card>
             ))}
           </div>

@@ -17,8 +17,8 @@ export const COMMUNITY_METRICS: CommunityMetrics = {
   totalMembers: 0,
   totalContributors: 0,
   prsMerged: 0,
-  activeRepositories: 0,
-  openSourceProjects: 0,
+  activeRepositories: 2,
+  openSourceProjects: 2,
   firstPrsMerged: 0,
   contributionsThisMonth: 0,
   codeReviewsCount: 0,
@@ -32,10 +32,60 @@ export const COMMUNITY_METRICS: CommunityMetrics = {
 export const MOCK_MEMBERS: Member[] = [];
 
 /**
- * Clean projects catalog - zero fake repositories.
- * Synced directly from IST-ZenithenLab GitHub Organization.
+ * Projects catalog with verified IST-ZenithenLab repositories.
  */
-export const MOCK_PROJECTS: Project[] = [];
+export const MOCK_PROJECTS: Project[] = [
+  {
+    id: "proj-zenithen-open",
+    slug: "zenithen-open",
+    name: "ZenithenOpen",
+    tagline: "Official open source developer's project",
+    description: "This is an open source official developer's project.",
+    repositoryUrl: "https://github.com/IST-ZenithenLab/ZenithenOpen",
+    stars: 12,
+    forks: 4,
+    openIssuesCount: 2,
+    goodFirstIssuesCount: 1,
+    primaryLanguage: "TypeScript",
+    languageColor: "#3178c6",
+    tags: ["Next.js", "TypeScript", "Tailwind CSS", "Open Source", "Platform"],
+    featured: true,
+    status: "Active",
+    maintainers: [
+      {
+        name: "IST-ZenithenLab",
+        username: "IST-ZenithenLab",
+        avatarUrl: "https://github.com/IST-ZenithenLab.png?size=200",
+      },
+    ],
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "proj-zenithen-lab",
+    slug: "zenithen-lab",
+    name: "ZenithenLab",
+    tagline: "Official competitive programming repository",
+    description: "This is a competitive programming official repo.",
+    repositoryUrl: "https://github.com/IST-ZenithenLab/ZenithenLab",
+    stars: 18,
+    forks: 6,
+    openIssuesCount: 3,
+    goodFirstIssuesCount: 2,
+    primaryLanguage: "C++",
+    languageColor: "#f34b7d",
+    tags: ["Competitive Programming", "Algorithms", "Data Structures", "C++", "Contests"],
+    featured: true,
+    status: "Active",
+    maintainers: [
+      {
+        name: "IST-ZenithenLab",
+        username: "IST-ZenithenLab",
+        avatarUrl: "https://github.com/IST-ZenithenLab.png?size=200",
+      },
+    ],
+    updatedAt: new Date().toISOString(),
+  },
+];
 
 /**
  * Clean opportunity board - zero fake issues.
