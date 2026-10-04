@@ -1,83 +1,415 @@
+"use client";
+
+import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, GitPullRequest, GitFork, Terminal, CheckCircle2 } from "lucide-react";
+import {
+  ArrowLeft,
+  BookOpen,
+  GitPullRequest,
+  CheckCircle2,
+  Terminal,
+  FileCode,
+  Newspaper,
+  Calendar,
+  ExternalLink,
+  ChevronRight,
+  Sparkles,
+  Copy,
+  Check,
+  Filter,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+type ResourceTab = "All" | "Learn to PR" | "Make First PR" | "Blog";
 
 export default function ResourcesPage() {
-  const steps = [
+  const [activeTab, setActiveTab] = React.useState<ResourceTab>("All");
+  const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+
+  const tabs: ResourceTab[] = ["All", "Learn to PR", "Make First PR", "Blog"];
+
+  const copyToClipboard = (text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const learnConcepts = [
     {
-      title: "1. Fork & Clone Repository",
-      description: "Fork any IST-ZenithenLab repository on GitHub, then clone it locally onto your development machine.",
+      title: "Understanding the Pull Request Lifecycle",
+      category: "Git Architecture",
+      description:
+        "A pull request (PR) is a formal proposal to merge changes from your independent branch or fork into an upstream codebase. It provides a collaborative forum for peer code reviews, automated CI checks, and architectural validation before code hits production.",
+      keyTakeaways: [
+        "Origin vs. Upstream: Maintain a synchronized link with the main campus repository",
+        "Feature Branches: Always isolate your work onto dedicated branch names",
+        "Atomic Commits: Keep each commit focused on one cohesive logical change",
+      ],
+    },
+    {
+      title: "Conventional Commit Standards",
+      category: "Engineering Etiquette",
+      description:
+        "ZenithenOpen projects enforce the Conventional Commits specification to generate automated release changelogs and maintain clean git histories.",
+      keyTakeaways: [
+        "feat: Introduces a new user-facing feature (e.g., feat: add dark theme switcher)",
+        "fix: Patches an existing software defect (e.g., fix: resolve sidebar overflow on mobile)",
+        "docs: Updates documentation, markdown files, or guides",
+        "refactor: Restructures existing code without altering external behavior",
+      ],
+    },
+    {
+      title: "Resolving Git Merge Conflicts",
+      category: "Advanced Workflow",
+      description:
+        "Merge conflicts happen when two branches modify the same lines of code. Resolving them cleanly is a critical skill for any professional open-source software engineer.",
+      keyTakeaways: [
+        "Pull latest changes from upstream main before opening or updating a PR",
+        "Use git rebase upstream/main to replay your commits cleanly on top",
+        "Resolve conflicts in your IDE, verify builds, and push with confidence",
+      ],
+    },
+  ];
+
+  const firstPrSteps = [
+    {
+      step: 1,
+      title: "Find a Good First Issue",
+      description:
+        "Visit our curated campus opportunities board or any ZenithenOpen repository and filter issues by the 'good first issue' label.",
+      command: "https://github.com/IST-ZenithenLab/ZenithenOpen/issues?q=label%3A%22good+first+issue%22",
+      isUrl: true,
+    },
+    {
+      step: 2,
+      title: "Fork the Repository to Your GitHub",
+      description:
+        "Click the 'Fork' button at the top-right of the repository on GitHub to create your personal copy.",
+      command: "Click 'Fork' on GitHub -> Select your personal account",
+      isUrl: false,
+    },
+    {
+      step: 3,
+      title: "Clone Your Fork Locally",
+      description:
+        "Download your repository onto your local development machine using git in your terminal.",
       command: "git clone https://github.com/<your-username>/ZenithenOpen.git",
+      isUrl: false,
     },
     {
-      title: "2. Create a Feature Branch",
-      description: "Always isolate changes into a dedicated branch before writing code.",
+      step: 4,
+      title: "Create a Dedicated Feature Branch",
+      description:
+        "Never work directly on main. Create and switch to a descriptive branch for your change.",
       command: "git checkout -b feature/my-first-contribution",
+      isUrl: false,
     },
     {
-      title: "3. Verify Changes & Commit",
-      description: "Ensure linting and tests pass before committing with clear, conventional messages.",
-      command: 'git commit -m "feat: my descriptive contribution"',
+      step: 5,
+      title: "Make Your Edits & Verify Quality",
+      description:
+        "Implement your code or documentation changes, then run local validation scripts to ensure linting passes.",
+      command: "npm run lint; npm test",
+      isUrl: false,
     },
     {
-      title: "4. Open Pull Request",
-      description: "Push your feature branch and open a PR targeting the main development branch for peer review.",
-      command: "git push -u origin feature/my-first-contribution",
+      step: 6,
+      title: "Commit and Push to Origin",
+      description:
+        "Stage your files, commit with a descriptive conventional message, and push to your remote fork.",
+      command: 'git add -A && git commit -m "docs: add contributor profile" && git push -u origin feature/my-first-contribution',
+      isUrl: false,
+    },
+    {
+      step: 7,
+      title: "Open Your Pull Request",
+      description:
+        "Navigate to GitHub and click 'Compare & pull request'. Fill out the PR template describing your changes and link the relevant issue.",
+      command: "https://github.com/IST-ZenithenLab/ZenithenOpen/pulls",
+      isUrl: true,
+    },
+  ];
+
+  const blogPosts = [
+    {
+      title: "How I Cracked My First GSoC as a Sophomore Developer",
+      author: "IST Alumni Scholar",
+      date: "October 2026",
+      readTime: "6 min read",
+      category: "Career & Fellowships",
+      excerpt:
+        "A tactical breakdown of proposal writing, communicating with maintainers, and turning small documentation pull requests into an accepted Google Summer of Code project.",
+      slug: "#",
+    },
+    {
+      title: "Understanding Git Under the Hood: Blobs, Trees, and Commits",
+      author: "ZenithenOpen Core Team",
+      date: "September 2026",
+      readTime: "8 min read",
+      category: "Engineering Deep Dive",
+      excerpt:
+        "Demystifying the internal object database of Git. Learn how directed acyclic graphs (DAGs) and SHA hashes power modern distributed version control.",
+      slug: "#",
+    },
+    {
+      title: "Building Real-Time Multi-Theme Engines with CSS Variables",
+      author: "Lead Frontend Maintainer",
+      date: "August 2026",
+      readTime: "5 min read",
+      category: "Web Architecture",
+      excerpt:
+        "A case study on architecting ZenithenOpen's 7-preset instant theme system using HSL color variables, localStorage persistence, and zero page reloads.",
+      slug: "#",
+    },
+    {
+      title: "Why Campus Open-Source Matters for Your Engineering Career",
+      author: "Community Mentors",
+      date: "July 2026",
+      readTime: "4 min read",
+      category: "Community Insights",
+      excerpt:
+        "How shipping verified pull requests into production repositories accelerates technical interviews and outshines generic classroom resume projects.",
+      slug: "#",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-16 px-4 sm:px-6 lg:px-8 transition-colors">
-      <div className="mx-auto max-w-4xl">
+    <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 transition-colors">
+      <div className="mx-auto max-w-5xl">
+        {/* Top Breadcrumb */}
         <Link
           href="/"
-          className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground mb-8 transition-colors"
+          className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground mb-8 transition-colors group"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
           <span>Back to Home</span>
         </Link>
 
-        <div className="inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-primary font-mono mb-3">
-          <BookOpen className="h-4 w-4" />
-          <span>Contributor Enablement</span>
+        {/* Header */}
+        <div className="space-y-3">
+          <div className="inline-flex items-center space-x-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary font-mono">
+            <BookOpen className="h-3.5 w-3.5" />
+            <span>Developer Enablement & Knowledge</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
+            Developer Resources
+          </h1>
+
+          <div className="p-4 rounded-xl border border-border bg-card/60">
+            <p className="text-base font-semibold text-primary">
+              &ldquo;Learn to make first PR&rdquo;
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+              Step-by-step guidance, git fundamentals, interactive pull request checklists, and in-depth technical blogs written by student developers for student developers.
+            </p>
+          </div>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-          Developer Resources
-        </h1>
-        <p className="mt-2 text-base text-muted-foreground leading-relaxed">
-          Learn to make first PR
-        </p>
-
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {steps.map((step, idx) => (
-            <div
-              key={idx}
-              className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors"
-            >
-              <div className="flex items-center space-x-2.5 text-xs font-bold text-primary mb-2 font-mono">
-                <CheckCircle2 className="h-4 w-4" />
-                <span>{step.title}</span>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-                {step.description}
-              </p>
-              <div className="rounded-xl bg-muted/60 border border-border/80 p-3 font-mono text-[11px] text-foreground overflow-x-auto">
-                <code>{step.command}</code>
-              </div>
-            </div>
-          ))}
+        {/* Navigation Tabs */}
+        <div className="mt-8 flex flex-wrap items-center gap-2 border-b border-border/80 pb-4">
+          <div className="flex items-center text-xs text-muted-foreground font-mono mr-2">
+            <Filter className="h-3.5 w-3.5 mr-1" />
+            <span>Filter:</span>
+          </div>
+          {tabs.map((tab) => {
+            const isSelected = activeTab === tab;
+            return (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  "px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border",
+                  isSelected
+                    ? "bg-primary text-primary-foreground border-primary shadow-xs font-semibold"
+                    : "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
+              >
+                {tab}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="mt-10 rounded-2xl border border-border bg-card/60 p-8 text-center">
-          <h3 className="text-lg font-bold text-foreground">Looking for Triaged Issues?</h3>
-          <p className="mt-1 text-xs text-muted-foreground max-w-md mx-auto">
-            Browse our curated opportunities board to find verified good first issues with mentor support.
+        {/* Section Contents */}
+        <div className="mt-8 space-y-12">
+          {/* Section: Learn to PR */}
+          {(activeTab === "All" || activeTab === "Learn to PR") && (
+            <section id="learn-to-pr" className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <GitPullRequest className="h-5 w-5 text-primary" />
+                <h2 className="text-2xl font-bold text-foreground">
+                  Learn Pull Requests (Learn to PR)
+                </h2>
+              </div>
+
+              <div className="space-y-4">
+                {learnConcepts.map((concept, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+                        {concept.category}
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-foreground">
+                      {concept.title}
+                    </h3>
+
+                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                      {concept.description}
+                    </p>
+
+                    <div className="mt-4 pt-3 border-t border-border/80 space-y-2">
+                      {concept.keyTakeaways.map((point, pIdx) => (
+                        <div key={pIdx} className="flex items-start space-x-2 text-xs text-foreground">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                          <span className="leading-snug text-muted-foreground">{point}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Section: Make First PR */}
+          {(activeTab === "All" || activeTab === "Make First PR") && (
+            <section id="make-first-pr" className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Terminal className="h-5 w-5 text-primary" />
+                  <h2 className="text-2xl font-bold text-foreground">
+                    Make Your First PR (Make First PR)
+                  </h2>
+                </div>
+                <span className="text-xs font-mono text-primary font-semibold">
+                  7 Guided Steps
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                {firstPrSteps.map((step, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-primary/40 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold font-mono">
+                          {step.step}
+                        </span>
+                        <h3 className="text-sm font-bold text-foreground">
+                          {step.title}
+                        </h3>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground ml-8 leading-relaxed mb-3">
+                      {step.description}
+                    </p>
+
+                    <div className="ml-8 flex items-center justify-between rounded-xl bg-muted/60 border border-border/80 px-3.5 py-2.5 font-mono text-xs text-foreground overflow-x-auto">
+                      <code className="text-[11px] truncate mr-2">{step.command}</code>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(step.command, idx)}
+                        className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
+                        title="Copy command"
+                      >
+                        {copiedIndex === idx ? (
+                          <Check className="h-3.5 w-3.5 text-primary" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Section: Blog */}
+          {(activeTab === "All" || activeTab === "Blog") && (
+            <section id="blog" className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Newspaper className="h-5 w-5 text-primary" />
+                <h2 className="text-2xl font-bold text-foreground">
+                  Technical Blog & Engineering Stories
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {blogPosts.map((post, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-2.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+                          {post.category}
+                        </span>
+                        <span className="text-[10px] font-mono text-muted-foreground">
+                          {post.readTime}
+                        </span>
+                      </div>
+
+                      <h3 className="text-base font-bold text-foreground leading-snug">
+                        {post.title}
+                      </h3>
+
+                      <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                        {post.excerpt}
+                      </p>
+                    </div>
+
+                    <div className="mt-5 pt-4 border-t border-border/80 flex items-center justify-between text-xs">
+                      <div className="flex items-center text-muted-foreground font-mono text-[11px]">
+                        <Calendar className="h-3 w-3 mr-1 text-primary" />
+                        <span>{post.date} &bull; {post.author}</span>
+                      </div>
+                      <Link href="https://github.com/IST-ZenithenLab/ZenithenOpen" target="_blank" rel="noreferrer">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-xs text-primary hover:text-primary hover:bg-primary/10 cursor-pointer"
+                        >
+                          <span>Read Article</span>
+                          <ChevronRight className="ml-1 h-3 w-3" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+
+        {/* Bottom Banner */}
+        <div className="mt-12 rounded-2xl border border-border bg-card/60 p-6 sm:p-8 text-center">
+          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary mb-3">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <h3 className="text-base font-bold text-foreground">
+            Ready to Write a Blog Post for the Community?
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
+            Share your technical learnings, open-source milestones, or tutorial guides with the campus developer community.
           </p>
-          <div className="mt-5 flex justify-center gap-3">
-            <Link href="/opportunities">
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs">
-                Explore Good First Issues
+          <div className="mt-4">
+            <Link href="https://github.com/IST-ZenithenLab/ZenithenOpen" target="_blank" rel="noreferrer">
+              <Button size="sm" variant="outline" className="border-border text-xs text-foreground cursor-pointer">
+                <span>Submit a Technical Article</span>
+                <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
               </Button>
             </Link>
           </div>
