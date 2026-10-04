@@ -104,7 +104,7 @@ export const MOCK_FIRST_PR_STORIES: FirstPrStory[] = [];
 export const MOCK_LEADERBOARD: ContributorLeaderboardEntry[] = [];
 
 /**
- * Verified engineering learning roadmaps authored for S-VYASA students.
+ * Verified engineering learning roadmaps authored for IST students.
  * Provides authentic, high-value structured curriculums with 0 fake enrollment counts.
  */
 export const MOCK_LEARNING_PATHS: LearningPath[] = [
@@ -257,7 +257,7 @@ export const MOCK_LEARNING_PATHS: LearningPath[] = [
 export const MOCK_RESUME_DATA: ResumeProfileData = {
   fullName: "Your Name",
   headline: "Open-Source Software Engineer",
-  email: "your.email@svyasa.edu.in",
+  email: "your.email@ist.edu.in",
   location: "Bengaluru, India",
   githubUsername: "yourusername",
   linkedinUrl: "https://linkedin.com",
@@ -273,7 +273,7 @@ export const MOCK_RESUME_DATA: ResumeProfileData = {
   highlightedRepos: [
     {
       name: "ZenithenOpen",
-      description: "Open-source community engineering platform for S-VYASA University.",
+      description: "Open-source community engineering platform for IST.",
       stars: 0,
       language: "TypeScript",
       prsAuthored: 1,
@@ -281,7 +281,7 @@ export const MOCK_RESUME_DATA: ResumeProfileData = {
     },
   ],
   education: {
-    institution: "S-VYASA Deemed to be University, Bengaluru",
+    institution: "IST Bengaluru",
     degree: "Bachelor of Technology",
     field: "Computer Science & Engineering",
     graduationYear: "2027",

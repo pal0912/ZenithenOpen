@@ -1,5 +1,5 @@
 # ZenithenOpen 🚀
-### Production-Grade Open-Source Community Platform for S-VYASA University & IST-ZenithenLab
+### Production-Grade Open-Source Community Platform for IST & IST-ZenithenLab
 
 [![ZenithenOpen CI](https://github.com/IST-ZenithenLab/ZenithenOpen/actions/workflows/ci.yml/badge.svg)](https://github.com/IST-ZenithenLab/ZenithenOpen/actions/workflows/ci.yml)
 [![Next.js](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)](https://nextjs.org/)
@@ -12,7 +12,7 @@
 
 ## 📖 Overview
 
-**ZenithenOpen** is the official open-source engineering and community platform designed for **S-VYASA University** and **IST-ZenithenLab**, empowering 2,000+ student developers, contributors, and alumni to:
+**ZenithenOpen** is the official open-source engineering and community platform designed for **IST** and **IST-ZenithenLab**, empowering 2,000+ student developers, contributors, and alumni to:
 - 📊 Track live community impact metrics, merged pull requests, and repository health.
 - 🏆 Compete on contributor leaderboards with monthly and all-time rankings.
 - 🎯 Discover beginner-friendly, triaged **Good First Issues** across campus open-source projects.
@@ -132,4 +132,4 @@ We welcome contributions from students, mentors, and open-source enthusiasts!
 
 ## 📄 License
 
-Distributed under the MIT License. Built with ❤️ by [IST-ZenithenLab](https://github.com/IST-ZenithenLab) and the S-VYASA Open Source Community.
+Distributed under the MIT License. Built with ❤️ by [IST-ZenithenLab](https://github.com/IST-ZenithenLab) and the IST Open Source Community.

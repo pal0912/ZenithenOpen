@@ -22,7 +22,7 @@ export function Footer() {
             <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
               The premier open-source engineering community at{" "}
               <span className="text-foreground font-medium">
-                S-VYASA Deemed to be University, Bengaluru
+                IST Bengaluru
               </span>
               . Building production software, empowering first-time contributors, and shipping to millions.
             </p>
@@ -133,7 +133,7 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-12 flex flex-col items-center justify-between border-t border-border pt-6 sm:flex-row text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} ZenithenOpen • S-VYASA Deemed to be University, Bengaluru.</p>
+          <p>© {new Date().getFullYear()} ZenithenOpen • IST Bengaluru.</p>
           <div className="mt-4 flex items-center space-x-4 sm:mt-0">
             <span className="flex items-center space-x-1">
               <span>Architected for</span>

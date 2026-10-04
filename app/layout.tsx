@@ -15,12 +15,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ZenithenOpen — Open-Source Community Platform | S-VYASA Bengaluru",
+  title: "ZenithenOpen — Open-Source Community Platform | IST Bengaluru",
   description:
-    "Data-driven open-source development community at S-VYASA Deemed to be University, Bengaluru. Showcasing member achievements, GitHub contributions, live projects, learning paths, mentorship, and GSoC preparation.",
+    "Data-driven open-source development community at IST Bengaluru. Showcasing member achievements, GitHub contributions, live projects, learning paths, mentorship, and GSoC preparation.",
   keywords: [
     "ZenithenOpen",
-    "S-VYASA University",
+    "IST",
     "Open Source Community",
     "Bengaluru Tech",
     "GitHub Contributions",

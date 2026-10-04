@@ -60,7 +60,7 @@ export default function MembersPage() {
                 Members & Contributors
               </h1>
               <p className="mt-1 text-sm text-muted-foreground max-w-2xl leading-relaxed">
-                Student developers, open-source maintainers, and mentors building across S-VYASA Deemed to be University, Bengaluru.
+                Student developers, open-source maintainers, and mentors building across IST Bengaluru.
               </p>
             </div>
             <Button
@@ -113,7 +113,7 @@ export default function MembersPage() {
             </div>
             <h3 className="text-xl font-bold text-foreground">No Members Connected Yet</h3>
             <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-              Be the founding student contributor to link your GitHub profile to the S-VYASA directory.
+              Be the founding student contributor to link your GitHub profile to the IST directory.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Button

@@ -94,10 +94,10 @@ Linear/Vercel-Grade Design System Overhaul & Authentic Zero-State Sanitization
 ## Entry: 2026-10-02 — Milestone 3: 2-Step USN Verification, GitHub Auth Modal & Open-Source Database Abstraction
 
 ### Milestone
-S-VYASA Student USN Verification, GitHub SSO Link Modal, and Decoupled Database Layer
+IST Student USN Verification, GitHub SSO Link Modal, and Decoupled Database Layer
 
 ### Files Changed
-* `lib/auth/usn-verification.ts` — Implemented algorithmic S-VYASA enrollment validator (`^(1SV|SV)\d{2}[A-Z]{2,4}\d{3}$`) with branch decoding, year of study inference, and pluggable DB hooks. Zero hardcoded student records committed to git.
+* `lib/auth/usn-verification.ts` — Implemented algorithmic IST enrollment validator (`^(1SV|SV)\d{2}[A-Z]{2,4}\d{3}$`) with branch decoding, year of study inference, and pluggable DB hooks. Zero hardcoded student records committed to git.
 * `lib/db/index.ts` — Created clean database layer abstraction interface with `isDatabaseConfigured()` check and plug-and-play PostgreSQL / Prisma hooks.
 * `app/api/auth/verify-usn/route.ts` — Dynamic Next.js API route verifying student USN via async verification service.
 * `components/auth/auth-context.tsx` — Global client-side authentication provider managing student enrollment state, GitHub link status, and session persistence in `localStorage`.
@@ -111,7 +111,7 @@ S-VYASA Student USN Verification, GitHub SSO Link Modal, and Decoupled Database 
 
 ### Architecture & Open-Source Decisions
 1. **Public Repository Privacy**: In accordance with open-source hygiene, zero private student rosters or mock student names exist in source control. The validation layer operates algorithmically today, and seamlessly connects to PostgreSQL or Supabase as soon as `DATABASE_URL` is set in production.
-2. **Decoupled 2-Step Workflow**: Prevents unauthorized GitHub linking by ensuring only S-VYASA University students can register.
+2. **Decoupled 2-Step Workflow**: Prevents unauthorized GitHub linking by ensuring only IST students can register.
 3. **Pluggable DB Adapter**: Allows the frontend to be fully tested and deployed on open-source platforms while leaving database integration as a drop-in hook in `lib/db/index.ts`.
 
 ### Verification

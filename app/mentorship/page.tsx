@@ -124,7 +124,7 @@ export default function MentorshipPage() {
                 <div>
                   <h3 className="text-lg font-bold text-foreground">Request Open-Source Mentorship</h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Match with an S-VYASA student mentor for 1-on-1 code reviews.
+                    Match with an IST student mentor for 1-on-1 code reviews.
                   </p>
                 </div>
                 <button
@@ -161,7 +161,7 @@ export default function MentorshipPage() {
                     <Input
                       required
                       type="email"
-                      placeholder="student@svyasa.edu.in"
+                      placeholder="student@ist.edu.in"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="bg-background border-border text-foreground text-xs"

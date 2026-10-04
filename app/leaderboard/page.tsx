@@ -33,7 +33,7 @@ export default function LeaderboardPage() {
             Contributor Leaderboard
           </h1>
           <p className="mt-1 text-sm text-muted-foreground max-w-2xl leading-relaxed">
-            Celebrating S-VYASA student developers who contribute, review, and ship code together.
+            Celebrating IST student developers who contribute, review, and ship code together.
             We prioritize steady progress and constructive code reviews over raw volume.
           </p>
 

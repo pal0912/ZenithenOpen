@@ -1,12 +1,12 @@
 /**
- * S-VYASA University Student USN Verification Service (Open-Source Architecture)
+ * IST Student USN Verification Service (Open-Source Architecture)
  * 
- * Verifies whether an incoming student belongs to S-VYASA University
+ * Verifies whether an incoming student belongs to IST
  * before permitting them to link their GitHub profile.
  * 
  * Designed for Open-Source:
  * - Zero hardcoded student names or sensitive rosters in source control.
- * - Algorithmic verification validates authentic S-VYASA USN formats (1SV... / SV...).
+ * - Algorithmic verification validates authentic IST USN formats (1SV... / SV...).
  * - Pluggable Database Hook: Connects to PostgreSQL, Prisma, Drizzle, or Supabase
  *   when the database is configured.
  */
@@ -49,15 +49,15 @@ export async function queryStudentDatabase(usn: string): Promise<VerifiedStudent
     name: record.name || `Student (${record.usn})`,
     department: record.department || "School of Computing & Engineering",
     year: record.year || "Student",
-    college: "S-VYASA Deemed to be University, Bengaluru",
+    college: "IST Bengaluru",
     verifiedAt: new Date().toISOString(),
   };
 }
 
 /**
- * Known S-VYASA engineering and computing departments mapped by code
+ * Known IST engineering and computing departments mapped by code
  */
-const SVYASA_BRANCH_MAP: Record<string, string> = {
+const IST_BRANCH_MAP: Record<string, string> = {
   CS: "Computer Science & Engineering",
   CSE: "Computer Science & Engineering",
   AI: "Artificial Intelligence & Data Science",
@@ -72,13 +72,13 @@ const SVYASA_BRANCH_MAP: Record<string, string> = {
 };
 
 /**
- * Algorithmic validator for S-VYASA University USN format.
+ * Algorithmic validator for IST USN format.
  * Format standard: ^(1SV|SV)[0-9]{2}[A-Z]{2,4}[0-9]{3}$ (e.g., 1SV23CS042, 1SV24AI015)
  */
-export function parseSvyasaUsn(rawUsn: string): VerifiedStudent | null {
+export function parseIstUsn(rawUsn: string): VerifiedStudent | null {
   const normalized = rawUsn.trim().toUpperCase();
-  const svyasaPattern = /^(1SV|SV)(\d{2})([A-Z]{2,4})(\d{3})$/i;
-  const match = normalized.match(svyasaPattern);
+  const pattern = /^(1SV|SV)(\d{2})([A-Z]{2,4})(\d{3})$/i;
+  const match = normalized.match(pattern);
 
   if (!match) {
     // Also accept generic SV prefix with roll number for legacy or alternative schemes
@@ -88,7 +88,7 @@ export function parseSvyasaUsn(rawUsn: string): VerifiedStudent | null {
         name: `Student (${normalized})`,
         department: "School of Computing & Engineering",
         year: "Enrolled Student",
-        college: "S-VYASA Deemed to be University, Bengaluru",
+        college: "IST Bengaluru",
         verifiedAt: new Date().toISOString(),
       };
     }
@@ -98,7 +98,7 @@ export function parseSvyasaUsn(rawUsn: string): VerifiedStudent | null {
   const yearDigits = match[2];
   const branchCode = match[3];
 
-  const department = SVYASA_BRANCH_MAP[branchCode] || `${branchCode} Engineering`;
+  const department = IST_BRANCH_MAP[branchCode] || `${branchCode} Engineering`;
   const admissionYear = 2000 + parseInt(yearDigits, 10);
   const currentYear = new Date().getFullYear();
   const yearDiff = currentYear - admissionYear + 1;
@@ -110,17 +110,18 @@ export function parseSvyasaUsn(rawUsn: string): VerifiedStudent | null {
     name: `Student (${normalized})`,
     department,
     year: yearLabel,
-    college: "S-VYASA Deemed to be University, Bengaluru",
+    college: "IST Bengaluru",
     verifiedAt: new Date().toISOString(),
   };
 }
 
+
 /**
- * Validates whether an entered USN belongs to S-VYASA University.
+ * Validates whether an entered USN belongs to IST.
  * 
  * Flow:
  * 1. Checks future database record if database provider is active.
- * 2. Fallbacks to S-VYASA algorithmic format validation (Open-Source mode).
+ * 2. Fallbacks to IST algorithmic format validation (Open-Source mode).
  */
 export async function verifyStudentUSN(rawUsn: string): Promise<VerificationResult> {
   if (!rawUsn || typeof rawUsn !== "string") {
@@ -146,7 +147,7 @@ export async function verifyStudentUSN(rawUsn: string): Promise<VerificationResu
   }
 
   // 2. Open-source algorithmic validation
-  const parsedStudent = parseSvyasaUsn(normalized);
+  const parsedStudent = parseIstUsn(normalized);
   if (parsedStudent) {
     return {
       valid: true,
@@ -156,6 +157,6 @@ export async function verifyStudentUSN(rawUsn: string): Promise<VerificationResu
 
   return {
     valid: false,
-    error: "Invalid University USN. Only students of S-VYASA University (prefix: 1SV... or SV...) are eligible to join.",
+    error: "Invalid University USN. Only students of IST (prefix: 1SV... or SV...) are eligible to join.",
   };
 }

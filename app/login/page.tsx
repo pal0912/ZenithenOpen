@@ -28,7 +28,7 @@ export default function LoginPage() {
           <ShieldCheck className="h-3.5 w-3.5" />
           <span>Student Authentication</span>
         </div>
-        <h1 className="text-2xl font-extrabold text-foreground">S-VYASA Contributor Access</h1>
+        <h1 className="text-2xl font-extrabold text-foreground">IST Contributor Access</h1>
         <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
           Verify your enrollment via university USN, then link your GitHub account to access open-source repos, pull request tracking, and the contributor leaderboard.
         </p>

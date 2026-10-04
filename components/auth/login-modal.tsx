@@ -58,7 +58,7 @@ export function LoginModal() {
       const data = await res.json();
 
       if (!res.ok || !data.verified) {
-        setErrorMessage(data.error || "Invalid USN. Ensure you enter a valid S-VYASA enrollment number.");
+        setErrorMessage(data.error || "Invalid USN. Ensure you enter a valid IST enrollment number.");
         setIsVerifying(false);
         return;
       }
@@ -144,7 +144,7 @@ export function LoginModal() {
           </span>
         </div>
 
-        {/* STEP 1: S-VYASA USN VERIFICATION */}
+        {/* STEP 1: IST USN VERIFICATION */}
         {step === 1 && (
           <div>
             <div className="flex items-center space-x-3 mb-4">
@@ -155,12 +155,12 @@ export function LoginModal() {
                 <h2 className="text-xl font-extrabold tracking-tight text-foreground">
                   Student Verification
                 </h2>
-                <p className="text-xs text-muted-foreground">S-VYASA University Contributor Access</p>
+                <p className="text-xs text-muted-foreground">IST Contributor Access</p>
               </div>
             </div>
 
             <p className="text-xs text-muted-foreground leading-relaxed mb-5">
-              ZenithenOpen is exclusive to S-VYASA engineering students. Enter your University Serial Number (USN) to confirm your campus enrollment.
+              ZenithenOpen is exclusive to IST engineering students. Enter your University Serial Number (USN) to confirm your campus enrollment.
             </p>
 
             {errorMessage && (
@@ -247,7 +247,7 @@ export function LoginModal() {
               <div className="flex items-center justify-between">
                 <span className="flex items-center space-x-1.5 text-xs font-semibold text-accent">
                   <CheckCircle2 className="h-4 w-4" />
-                  <span>S-VYASA Student Verified</span>
+                  <span>IST Student Verified</span>
                 </span>
                 <span className="font-mono text-xs font-bold text-accent bg-accent/20 px-2 py-0.5 rounded border border-accent/40">
                   {verifiedStudent.usn}

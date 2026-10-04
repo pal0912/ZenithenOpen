@@ -49,7 +49,7 @@ export default function HomePage() {
                 Campus Project Catalog
               </h2>
               <p className="text-sm text-muted-foreground mt-1 max-w-xl">
-                Open-source software maintained by S-VYASA engineers and student contributors.
+                Open-source software maintained by IST engineers and student contributors.
               </p>
             </div>
             <Link href="/projects">
@@ -284,7 +284,7 @@ export default function HomePage() {
             From First Commit to Google Summer of Code
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
-            Guided roadmaps curated for S-VYASA students to master open source and distributed software development.
+            Guided roadmaps curated for IST students to master open source and distributed software development.
           </p>
 
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-left">
@@ -328,7 +328,7 @@ export default function HomePage() {
             Ready to ship your first commit?
           </h2>
           <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Join S-VYASA University&apos;s open-source engineering chapter.
+            Join IST&apos;s open-source engineering chapter.
             Connect with campus mentors, choose a roadmap, and see your code merged into production.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">

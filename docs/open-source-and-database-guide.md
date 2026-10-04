@@ -12,12 +12,12 @@ ZenithenOpen is built to be hosted on public open-source repositories (such as G
 ## 2. University USN Verification Architecture
 
 The login system uses a 2-step verification workflow:
-1. **Step 1 — S-VYASA USN Verification:** Validates that the student is an enrolled student at S-VYASA University.
+1. **Step 1 — IST USN Verification:** Validates that the student is an enrolled student at IST.
 2. **Step 2 — GitHub Profile Linking:** Authorizes and links their GitHub account to their student record.
 
 ### How Verification Works Today (Standalone Open-Source Mode)
 - Located in [`lib/auth/usn-verification.ts`](file:///d:/ZenithenOpen/lib/auth/usn-verification.ts).
-- Verifies the standard S-VYASA University USN format:
+- Verifies the standard IST USN format:
   ```regex
   ^(1SV|SV)[0-9]{2}[A-Z]{2,4}[0-9]{3}$
   ```

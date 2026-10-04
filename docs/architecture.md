@@ -1,7 +1,7 @@
 # ZenithenOpen Architecture Specification
 
 **Version:** 1.0.0 (October 2026)  
-**Organization:** IST-ZenithenLab / S-VYASA University  
+**Organization:** IST-ZenithenLab / IST  
 **Target Scale:** 2,000+ active students, contributors, and alumni
 
 ---

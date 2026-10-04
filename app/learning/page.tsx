@@ -208,7 +208,7 @@ export default function LearningPathsPage() {
                 Open Source Fellowship Tracker
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                ZenithenOpen provides free 1-on-1 mentorship for S-VYASA students applying to Google Summer of Code, LFX, and Linux Foundation programs.
+                ZenithenOpen provides free 1-on-1 mentorship for IST students applying to Google Summer of Code, LFX, and Linux Foundation programs.
               </p>
               <ul className="text-xs space-y-2 text-muted-foreground">
                 <li className="flex items-center space-x-2">
