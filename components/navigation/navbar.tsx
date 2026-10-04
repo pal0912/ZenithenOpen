@@ -11,7 +11,6 @@ import {
   Menu,
   X,
   LogOut,
-  Palette,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -51,36 +50,43 @@ export function Navbar() {
       )}
     >
       <div className="w-full flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Brand Logo - Clicking it opens the theme options menu */}
-        <div className="flex items-center flex-1 justify-start">
+        {/* Brand Area: Logo button triggers theme menu; Name links to homepage (First page) */}
+        <div className="flex items-center flex-1 justify-start space-x-3">
+          {/* Logo Theme Trigger Button */}
           <button
             type="button"
             data-theme-trigger="navbar"
             onClick={() => toggleMenu("navbar")}
-            aria-label={`ZenithenOpen — Click to change theme (current: ${theme})`}
+            aria-label={`Switch theme (current: ${theme})`}
             aria-haspopup="dialog"
             aria-expanded={isThemeActiveOnNavbar}
-            title="Click ZenithenOpen logo to change theme"
+            title="Click to change theme"
             className={cn(
-              "group flex items-center space-x-2.5 text-left rounded-xl p-1 -ml-1 transition-all cursor-pointer",
+              "group relative flex h-10 w-10 items-center justify-center rounded-xl transition-all cursor-pointer",
+              "bg-gradient-to-br from-primary via-secondary to-accent p-0.5 shadow-md shadow-primary/20",
+              "hover:scale-105 active:scale-95 transition-transform",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-              isThemeActiveOnNavbar && "ring-2 ring-primary/40 bg-muted/40"
+              isThemeActiveOnNavbar && "ring-2 ring-primary ring-offset-2 ring-offset-background"
             )}
           >
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-secondary to-accent p-0.5 shadow-md shadow-primary/20 group-hover:scale-105 transition-transform">
-              <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-card">
-                <Code2 className="h-5 w-5 text-primary group-hover:text-secondary transition-colors" />
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-                Zenithen<span className="text-primary">Open</span>
-              </span>
-              <span className="text-[10px] font-medium text-muted-foreground tracking-wider uppercase">
-                Open Source Community
-              </span>
+            <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-card transition-colors group-hover:bg-card/80">
+              <Code2 className="h-5 w-5 text-primary group-hover:text-secondary transition-colors" />
             </div>
           </button>
+
+          {/* Brand Name Link - Returns to First Page */}
+          <Link
+            href="/"
+            className="flex flex-col group select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md px-1 -ml-1 transition-all"
+            title="Go to ZenithenOpen Homepage"
+          >
+            <span className="text-lg font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+              Zenithen<span className="text-primary">Open</span>
+            </span>
+            <span className="text-[10px] font-medium text-muted-foreground tracking-wider uppercase group-hover:text-foreground transition-colors">
+              Open Source Community
+            </span>
+          </Link>
         </div>
 
         {/* Desktop Nav Links - Centered in middle */}
@@ -106,17 +112,6 @@ export function Navbar() {
 
         {/* Right Action buttons */}
         <div className="hidden sm:flex items-center flex-1 justify-end space-x-3">
-          {/* Header Theme Switcher Icon */}
-          <button
-            type="button"
-            data-theme-trigger="navbar-icon"
-            onClick={() => toggleMenu("navbar")}
-            aria-label={`Change theme (current: ${theme})`}
-            title={`Switch theme (current: ${theme})`}
-            className="flex items-center justify-center h-8 w-8 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-          >
-            <Palette className="h-4 w-4 text-primary" />
-          </button>
 
           {user ? (
             <div className="flex items-center space-x-2">
@@ -164,16 +159,6 @@ export function Navbar() {
 
         {/* Mobile menu trigger */}
         <div className="flex lg:hidden items-center space-x-2">
-          <button
-            type="button"
-            data-theme-trigger="mobile-icon"
-            onClick={() => toggleMenu("navbar")}
-            aria-label={`Change theme (current: ${theme})`}
-            className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
-            title="Change theme"
-          >
-            <Palette className="h-5 w-5 text-primary" />
-          </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
