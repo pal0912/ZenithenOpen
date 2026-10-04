@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   BookOpen,
@@ -20,12 +21,18 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useNavigation } from "@/components/navigation/navigation-context";
 
+const VALID_RESOURCE_TABS = ["learn-to-pr", "make-first-pr", "blog"] as const;
+type ResourceTab = (typeof VALID_RESOURCE_TABS)[number];
+
 export default function ResourcesPage() {
   const { activeSection } = useNavigation();
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
 
-  // Default to Learn to PR
-  const currentTab = activeSection || "learn-to-pr";
+  // Robust algorithm matching Programs: safely falls back to default if activeSection is invalid or null
+  const defaultTab: ResourceTab = "learn-to-pr";
+  const currentTab: ResourceTab = VALID_RESOURCE_TABS.includes(activeSection as ResourceTab)
+    ? (activeSection as ResourceTab)
+    : defaultTab;
 
   const copyToClipboard = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
@@ -196,7 +203,13 @@ export default function ResourcesPage() {
 
         {/* ONLY THE SELECTED RESOURCE SECTION - NO OTHER THINGS */}
         <div className="mt-10">
-          {/* Section: Learn to PR */}
+          <motion.div
+            key={currentTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            {/* Section: Learn to PR */}
           {currentTab === "learn-to-pr" && (
             <section className="space-y-6 rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5">
               <div className="flex items-center space-x-3 mb-2">
@@ -374,6 +387,7 @@ export default function ResourcesPage() {
               </div>
             </section>
           )}
+          </motion.div>
         </div>
       </div>
     </div>

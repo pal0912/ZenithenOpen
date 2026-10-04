@@ -18,11 +18,17 @@ import {
 } from "lucide-react";
 import { useNavigation } from "@/components/navigation/navigation-context";
 
+const VALID_COMMUNITY_TABS = ["about", "journey", "members", "rewards", "featured"] as const;
+type CommunityTab = (typeof VALID_COMMUNITY_TABS)[number];
+
 export default function CommunityPage() {
   const { activeSection } = useNavigation();
 
-  // Default to About section
-  const currentTab = activeSection || "about";
+  // Robust algorithm matching Programs: safely falls back to default if activeSection is invalid or null
+  const defaultTab: CommunityTab = "about";
+  const currentTab: CommunityTab = VALID_COMMUNITY_TABS.includes(activeSection as CommunityTab)
+    ? (activeSection as CommunityTab)
+    : defaultTab;
 
   const milestones = [
     {

@@ -151,7 +151,8 @@ export function Navbar() {
             className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-1 sm:space-x-1.5 overflow-x-auto no-scrollbar py-1 px-2 max-w-[55vw]"
           >
             {currentNavItems.map((item) => {
-              const currentActive = activeSection || currentNavItems[0]?.id;
+              const isValidActive = currentNavItems.some((n) => n.id === activeSection);
+              const currentActive = isValidActive ? activeSection : currentNavItems[0]?.id;
               const isSelected = currentActive === item.id;
               return (
                 <button

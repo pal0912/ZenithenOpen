@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   Calendar,
@@ -19,11 +20,17 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useNavigation } from "@/components/navigation/navigation-context";
 
+const VALID_EVENT_TABS = ["upcoming", "hackathons", "achievements"] as const;
+type EventTab = (typeof VALID_EVENT_TABS)[number];
+
 export default function EventsPage() {
   const { activeSection } = useNavigation();
 
-  // Default to Upcoming
-  const currentTab = activeSection || "upcoming";
+  // Robust algorithm matching Programs: safely falls back to default if activeSection is invalid or null
+  const defaultTab: EventTab = "upcoming";
+  const currentTab: EventTab = VALID_EVENT_TABS.includes(activeSection as EventTab)
+    ? (activeSection as EventTab)
+    : defaultTab;
 
   const upcomingEvents = [
     {
@@ -164,7 +171,13 @@ export default function EventsPage() {
 
         {/* ONLY THE SELECTED EVENT SECTION - NO OTHER THINGS */}
         <div className="mt-10">
-          {/* Section: Upcoming */}
+          <motion.div
+            key={currentTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            {/* Section: Upcoming */}
           {currentTab === "upcoming" && (
             <section className="space-y-6 rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5">
               <div className="flex items-center justify-between">
@@ -392,6 +405,7 @@ export default function EventsPage() {
               </div>
             </section>
           )}
+          </motion.div>
         </div>
       </div>
     </div>
