@@ -4,29 +4,57 @@ import { ArrowRight } from "lucide-react";
 import { GithubIcon } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { FloatingOrgBadges } from "@/components/hero/floating-org-badges";
+import { useNavigation } from "@/components/navigation/navigation-context";
+import { cn } from "@/lib/utils";
 
 export function HeroSection() {
+  const { isSidebarOpen } = useNavigation();
+
   return (
     <section className="relative overflow-hidden pt-20 pb-20 lg:pt-28 lg:pb-32 min-h-[820px] flex items-center justify-center bg-background border-b border-border transition-colors">
-      {/* Floating Badges Constellation of Top GitHub Organizations */}
-      <FloatingOrgBadges />
+      {/* Floating Badges Constellation of Top GitHub Organizations - Smoothly fades out when menu opens */}
+      <div
+        className={cn(
+          "absolute inset-0 overflow-hidden pointer-events-none transition-all duration-500 ease-in-out",
+          isSidebarOpen
+            ? "opacity-0 scale-95 pointer-events-none"
+            : "opacity-100 scale-100"
+        )}
+        aria-hidden={isSidebarOpen}
+      >
+        <FloatingOrgBadges />
+      </div>
 
       {/* Ambient background glow highlights responding to theme tokens */}
       <div
-        className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[480px] blur-[130px] pointer-events-none rounded-full"
+        className={cn(
+          "absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[480px] blur-[130px] pointer-events-none rounded-full transition-opacity duration-500",
+          isSidebarOpen ? "opacity-30" : "opacity-100"
+        )}
         style={{
           background: "radial-gradient(circle, var(--glow) 0%, transparent 70%)",
         }}
       />
       <div
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[360px] blur-[120px] pointer-events-none rounded-full"
+        className={cn(
+          "absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[360px] blur-[120px] pointer-events-none rounded-full transition-opacity duration-500",
+          isSidebarOpen ? "opacity-30" : "opacity-100"
+        )}
         style={{
           background: "radial-gradient(circle, var(--glow-secondary) 0%, transparent 70%)",
         }}
       />
 
-      {/* Left-Aligned Hero Content */}
-      <div className="relative z-10 pointer-events-none w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-left">
+      {/* Left-Aligned Hero Content - Smoothly animates toward left when menu opens */}
+      <div
+        className={cn(
+          "relative z-10 pointer-events-none w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-left",
+          "transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform",
+          isSidebarOpen
+            ? "-translate-x-4 sm:-translate-x-10 md:-translate-x-16 lg:-translate-x-20 xl:-translate-x-24"
+            : "translate-x-0"
+        )}
+      >
         {/* Hero Title */}
         <h1 className="max-w-4xl text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1]">
           <span className="text-foreground block">Every contributor makes us stronger,</span>

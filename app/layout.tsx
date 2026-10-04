@@ -43,6 +43,8 @@ import { LoginModal } from "@/components/auth/login-modal";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import { ThemeMenu } from "@/components/theme/theme-menu";
+import { NavigationProvider } from "@/components/navigation/navigation-context";
+import { SidebarMenu } from "@/components/navigation/sidebar-menu";
 
 export default function RootLayout({
   children,
@@ -66,12 +68,15 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
         <AuthProvider>
           <ThemeProvider>
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <LoginModal />
-            <ThemeSwitcher />
-            <ThemeMenu />
+            <NavigationProvider>
+              <Navbar />
+              <SidebarMenu />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <LoginModal />
+              <ThemeSwitcher />
+              <ThemeMenu />
+            </NavigationProvider>
           </ThemeProvider>
         </AuthProvider>
       </body>
