@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   Calendar,
@@ -15,14 +14,13 @@ import {
   ExternalLink,
   ChevronRight,
   Sparkles,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useNavigation } from "@/components/navigation/navigation-context";
 
 export default function EventsPage() {
-  const { popupSection, closePopup, openPopup, activeSection } = useNavigation();
+  const { activeSection } = useNavigation();
 
   const upcomingEvents = [
     {
@@ -128,6 +126,16 @@ export default function EventsPage() {
     },
   ];
 
+  // Scroll to section when activeSection changes
+  React.useEffect(() => {
+    if (activeSection) {
+      const el = document.getElementById(activeSection);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [activeSection]);
+
   return (
     <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="mx-auto max-w-5xl">
@@ -156,29 +164,29 @@ export default function EventsPage() {
               &ldquo;upcoming events&rdquo;
             </p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              Explore upcoming coding workshops, weekly open-source hack hours, and celebrate our community&apos;s proud hackathon achievements. Click any option in the top navbar to view details.
+              Explore upcoming coding workshops, weekly open-source hack hours, and celebrate our community&apos;s proud hackathon achievements. Select any option in the top navbar to jump directly to that section.
             </p>
           </div>
         </div>
 
-        {/* Section Contents - Clean without in-page filter bar */}
+        {/* Section Contents */}
         <div className="mt-10 space-y-12">
           {/* Upcoming Section */}
-          <section id="upcoming" className="space-y-4">
+          <section
+            id="upcoming"
+            className={cn(
+              "space-y-4 rounded-2xl transition-all p-1",
+              activeSection === "upcoming" && "ring-2 ring-primary/40 rounded-2xl"
+            )}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5 text-primary" />
                 <h2 className="text-2xl font-bold text-foreground">Upcoming Events</h2>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openPopup("upcoming")}
-                className="border-border text-xs text-foreground cursor-pointer"
-              >
-                <span>Upcoming Details</span>
-                <ChevronRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
+              <span className="text-xs font-mono text-muted-foreground">
+                3 Events Scheduled
+              </span>
             </div>
 
             <div className="space-y-4">
@@ -240,21 +248,16 @@ export default function EventsPage() {
           </section>
 
           {/* Hackathons Section */}
-          <section id="hackathons" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Flame className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">Hackathons & Sprints</h2>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openPopup("hackathons")}
-                className="border-border text-xs text-foreground cursor-pointer"
-              >
-                <span>Hackathons Details</span>
-                <ChevronRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
+          <section
+            id="hackathons"
+            className={cn(
+              "space-y-4 rounded-2xl transition-all p-1",
+              activeSection === "hackathons" && "ring-2 ring-primary/40 rounded-2xl"
+            )}
+          >
+            <div className="flex items-center space-x-2">
+              <Flame className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-bold text-foreground">Hackathons & Sprints</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -303,15 +306,16 @@ export default function EventsPage() {
                   </div>
 
                   <div className="mt-5">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openPopup("hackathons")}
-                      className="w-full border-border text-xs text-foreground hover:bg-muted cursor-pointer"
-                    >
-                      <span>View Hackathon Track</span>
-                      <ChevronRight className="ml-1 h-3.5 w-3.5" />
-                    </Button>
+                    <Link href="https://github.com/IST-ZenithenLab/ZenithenOpen" target="_blank" rel="noreferrer">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full border-border text-xs text-foreground hover:bg-muted cursor-pointer"
+                      >
+                        <span>View Hackathon Track</span>
+                        <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -319,21 +323,16 @@ export default function EventsPage() {
           </section>
 
           {/* Achievements Section */}
-          <section id="achievements" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Trophy className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">Event Achievements</h2>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openPopup("achievements")}
-                className="border-border text-xs text-foreground cursor-pointer"
-              >
-                <span>Achievements Details</span>
-                <ChevronRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
+          <section
+            id="achievements"
+            className={cn(
+              "space-y-4 rounded-2xl transition-all p-1",
+              activeSection === "achievements" && "ring-2 ring-primary/40 rounded-2xl"
+            )}
+          >
+            <div className="flex items-center space-x-2">
+              <Trophy className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-bold text-foreground">Event Achievements</h2>
             </div>
 
             {/* Stats Bar */}
@@ -414,78 +413,6 @@ export default function EventsPage() {
           </div>
         </div>
       </div>
-
-      {/* Events Section Popup Dialog Modal */}
-      <AnimatePresence>
-        {popupSection && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closePopup}
-              aria-hidden="true"
-              className="fixed inset-0 bg-black/75 backdrop-blur-md"
-            />
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative z-10 w-full max-w-2xl rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-2xl text-foreground select-none"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-muted border border-border">
-                    Events Track
-                  </span>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-foreground mt-1 capitalize">
-                    {popupSection.replace("-", " ")}
-                  </h2>
-                </div>
-                <button
-                  type="button"
-                  onClick={closePopup}
-                  aria-label="Close popup"
-                  className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              <div className="mt-4 p-4 rounded-xl border border-border/80 bg-muted/40">
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {popupSection === "upcoming" && "Join our scheduled developer sessions, Git workshops, and weekly office hours to collaborate and build together."}
-                  {popupSection === "hackathons" && "Compete in ZenithHacks, Smart India Hackathon, and Hacktoberfest sprints with community mentorship and bounties."}
-                  {popupSection === "achievements" && "Celebrate student achievements, national finalist selections, and thousands of lines of open-source code shipped into production."}
-                </p>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-border/80 flex items-center justify-end space-x-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={closePopup}
-                  className="border-border text-xs text-foreground cursor-pointer"
-                >
-                  Close
-                </Button>
-                <Link href={`#${popupSection}`} onClick={closePopup}>
-                  <Button
-                    size="sm"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer"
-                  >
-                    <span>Jump to Section</span>
-                    <ChevronRight className="ml-1 h-3.5 w-3.5" />
-                  </Button>
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

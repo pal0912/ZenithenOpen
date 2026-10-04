@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   Rocket,
@@ -15,7 +15,6 @@ import {
   CheckCircle2,
   Sparkles,
   ChevronRight,
-  X,
   Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -123,15 +122,12 @@ const PROGRAMS: ProgramItem[] = [
 ];
 
 export default function ProgramsPage() {
-  const { popupSection, closePopup, openPopup, activeSection, setActiveSection } = useNavigation();
+  const { activeSection, setActiveSection } = useNavigation();
 
   // "make sure that open souce option is default and user see that as a default thing"
   const defaultProgramId = "open-source";
   const currentSelectedId = activeSection || defaultProgramId;
   const currentProgram = PROGRAMS.find((p) => p.id === currentSelectedId) || PROGRAMS[0];
-
-  // Active modal program if popup requested
-  const activeModalProgram = PROGRAMS.find((p) => p.id === popupSection);
 
   const CurrentIcon = currentProgram.icon;
 
@@ -163,18 +159,18 @@ export default function ProgramsPage() {
               &ldquo;All programs, nothing is big or small&rdquo;
             </p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              Every initiative at ZenithenOpen is treated with equal engineering dedication. Select any program from the top navbar to explore details and view its popup.
+              Every initiative at ZenithenOpen is treated with equal engineering dedication. Select any program from the top navbar to explore details directly on this page.
             </p>
           </div>
         </div>
 
-        {/* DEFAULT VIEW: Active Program Featured Showcase */}
+        {/* DEFAULT VIEW: Active Program Featured Showcase directly on the page */}
         <div className="mt-10">
           <motion.div
             key={currentProgram.id}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             className="rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5 transition-all"
           >
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
@@ -188,7 +184,7 @@ export default function ProgramsPage() {
                       {currentProgram.badge}
                     </span>
                     <span className="rounded-md bg-muted border border-border px-2 py-0.5 text-[10px] font-semibold text-muted-foreground font-mono">
-                      Active Program
+                      Viewing Program
                     </span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground mt-2">
@@ -200,23 +196,14 @@ export default function ProgramsPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0 sm:self-start">
-                <Button
-                  size="sm"
-                  onClick={() => openPopup(currentProgram.id)}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer shadow-md shadow-primary/25"
-                >
-                  <span>Open Popup</span>
-                  <ChevronRight className="ml-1 h-3.5 w-3.5" />
-                </Button>
+              <div className="shrink-0 sm:self-start">
                 <Link href={currentProgram.actionHref}>
                   <Button
-                    variant="outline"
                     size="sm"
-                    className="w-full border-border text-xs text-foreground hover:bg-muted cursor-pointer"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer shadow-md shadow-primary/25"
                   >
                     <span>{currentProgram.actionLabel}</span>
-                    <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                    <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
                   </Button>
                 </Link>
               </div>
@@ -255,10 +242,7 @@ export default function ProgramsPage() {
               return (
                 <div
                   key={prog.id}
-                  onClick={() => {
-                    setActiveSection(prog.id);
-                    openPopup(prog.id);
-                  }}
+                  onClick={() => setActiveSection(prog.id)}
                   className={cn(
                     "rounded-xl border p-4.5 cursor-pointer transition-all flex flex-col justify-between select-none group",
                     isSelected
@@ -317,100 +301,6 @@ export default function ProgramsPage() {
           </div>
         </div>
       </div>
-
-      {/* Program Details Popup Modal */}
-      <AnimatePresence>
-        {activeModalProgram && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closePopup}
-              aria-hidden="true"
-              className="fixed inset-0 bg-black/75 backdrop-blur-md"
-            />
-
-            {/* Modal Dialog Content */}
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-label={activeModalProgram.title}
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative z-10 w-full max-w-2xl rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-2xl text-foreground select-none"
-            >
-              {/* Header with Close X */}
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-3.5">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary shrink-0">
-                    <activeModalProgram.icon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-muted border border-border">
-                      {activeModalProgram.badge}
-                    </span>
-                    <h2 className="text-xl sm:text-2xl font-extrabold text-foreground mt-1">
-                      {activeModalProgram.title}
-                    </h2>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={closePopup}
-                  aria-label="Close popup"
-                  className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              {/* Description */}
-              <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-                {activeModalProgram.description}
-              </p>
-
-              {/* Key Program Highlights */}
-              <div className="mt-6 space-y-2.5 rounded-xl border border-border/80 bg-muted/40 p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-primary font-mono">
-                  Program Highlights & Curriculum
-                </p>
-                {activeModalProgram.details.map((detail, idx) => (
-                  <div key={idx} className="flex items-start space-x-2 text-xs text-foreground">
-                    <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                    <span className="leading-snug text-muted-foreground">{detail}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="mt-6 pt-4 border-t border-border/80 flex flex-wrap items-center justify-end gap-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={closePopup}
-                  className="border-border text-xs text-foreground cursor-pointer"
-                >
-                  Close
-                </Button>
-                <Link href={activeModalProgram.actionHref} onClick={closePopup}>
-                  <Button
-                    size="sm"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer shadow-md shadow-primary/25"
-                  >
-                    <span>{activeModalProgram.actionLabel}</span>
-                    <ChevronRight className="ml-1 h-3.5 w-3.5" />
-                  </Button>
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

@@ -44,7 +44,7 @@ export function Navbar() {
   const pathname = usePathname();
   const { user, openLoginModal, logout } = useAuth();
   const { toggleMenu, isMenuOpen, menuAnchor, theme } = useTheme();
-  const { isSidebarOpen, toggleSidebar, activeSection, openPopup } = useNavigation();
+  const { isSidebarOpen, toggleSidebar, activeSection, setActiveSection } = useNavigation();
   const [scrolled, setScrolled] = React.useState(false);
 
   React.useEffect(() => {
@@ -157,7 +157,7 @@ export function Navbar() {
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => openPopup(item.id)}
+                  onClick={() => setActiveSection(item.id)}
                   className={cn(
                     "px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all cursor-pointer border",
                     isSelected

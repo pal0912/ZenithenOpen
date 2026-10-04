@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   BookOpen,
@@ -16,14 +15,13 @@ import {
   Sparkles,
   Copy,
   Check,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useNavigation } from "@/components/navigation/navigation-context";
 
 export default function ResourcesPage() {
-  const { popupSection, closePopup, openPopup, activeSection } = useNavigation();
+  const { activeSection } = useNavigation();
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
 
   const copyToClipboard = (text: string, index: number) => {
@@ -76,7 +74,6 @@ export default function ResourcesPage() {
       description:
         "Visit our curated campus opportunities board or any ZenithenOpen repository and filter issues by the 'good first issue' label.",
       command: "https://github.com/IST-ZenithenLab/ZenithenOpen/issues?q=label%3A%22good+first+issue%22",
-      isUrl: true,
     },
     {
       step: 2,
@@ -84,7 +81,6 @@ export default function ResourcesPage() {
       description:
         "Click the 'Fork' button at the top-right of the repository on GitHub to create your personal copy.",
       command: "Click 'Fork' on GitHub -> Select your personal account",
-      isUrl: false,
     },
     {
       step: 3,
@@ -92,7 +88,6 @@ export default function ResourcesPage() {
       description:
         "Download your repository onto your local development machine using git in your terminal.",
       command: "git clone https://github.com/<your-username>/ZenithenOpen.git",
-      isUrl: false,
     },
     {
       step: 4,
@@ -100,7 +95,6 @@ export default function ResourcesPage() {
       description:
         "Never work directly on main. Create and switch to a descriptive branch for your change.",
       command: "git checkout -b feature/my-first-contribution",
-      isUrl: false,
     },
     {
       step: 5,
@@ -108,7 +102,6 @@ export default function ResourcesPage() {
       description:
         "Implement your code or documentation changes, then run local validation scripts to ensure linting passes.",
       command: "npm run lint; npm test",
-      isUrl: false,
     },
     {
       step: 6,
@@ -116,7 +109,6 @@ export default function ResourcesPage() {
       description:
         "Stage your files, commit with a descriptive conventional message, and push to your remote fork.",
       command: 'git add -A && git commit -m "docs: add contributor profile" && git push -u origin feature/my-first-contribution',
-      isUrl: false,
     },
     {
       step: 7,
@@ -124,7 +116,6 @@ export default function ResourcesPage() {
       description:
         "Navigate to GitHub and click 'Compare & pull request'. Fill out the PR template describing your changes and link the relevant issue.",
       command: "https://github.com/IST-ZenithenLab/ZenithenOpen/pulls",
-      isUrl: true,
     },
   ];
 
@@ -137,7 +128,6 @@ export default function ResourcesPage() {
       category: "Career & Fellowships",
       excerpt:
         "A tactical breakdown of proposal writing, communicating with maintainers, and turning small documentation pull requests into an accepted Google Summer of Code project.",
-      slug: "#",
     },
     {
       title: "Understanding Git Under the Hood: Blobs, Trees, and Commits",
@@ -147,7 +137,6 @@ export default function ResourcesPage() {
       category: "Engineering Deep Dive",
       excerpt:
         "Demystifying the internal object database of Git. Learn how directed acyclic graphs (DAGs) and SHA hashes power modern distributed version control.",
-      slug: "#",
     },
     {
       title: "Building Real-Time Multi-Theme Engines with CSS Variables",
@@ -157,7 +146,6 @@ export default function ResourcesPage() {
       category: "Web Architecture",
       excerpt:
         "A case study on architecting ZenithenOpen's 7-preset instant theme system using HSL color variables, localStorage persistence, and zero page reloads.",
-      slug: "#",
     },
     {
       title: "Why Campus Open-Source Matters for Your Engineering Career",
@@ -167,9 +155,18 @@ export default function ResourcesPage() {
       category: "Community Insights",
       excerpt:
         "How shipping verified pull requests into production repositories accelerates technical interviews and outshines generic classroom resume projects.",
-      slug: "#",
     },
   ];
+
+  // Scroll to section when activeSection changes
+  React.useEffect(() => {
+    if (activeSection) {
+      const el = document.getElementById(activeSection);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [activeSection]);
 
   return (
     <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 transition-colors">
@@ -199,31 +196,26 @@ export default function ResourcesPage() {
               &ldquo;Learn to make first PR&rdquo;
             </p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              Step-by-step guidance, git fundamentals, interactive pull request checklists, and in-depth technical blogs. Click any resource option in the top navbar to view details.
+              Step-by-step guidance, git fundamentals, interactive pull request checklists, and in-depth technical blogs. Click any resource option in the top navbar to jump directly to that section.
             </p>
           </div>
         </div>
 
-        {/* Section Contents - Clean cards without in-page filter bar */}
+        {/* Section Contents */}
         <div className="mt-10 space-y-12">
           {/* Section: Learn to PR */}
-          <section id="learn-to-pr" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <GitPullRequest className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">
-                  Learn Pull Requests (Learn to PR)
-                </h2>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openPopup("learn-to-pr")}
-                className="border-border text-xs text-foreground cursor-pointer"
-              >
-                <span>Learn to PR Details</span>
-                <ChevronRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
+          <section
+            id="learn-to-pr"
+            className={cn(
+              "space-y-4 rounded-2xl transition-all p-1",
+              activeSection === "learn-to-pr" && "ring-2 ring-primary/40 rounded-2xl"
+            )}
+          >
+            <div className="flex items-center space-x-2">
+              <GitPullRequest className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-bold text-foreground">
+                Learn Pull Requests (Learn to PR)
+              </h2>
             </div>
 
             <div className="space-y-4">
@@ -260,7 +252,13 @@ export default function ResourcesPage() {
           </section>
 
           {/* Section: Make First PR */}
-          <section id="make-first-pr" className="space-y-4">
+          <section
+            id="make-first-pr"
+            className={cn(
+              "space-y-4 rounded-2xl transition-all p-1",
+              activeSection === "make-first-pr" && "ring-2 ring-primary/40 rounded-2xl"
+            )}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Terminal className="h-5 w-5 text-primary" />
@@ -268,15 +266,9 @@ export default function ResourcesPage() {
                   Make Your First PR (Make First PR)
                 </h2>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openPopup("make-first-pr")}
-                className="border-border text-xs text-foreground cursor-pointer"
-              >
-                <span>First PR Checklist</span>
-                <ChevronRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
+              <span className="text-xs font-mono text-primary font-semibold">
+                7 Guided Steps
+              </span>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -321,23 +313,18 @@ export default function ResourcesPage() {
           </section>
 
           {/* Section: Blog */}
-          <section id="blog" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Newspaper className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">
-                  Technical Blog & Engineering Stories
-                </h2>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openPopup("blog")}
-                className="border-border text-xs text-foreground cursor-pointer"
-              >
-                <span>Blog Articles</span>
-                <ChevronRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
+          <section
+            id="blog"
+            className={cn(
+              "space-y-4 rounded-2xl transition-all p-1",
+              activeSection === "blog" && "ring-2 ring-primary/40 rounded-2xl"
+            )}
+          >
+            <div className="flex items-center space-x-2">
+              <Newspaper className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-bold text-foreground">
+                Technical Blog & Engineering Stories
+              </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -408,78 +395,6 @@ export default function ResourcesPage() {
           </div>
         </div>
       </div>
-
-      {/* Resources Popup Dialog Modal */}
-      <AnimatePresence>
-        {popupSection && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closePopup}
-              aria-hidden="true"
-              className="fixed inset-0 bg-black/75 backdrop-blur-md"
-            />
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative z-10 w-full max-w-2xl rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-2xl text-foreground select-none"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-muted border border-border">
-                    Developer Guides
-                  </span>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-foreground mt-1 capitalize">
-                    {popupSection.replace("-", " ")}
-                  </h2>
-                </div>
-                <button
-                  type="button"
-                  onClick={closePopup}
-                  aria-label="Close popup"
-                  className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              <div className="mt-4 p-4 rounded-xl border border-border/80 bg-muted/40">
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {popupSection === "learn-to-pr" && "Master pull request etiquette, Git DAG architecture, atomic commits, conventional commit syntax, and resolving merge conflicts."}
-                  {popupSection === "make-first-pr" && "Follow our 7-step guided checklist: find a beginner issue, fork the repository, clone locally, write code, run verification, and submit your PR."}
-                  {popupSection === "blog" && "Explore student technical blogs covering GSoC scholar retrospectives, Git internals, CSS theme variable architectures, and career acceleration."}
-                </p>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-border/80 flex items-center justify-end space-x-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={closePopup}
-                  className="border-border text-xs text-foreground cursor-pointer"
-                >
-                  Close
-                </Button>
-                <Link href={`#${popupSection}`} onClick={closePopup}>
-                  <Button
-                    size="sm"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer"
-                  >
-                    <span>Jump to Section</span>
-                    <ChevronRight className="ml-1 h-3.5 w-3.5" />
-                  </Button>
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

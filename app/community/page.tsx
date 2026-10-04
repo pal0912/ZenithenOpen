@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   Users2,
@@ -16,7 +15,6 @@ import {
   Star,
   ChevronRight,
   ShieldCheck,
-  X,
 } from "lucide-react";
 import { GithubIcon } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
@@ -24,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { useNavigation } from "@/components/navigation/navigation-context";
 
 export default function CommunityPage() {
-  const { popupSection, closePopup, openPopup, activeSection } = useNavigation();
+  const { activeSection } = useNavigation();
 
   const milestones = [
     {
@@ -164,6 +162,16 @@ export default function CommunityPage() {
     },
   ];
 
+  // Scroll to section when activeSection changes
+  React.useEffect(() => {
+    if (activeSection) {
+      const el = document.getElementById(activeSection);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [activeSection]);
+
   return (
     <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="mx-auto max-w-5xl">
@@ -192,7 +200,7 @@ export default function CommunityPage() {
               &ldquo;our community :))&rdquo;
             </p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              We are an authentic, student-led open-source community at IST Bengaluru. Click any community option in the top navbar to view its popup.
+              We are an authentic, student-led open-source community at IST Bengaluru. Click any community option in the top navbar to jump directly to that section.
             </p>
           </div>
         </div>
@@ -200,21 +208,16 @@ export default function CommunityPage() {
         {/* Content Sections */}
         <div className="mt-10 space-y-12">
           {/* Section: About */}
-          <section id="about" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Heart className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">About ZenithenOpen</h2>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openPopup("about")}
-                className="border-border text-xs text-foreground cursor-pointer"
-              >
-                <span>About Popup</span>
-                <ChevronRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
+          <section
+            id="about"
+            className={cn(
+              "space-y-4 rounded-2xl transition-all p-1",
+              activeSection === "about" && "ring-2 ring-primary/40 rounded-2xl"
+            )}
+          >
+            <div className="flex items-center space-x-2">
+              <Heart className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-bold text-foreground">About ZenithenOpen</h2>
             </div>
             <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 space-y-4 shadow-xs">
               <p className="text-sm text-foreground/90 leading-relaxed">
@@ -250,21 +253,16 @@ export default function CommunityPage() {
           </section>
 
           {/* Section: Journey */}
-          <section id="journey" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Milestone className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">Our Community Journey</h2>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openPopup("journey")}
-                className="border-border text-xs text-foreground cursor-pointer"
-              >
-                <span>Journey Popup</span>
-                <ChevronRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
+          <section
+            id="journey"
+            className={cn(
+              "space-y-4 rounded-2xl transition-all p-1",
+              activeSection === "journey" && "ring-2 ring-primary/40 rounded-2xl"
+            )}
+          >
+            <div className="flex items-center space-x-2">
+              <Milestone className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-bold text-foreground">Our Community Journey</h2>
             </div>
             <div className="relative border-l-2 border-border ml-4 sm:ml-6 pl-6 sm:pl-8 space-y-8">
               {milestones.map((item, idx) => (
@@ -285,21 +283,16 @@ export default function CommunityPage() {
           </section>
 
           {/* Section: Members */}
-          <section id="members" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Users2 className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">Community Members</h2>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openPopup("members")}
-                className="border-border text-xs text-foreground cursor-pointer"
-              >
-                <span>Members Popup</span>
-                <ChevronRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
+          <section
+            id="members"
+            className={cn(
+              "space-y-4 rounded-2xl transition-all p-1",
+              activeSection === "members" && "ring-2 ring-primary/40 rounded-2xl"
+            )}
+          >
+            <div className="flex items-center space-x-2">
+              <Users2 className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-bold text-foreground">Community Members</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {members.map((group, idx) => (
@@ -330,21 +323,16 @@ export default function CommunityPage() {
           </section>
 
           {/* Section: Rewards */}
-          <section id="rewards" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Gift className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">Contributor Rewards & Swag</h2>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openPopup("rewards")}
-                className="border-border text-xs text-foreground cursor-pointer"
-              >
-                <span>Rewards Popup</span>
-                <ChevronRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
+          <section
+            id="rewards"
+            className={cn(
+              "space-y-4 rounded-2xl transition-all p-1",
+              activeSection === "rewards" && "ring-2 ring-primary/40 rounded-2xl"
+            )}
+          >
+            <div className="flex items-center space-x-2">
+              <Gift className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-bold text-foreground">Contributor Rewards & Swag</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {rewardTiers.map((tier, idx) => {
@@ -385,21 +373,16 @@ export default function CommunityPage() {
           </section>
 
           {/* Section: Featured */}
-          <section id="featured" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">Featured Highlights</h2>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => openPopup("featured")}
-                className="border-border text-xs text-foreground cursor-pointer"
-              >
-                <span>Featured Popup</span>
-                <ChevronRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
+          <section
+            id="featured"
+            className={cn(
+              "space-y-4 rounded-2xl transition-all p-1",
+              activeSection === "featured" && "ring-2 ring-primary/40 rounded-2xl"
+            )}
+          >
+            <div className="flex items-center space-x-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-bold text-foreground">Featured Highlights</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {featuredItems.map((item, idx) => (
@@ -453,80 +436,6 @@ export default function CommunityPage() {
           </div>
         </div>
       </div>
-
-      {/* Community Section Popup Dialog Modal */}
-      <AnimatePresence>
-        {popupSection && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closePopup}
-              aria-hidden="true"
-              className="fixed inset-0 bg-black/75 backdrop-blur-md"
-            />
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative z-10 w-full max-w-2xl rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-2xl text-foreground select-none"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-muted border border-border">
-                    Community Spotlight
-                  </span>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-foreground mt-1 capitalize">
-                    {popupSection.replace("-", " ")}
-                  </h2>
-                </div>
-                <button
-                  type="button"
-                  onClick={closePopup}
-                  aria-label="Close popup"
-                  className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              <div className="mt-4 p-4 rounded-xl border border-border/80 bg-muted/40">
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {popupSection === "about" && "ZenithenOpen was built to bring real open-source culture to our campus through hands-on code reviews, verified PRs, and collaborative mentorship."}
-                  {popupSection === "journey" && "Explore our growth timeline from early campus origins in 2024 to hundreds of merged pull requests, national hackathons, and global fellowships."}
-                  {popupSection === "members" && "Meet our community directory of core team architects, active student contributors, industry alumni mentors, and first-time learners."}
-                  {popupSection === "rewards" && "Earn digital badges, stickers, contributor T-shirts, and custom hoodies by reaching verified pull request milestones."}
-                  {popupSection === "featured" && "Discover top merged pull requests, national hackathon podium finishes, and standout contributor achievements."}
-                </p>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-border/80 flex items-center justify-end space-x-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={closePopup}
-                  className="border-border text-xs text-foreground cursor-pointer"
-                >
-                  Close
-                </Button>
-                <Link href={`#${popupSection}`} onClick={closePopup}>
-                  <Button
-                    size="sm"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer"
-                  >
-                    <span>Jump to Section</span>
-                    <ChevronRight className="ml-1 h-3.5 w-3.5" />
-                  </Button>
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
