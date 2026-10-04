@@ -8,6 +8,11 @@ interface NavigationContextType {
   openSidebar: () => void;
   closeSidebar: () => void;
   toggleSidebar: () => void;
+  activeSection: string | null;
+  setActiveSection: (section: string | null) => void;
+  popupSection: string | null;
+  openPopup: (section: string) => void;
+  closePopup: () => void;
 }
 
 const NavigationContext = React.createContext<NavigationContextType | undefined>(
@@ -20,6 +25,8 @@ export function NavigationProvider({
   children: React.ReactNode;
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const [activeSection, setActiveSection] = React.useState<string | null>(null);
+  const [popupSection, setPopupSection] = React.useState<string | null>(null);
   const pathname = usePathname();
 
   const openSidebar = React.useCallback(() => {
@@ -34,26 +41,41 @@ export function NavigationProvider({
     setIsSidebarOpen((prev) => !prev);
   }, []);
 
-  // Close sidebar on route change
+  const openPopup = React.useCallback((section: string) => {
+    setActiveSection(section);
+    setPopupSection(section);
+  }, []);
+
+  const closePopup = React.useCallback(() => {
+    setPopupSection(null);
+  }, []);
+
+  // Reset active section & popup on route change
   React.useEffect(() => {
     setIsSidebarOpen(false);
+    setActiveSection(null);
+    setPopupSection(null);
   }, [pathname]);
 
-  // Handle keyboard interaction (Escape key closes sidebar)
+  // Handle keyboard interaction (Escape key closes sidebar or popup)
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isSidebarOpen) {
-        setIsSidebarOpen(false);
+      if (event.key === "Escape") {
+        if (popupSection) {
+          setPopupSection(null);
+        } else if (isSidebarOpen) {
+          setIsSidebarOpen(false);
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, popupSection]);
 
-  // Prevent background scroll when sidebar is open on small mobile devices
+  // Prevent background scroll when sidebar or popup is open
   React.useEffect(() => {
-    if (isSidebarOpen && typeof window !== "undefined" && window.innerWidth < 768) {
+    if ((isSidebarOpen && typeof window !== "undefined" && window.innerWidth < 768) || popupSection) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -61,7 +83,7 @@ export function NavigationProvider({
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, popupSection]);
 
   return (
     <NavigationContext.Provider
@@ -70,6 +92,11 @@ export function NavigationProvider({
         openSidebar,
         closeSidebar,
         toggleSidebar,
+        activeSection,
+        setActiveSection,
+        popupSection,
+        openPopup,
+        closePopup,
       }}
     >
       {children}
