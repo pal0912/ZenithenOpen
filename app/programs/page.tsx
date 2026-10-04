@@ -13,12 +13,8 @@ import {
   Coins,
   ExternalLink,
   CheckCircle2,
-  Sparkles,
-  ChevronRight,
-  Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { useNavigation } from "@/components/navigation/navigation-context";
 
 interface ProgramItem {
@@ -122,9 +118,9 @@ const PROGRAMS: ProgramItem[] = [
 ];
 
 export default function ProgramsPage() {
-  const { activeSection, setActiveSection } = useNavigation();
+  const { activeSection } = useNavigation();
 
-  // "make sure that open souce option is default and user see that as a default thing"
+  // Default to Open Source
   const defaultProgramId = "open-source";
   const currentSelectedId = activeSection || defaultProgramId;
   const currentProgram = PROGRAMS.find((p) => p.id === currentSelectedId) || PROGRAMS[0];
@@ -159,12 +155,12 @@ export default function ProgramsPage() {
               &ldquo;All programs, nothing is big or small&rdquo;
             </p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              Every initiative at ZenithenOpen is treated with equal engineering dedication. Select any program from the top navbar to explore details directly on this page.
+              Every initiative at ZenithenOpen is treated with equal engineering dedication. Switch between programs using the top navbar options.
             </p>
           </div>
         </div>
 
-        {/* DEFAULT VIEW: Active Program Featured Showcase directly on the page */}
+        {/* ONLY THE SELECTED PROGRAM INFO - NO OTHER THINGS */}
         <div className="mt-10">
           <motion.div
             key={currentProgram.id}
@@ -184,7 +180,7 @@ export default function ProgramsPage() {
                       {currentProgram.badge}
                     </span>
                     <span className="rounded-md bg-muted border border-border px-2 py-0.5 text-[10px] font-semibold text-muted-foreground font-mono">
-                      Viewing Program
+                      Program Information
                     </span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground mt-2">
@@ -224,81 +220,6 @@ export default function ProgramsPage() {
               </div>
             </div>
           </motion.div>
-        </div>
-
-        {/* All Programs Directory Cards */}
-        <div className="mt-12 space-y-4">
-          <div className="flex items-center space-x-2">
-            <Layers className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground font-mono">
-              All Campus Programs
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {PROGRAMS.map((prog) => {
-              const Icon = prog.icon;
-              const isSelected = prog.id === currentSelectedId;
-              return (
-                <div
-                  key={prog.id}
-                  onClick={() => setActiveSection(prog.id)}
-                  className={cn(
-                    "rounded-xl border p-4.5 cursor-pointer transition-all flex flex-col justify-between select-none group",
-                    isSelected
-                      ? "border-primary bg-primary/5 ring-1 ring-primary/30"
-                      : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
-                  )}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-primary">
-                        <Icon className="h-4 w-4" />
-                      </div>
-                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                        {prog.badge}
-                      </span>
-                    </div>
-
-                    <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
-                      {prog.title}
-                    </h4>
-                    <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
-                      {prog.description}
-                    </p>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-xs">
-                    <span className="text-[11px] font-medium text-primary font-mono">
-                      {isSelected ? "Currently Viewing" : "Click to View"}
-                    </span>
-                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Bottom Banner */}
-        <div className="mt-12 rounded-2xl border border-border bg-muted/40 p-6 sm:p-8 text-center">
-          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary mb-3">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <h3 className="text-base font-bold text-foreground">
-            Want to Launch a New Campus Program?
-          </h3>
-          <p className="mt-1 text-xs text-muted-foreground max-w-lg mx-auto leading-relaxed">
-            All programs start with a single motivated student. Submit a proposal or propose a study group in our open repository.
-          </p>
-          <div className="mt-4">
-            <Link href="https://github.com/IST-ZenithenLab/ZenithenOpen" target="_blank" rel="noreferrer">
-              <Button size="sm" variant="outline" className="border-border text-xs text-foreground cursor-pointer">
-                <span>Submit Program Proposal</span>
-                <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
         </div>
       </div>
     </div>

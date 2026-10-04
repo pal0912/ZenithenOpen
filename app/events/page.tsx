@@ -22,6 +22,9 @@ import { useNavigation } from "@/components/navigation/navigation-context";
 export default function EventsPage() {
   const { activeSection } = useNavigation();
 
+  // Default to Upcoming
+  const currentTab = activeSection || "upcoming";
+
   const upcomingEvents = [
     {
       title: "Git & GitHub Masterclass: From Clone to First PR",
@@ -126,16 +129,6 @@ export default function EventsPage() {
     },
   ];
 
-  // Scroll to section when activeSection changes
-  React.useEffect(() => {
-    if (activeSection) {
-      const el = document.getElementById(activeSection);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }
-  }, [activeSection]);
-
   return (
     <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="mx-auto max-w-5xl">
@@ -164,253 +157,241 @@ export default function EventsPage() {
               &ldquo;upcoming events&rdquo;
             </p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              Explore upcoming coding workshops, weekly open-source hack hours, and celebrate our community&apos;s proud hackathon achievements. Select any option in the top navbar to jump directly to that section.
+              Explore upcoming coding workshops, weekly hack hours, and celebrate student achievements. Switch between events using the top navbar options.
             </p>
           </div>
         </div>
 
-        {/* Section Contents */}
-        <div className="mt-10 space-y-12">
-          {/* Upcoming Section */}
-          <section
-            id="upcoming"
-            className={cn(
-              "space-y-4 rounded-2xl transition-all p-1",
-              activeSection === "upcoming" && "ring-2 ring-primary/40 rounded-2xl"
-            )}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Calendar className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">Upcoming Events</h2>
-              </div>
-              <span className="text-xs font-mono text-muted-foreground">
-                3 Events Scheduled
-              </span>
-            </div>
-
-            <div className="space-y-4">
-              {upcomingEvents.map((evt, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
-                >
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
-                        {evt.category}
-                      </span>
-                      {evt.tags.map((tag, tIdx) => (
-                        <span
-                          key={tIdx}
-                          className="text-[10px] font-mono text-muted-foreground px-2 py-0.5 rounded-md bg-muted border border-border/80"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    <h3 className="text-lg font-bold text-foreground">
-                      {evt.title}
-                    </h3>
-
-                    <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
-                      {evt.description}
-                    </p>
-
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-1 font-mono">
-                      <span className="flex items-center">
-                        <Calendar className="h-3.5 w-3.5 mr-1 text-primary" />
-                        {evt.date}
-                      </span>
-                      <span className="flex items-center">
-                        <Clock className="h-3.5 w-3.5 mr-1 text-primary" />
-                        {evt.time}
-                      </span>
-                      <span className="flex items-center">
-                        <MapPin className="h-3.5 w-3.5 mr-1 text-primary" />
-                        {evt.location}
-                      </span>
-                    </div>
+        {/* ONLY THE SELECTED EVENT SECTION - NO OTHER THINGS */}
+        <div className="mt-10">
+          {/* Section: Upcoming */}
+          {currentTab === "upcoming" && (
+            <section className="space-y-6 rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 border border-primary/25 text-primary">
+                    <Calendar className="h-6 w-6" />
                   </div>
-
-                  <div className="shrink-0 self-start md:self-center">
-                    <Link href={evt.rsvpLink} target="_blank" rel="noreferrer">
-                      <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer">
-                        <span>RSVP & Details</span>
-                        <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-                      </Button>
-                    </Link>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2.5 py-0.5 rounded-md bg-muted border border-border">
+                      Schedule & Workshops
+                    </span>
+                    <h2 className="text-2xl font-bold text-foreground mt-1">Upcoming Events</h2>
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
+                <span className="text-xs font-mono text-muted-foreground hidden sm:inline-block">
+                  3 Events Scheduled
+                </span>
+              </div>
 
-          {/* Hackathons Section */}
-          <section
-            id="hackathons"
-            className={cn(
-              "space-y-4 rounded-2xl transition-all p-1",
-              activeSection === "hackathons" && "ring-2 ring-primary/40 rounded-2xl"
-            )}
-          >
-            <div className="flex items-center space-x-2">
-              <Flame className="h-5 w-5 text-primary" />
-              <h2 className="text-2xl font-bold text-foreground">Hackathons & Sprints</h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {hackathons.map((hack, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
-                        {hack.status}
-                      </span>
-                      <span className="text-[10px] font-mono text-muted-foreground">
-                        {hack.duration}
-                      </span>
-                    </div>
-
-                    <h3 className="text-base font-bold text-foreground leading-snug">
-                      {hack.name}
-                    </h3>
-
-                    <p className="text-xs font-medium text-primary mt-1">
-                      {hack.focus}
-                    </p>
-
-                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                      {hack.description}
-                    </p>
-
-                    <div className="mt-4 pt-3 border-t border-border/80 space-y-1.5">
-                      <p className="text-[11px] font-semibold text-foreground font-mono">
-                        {hack.prizes}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {hack.highlights.map((h, hIdx) => (
+              <div className="space-y-4 pt-2">
+                {upcomingEvents.map((evt, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+                          {evt.category}
+                        </span>
+                        {evt.tags.map((tag, tIdx) => (
                           <span
-                            key={hIdx}
-                            className="text-[10px] font-mono text-muted-foreground px-2 py-0.5 rounded bg-muted/60"
+                            key={tIdx}
+                            className="text-[10px] font-mono text-muted-foreground px-2 py-0.5 rounded-md bg-muted border border-border/80"
                           >
-                            {h}
+                            {tag}
                           </span>
                         ))}
                       </div>
+
+                      <h3 className="text-lg font-bold text-foreground">
+                        {evt.title}
+                      </h3>
+
+                      <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
+                        {evt.description}
+                      </p>
+
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-1 font-mono">
+                        <span className="flex items-center">
+                          <Calendar className="h-3.5 w-3.5 mr-1 text-primary" />
+                          {evt.date}
+                        </span>
+                        <span className="flex items-center">
+                          <Clock className="h-3.5 w-3.5 mr-1 text-primary" />
+                          {evt.time}
+                        </span>
+                        <span className="flex items-center">
+                          <MapPin className="h-3.5 w-3.5 mr-1 text-primary" />
+                          {evt.location}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0 self-start md:self-center">
+                      <Link href={evt.rsvpLink} target="_blank" rel="noreferrer">
+                        <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer">
+                          <span>RSVP & Details</span>
+                          <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+                        </Button>
+                      </Link>
                     </div>
                   </div>
+                ))}
+              </div>
+            </section>
+          )}
 
-                  <div className="mt-5">
-                    <Link href="https://github.com/IST-ZenithenLab/ZenithenOpen" target="_blank" rel="noreferrer">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full border-border text-xs text-foreground hover:bg-muted cursor-pointer"
-                      >
-                        <span>View Hackathon Track</span>
-                        <ChevronRight className="ml-1 h-3.5 w-3.5" />
-                      </Button>
-                    </Link>
-                  </div>
+          {/* Section: Hackathons */}
+          {currentTab === "hackathons" && (
+            <section className="space-y-6 rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5">
+              <div className="flex items-center space-x-3 mb-2">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 border border-primary/25 text-primary">
+                  <Flame className="h-6 w-6" />
                 </div>
-              ))}
-            </div>
-          </section>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2.5 py-0.5 rounded-md bg-muted border border-border">
+                    Competitions & Sprints
+                  </span>
+                  <h2 className="text-2xl font-bold text-foreground mt-1">Hackathons & Sprints</h2>
+                </div>
+              </div>
 
-          {/* Achievements Section */}
-          <section
-            id="achievements"
-            className={cn(
-              "space-y-4 rounded-2xl transition-all p-1",
-              activeSection === "achievements" && "ring-2 ring-primary/40 rounded-2xl"
-            )}
-          >
-            <div className="flex items-center space-x-2">
-              <Trophy className="h-5 w-5 text-primary" />
-              <h2 className="text-2xl font-bold text-foreground">Event Achievements</h2>
-            </div>
-
-            {/* Stats Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl border border-border bg-card/60">
-              <div className="text-center p-2">
-                <span className="text-2xl font-extrabold text-foreground font-mono">15+</span>
-                <p className="text-[10px] uppercase font-semibold text-muted-foreground font-mono mt-0.5">
-                  Hackathons Competed
-                </p>
-              </div>
-              <div className="text-center p-2">
-                <span className="text-2xl font-extrabold text-primary font-mono">8</span>
-                <p className="text-[10px] uppercase font-semibold text-muted-foreground font-mono mt-0.5">
-                  Podium Finishes
-                </p>
-              </div>
-              <div className="text-center p-2">
-                <span className="text-2xl font-extrabold text-foreground font-mono">₹2.5L+</span>
-                <p className="text-[10px] uppercase font-semibold text-muted-foreground font-mono mt-0.5">
-                  Bounties Won
-                </p>
-              </div>
-              <div className="text-center p-2">
-                <span className="text-2xl font-extrabold text-accent font-mono">350+</span>
-                <p className="text-[10px] uppercase font-semibold text-muted-foreground font-mono mt-0.5">
-                  Hackathon PRs
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {achievements.map((item, idx) => {
-                const Icon = item.icon;
-                return (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
+                {hackathons.map((hack, idx) => (
                   <div
                     key={idx}
-                    className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-primary/40 transition-colors"
+                    className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors flex flex-col justify-between"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary">
-                        <Icon className="h-4.5 w-4.5" />
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+                          {hack.status}
+                        </span>
+                        <span className="text-[10px] font-mono text-muted-foreground">
+                          {hack.duration}
+                        </span>
                       </div>
-                      <span className="text-xs font-bold text-primary font-mono px-2 py-0.5 rounded-md bg-muted border border-border">
-                        {item.award}
-                      </span>
-                    </div>
-                    <h3 className="text-base font-bold text-foreground mt-3">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        </div>
 
-        {/* Bottom Call to Action */}
-        <div className="mt-12 rounded-2xl border border-border bg-card/60 p-6 sm:p-8 text-center">
-          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary mb-3">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <h3 className="text-base font-bold text-foreground">
-            Have an Event Idea or Want to Host a Workshop?
-          </h3>
-          <p className="mt-1 text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
-            We support any student who wants to present a technical session, lead a study sprint, or run a campus hackathon.
-          </p>
-          <div className="mt-4">
-            <Link href="https://github.com/IST-ZenithenLab/ZenithenOpen/issues" target="_blank" rel="noreferrer">
-              <Button size="sm" variant="outline" className="border-border text-xs text-foreground cursor-pointer">
-                <span>Propose a Session on GitHub</span>
-                <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
+                      <h3 className="text-base font-bold text-foreground leading-snug">
+                        {hack.name}
+                      </h3>
+
+                      <p className="text-xs font-medium text-primary mt-1">
+                        {hack.focus}
+                      </p>
+
+                      <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                        {hack.description}
+                      </p>
+
+                      <div className="mt-4 pt-3 border-t border-border/80 space-y-1.5">
+                        <p className="text-[11px] font-semibold text-foreground font-mono">
+                          {hack.prizes}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {hack.highlights.map((h, hIdx) => (
+                            <span
+                              key={hIdx}
+                              className="text-[10px] font-mono text-muted-foreground px-2 py-0.5 rounded bg-muted/60"
+                            >
+                              {h}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-5">
+                      <Link href="https://github.com/IST-ZenithenLab/ZenithenOpen" target="_blank" rel="noreferrer">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full border-border text-xs text-foreground hover:bg-muted cursor-pointer"
+                        >
+                          <span>View Hackathon Track</span>
+                          <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Section: Achievements */}
+          {currentTab === "achievements" && (
+            <section className="space-y-6 rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5">
+              <div className="flex items-center space-x-3 mb-2">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 border border-primary/25 text-primary">
+                  <Trophy className="h-6 w-6" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2.5 py-0.5 rounded-md bg-muted border border-border">
+                    Podiums & Awards
+                  </span>
+                  <h2 className="text-2xl font-bold text-foreground mt-1">Event Achievements</h2>
+                </div>
+              </div>
+
+              {/* Stats Bar */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl border border-border bg-card/60">
+                <div className="text-center p-2">
+                  <span className="text-2xl font-extrabold text-foreground font-mono">15+</span>
+                  <p className="text-[10px] uppercase font-semibold text-muted-foreground font-mono mt-0.5">
+                    Hackathons Competed
+                  </p>
+                </div>
+                <div className="text-center p-2">
+                  <span className="text-2xl font-extrabold text-primary font-mono">8</span>
+                  <p className="text-[10px] uppercase font-semibold text-muted-foreground font-mono mt-0.5">
+                    Podium Finishes
+                  </p>
+                </div>
+                <div className="text-center p-2">
+                  <span className="text-2xl font-extrabold text-foreground font-mono">₹2.5L+</span>
+                  <p className="text-[10px] uppercase font-semibold text-muted-foreground font-mono mt-0.5">
+                    Bounties Won
+                  </p>
+                </div>
+                <div className="text-center p-2">
+                  <span className="text-2xl font-extrabold text-accent font-mono">350+</span>
+                  <p className="text-[10px] uppercase font-semibold text-muted-foreground font-mono mt-0.5">
+                    Hackathon PRs
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                {achievements.map((item, idx) => {
+                  const Icon = item.icon;
+                  return (
+                    <div
+                      key={idx}
+                      className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-primary/40 transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary">
+                          <Icon className="h-4.5 w-4.5" />
+                        </div>
+                        <span className="text-xs font-bold text-primary font-mono px-2 py-0.5 rounded-md bg-muted border border-border">
+                          {item.award}
+                        </span>
+                      </div>
+                      <h3 className="text-base font-bold text-foreground mt-3">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </div>

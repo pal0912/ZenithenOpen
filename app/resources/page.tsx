@@ -24,6 +24,9 @@ export default function ResourcesPage() {
   const { activeSection } = useNavigation();
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
 
+  // Default to Learn to PR
+  const currentTab = activeSection || "learn-to-pr";
+
   const copyToClipboard = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
@@ -158,16 +161,6 @@ export default function ResourcesPage() {
     },
   ];
 
-  // Scroll to section when activeSection changes
-  React.useEffect(() => {
-    if (activeSection) {
-      const el = document.getElementById(activeSection);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }
-  }, [activeSection]);
-
   return (
     <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="mx-auto max-w-5xl">
@@ -196,203 +189,191 @@ export default function ResourcesPage() {
               &ldquo;Learn to make first PR&rdquo;
             </p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              Step-by-step guidance, git fundamentals, interactive pull request checklists, and in-depth technical blogs. Click any resource option in the top navbar to jump directly to that section.
+              Step-by-step guidance, git fundamentals, interactive pull request checklists, and in-depth technical blogs. Switch between resources using the top navbar options.
             </p>
           </div>
         </div>
 
-        {/* Section Contents */}
-        <div className="mt-10 space-y-12">
+        {/* ONLY THE SELECTED RESOURCE SECTION - NO OTHER THINGS */}
+        <div className="mt-10">
           {/* Section: Learn to PR */}
-          <section
-            id="learn-to-pr"
-            className={cn(
-              "space-y-4 rounded-2xl transition-all p-1",
-              activeSection === "learn-to-pr" && "ring-2 ring-primary/40 rounded-2xl"
-            )}
-          >
-            <div className="flex items-center space-x-2">
-              <GitPullRequest className="h-5 w-5 text-primary" />
-              <h2 className="text-2xl font-bold text-foreground">
-                Learn Pull Requests (Learn to PR)
-              </h2>
-            </div>
-
-            <div className="space-y-4">
-              {learnConcepts.map((concept, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
-                      {concept.category}
-                    </span>
-                  </div>
-
-                  <h3 className="text-lg font-bold text-foreground">
-                    {concept.title}
-                  </h3>
-
-                  <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                    {concept.description}
-                  </p>
-
-                  <div className="mt-4 pt-3 border-t border-border/80 space-y-2">
-                    {concept.keyTakeaways.map((point, pIdx) => (
-                      <div key={pIdx} className="flex items-start space-x-2 text-xs text-foreground">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
-                        <span className="leading-snug text-muted-foreground">{point}</span>
-                      </div>
-                    ))}
-                  </div>
+          {currentTab === "learn-to-pr" && (
+            <section className="space-y-6 rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5">
+              <div className="flex items-center space-x-3 mb-2">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 border border-primary/25 text-primary">
+                  <GitPullRequest className="h-6 w-6" />
                 </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Section: Make First PR */}
-          <section
-            id="make-first-pr"
-            className={cn(
-              "space-y-4 rounded-2xl transition-all p-1",
-              activeSection === "make-first-pr" && "ring-2 ring-primary/40 rounded-2xl"
-            )}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Terminal className="h-5 w-5 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">
-                  Make Your First PR (Make First PR)
-                </h2>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2.5 py-0.5 rounded-md bg-muted border border-border">
+                    Foundational Knowledge
+                  </span>
+                  <h2 className="text-2xl font-bold text-foreground mt-1">
+                    Learn Pull Requests (Learn to PR)
+                  </h2>
+                </div>
               </div>
-              <span className="text-xs font-mono text-primary font-semibold">
-                7 Guided Steps
-              </span>
-            </div>
 
-            <div className="grid grid-cols-1 gap-4">
-              {firstPrSteps.map((step, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-primary/40 transition-colors"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold font-mono">
-                        {step.step}
-                      </span>
-                      <h3 className="text-sm font-bold text-foreground">
-                        {step.title}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-muted-foreground ml-8 leading-relaxed mb-3">
-                    {step.description}
-                  </p>
-
-                  <div className="ml-8 flex items-center justify-between rounded-xl bg-muted/60 border border-border/80 px-3.5 py-2.5 font-mono text-xs text-foreground overflow-x-auto">
-                    <code className="text-[11px] truncate mr-2">{step.command}</code>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(step.command, idx)}
-                      className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
-                      title="Copy command"
-                    >
-                      {copiedIndex === idx ? (
-                        <Check className="h-3.5 w-3.5 text-primary" />
-                      ) : (
-                        <Copy className="h-3.5 w-3.5" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Section: Blog */}
-          <section
-            id="blog"
-            className={cn(
-              "space-y-4 rounded-2xl transition-all p-1",
-              activeSection === "blog" && "ring-2 ring-primary/40 rounded-2xl"
-            )}
-          >
-            <div className="flex items-center space-x-2">
-              <Newspaper className="h-5 w-5 text-primary" />
-              <h2 className="text-2xl font-bold text-foreground">
-                Technical Blog & Engineering Stories
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {blogPosts.map((post, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-2.5">
+              <div className="space-y-4 pt-2">
+                {learnConcepts.map((concept, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
                       <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
-                        {post.category}
-                      </span>
-                      <span className="text-[10px] font-mono text-muted-foreground">
-                        {post.readTime}
+                        {concept.category}
                       </span>
                     </div>
 
-                    <h3 className="text-base font-bold text-foreground leading-snug">
-                      {post.title}
+                    <h3 className="text-lg font-bold text-foreground">
+                      {concept.title}
                     </h3>
 
                     <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                      {post.excerpt}
+                      {concept.description}
                     </p>
-                  </div>
 
-                  <div className="mt-5 pt-4 border-t border-border/80 flex items-center justify-between text-xs">
-                    <div className="flex items-center text-muted-foreground font-mono text-[11px]">
-                      <Calendar className="h-3 w-3 mr-1 text-primary" />
-                      <span>{post.date} &bull; {post.author}</span>
+                    <div className="mt-4 pt-3 border-t border-border/80 space-y-2">
+                      {concept.keyTakeaways.map((point, pIdx) => (
+                        <div key={pIdx} className="flex items-start space-x-2 text-xs text-foreground">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                          <span className="leading-snug text-muted-foreground">{point}</span>
+                        </div>
+                      ))}
                     </div>
-                    <Link href="https://github.com/IST-ZenithenLab/ZenithenOpen" target="_blank" rel="noreferrer">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 px-2 text-xs text-primary hover:text-primary hover:bg-primary/10 cursor-pointer"
-                      >
-                        <span>Read Article</span>
-                        <ChevronRight className="ml-1 h-3 w-3" />
-                      </Button>
-                    </Link>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Section: Make First PR */}
+          {currentTab === "make-first-pr" && (
+            <section className="space-y-6 rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 border border-primary/25 text-primary">
+                    <Terminal className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2.5 py-0.5 rounded-md bg-muted border border-border">
+                      Interactive Walkthrough
+                    </span>
+                    <h2 className="text-2xl font-bold text-foreground mt-1">
+                      Make Your First PR (Make First PR)
+                    </h2>
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
-        </div>
+                <span className="text-xs font-mono text-primary font-semibold hidden sm:inline-block">
+                  7 Guided Steps
+                </span>
+              </div>
 
-        {/* Bottom Banner */}
-        <div className="mt-12 rounded-2xl border border-border bg-card/60 p-6 sm:p-8 text-center">
-          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary mb-3">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <h3 className="text-base font-bold text-foreground">
-            Ready to Write a Blog Post for the Community?
-          </h3>
-          <p className="mt-1 text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
-            Share your technical learnings, open-source milestones, or tutorial guides with the campus developer community.
-          </p>
-          <div className="mt-4">
-            <Link href="https://github.com/IST-ZenithenLab/ZenithenOpen" target="_blank" rel="noreferrer">
-              <Button size="sm" variant="outline" className="border-border text-xs text-foreground cursor-pointer">
-                <span>Submit a Technical Article</span>
-                <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
+              <div className="grid grid-cols-1 gap-4 pt-2">
+                {firstPrSteps.map((step, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-primary/40 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold font-mono">
+                          {step.step}
+                        </span>
+                        <h3 className="text-sm font-bold text-foreground">
+                          {step.title}
+                        </h3>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground ml-8 leading-relaxed mb-3">
+                      {step.description}
+                    </p>
+
+                    <div className="ml-8 flex items-center justify-between rounded-xl bg-muted/60 border border-border/80 px-3.5 py-2.5 font-mono text-xs text-foreground overflow-x-auto">
+                      <code className="text-[11px] truncate mr-2">{step.command}</code>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(step.command, idx)}
+                        className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer shrink-0"
+                        title="Copy command"
+                      >
+                        {copiedIndex === idx ? (
+                          <Check className="h-3.5 w-3.5 text-primary" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Section: Blog */}
+          {currentTab === "blog" && (
+            <section className="space-y-6 rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5">
+              <div className="flex items-center space-x-3 mb-2">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 border border-primary/25 text-primary">
+                  <Newspaper className="h-6 w-6" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2.5 py-0.5 rounded-md bg-muted border border-border">
+                    Engineering Articles
+                  </span>
+                  <h2 className="text-2xl font-bold text-foreground mt-1">
+                    Technical Blog & Engineering Stories
+                  </h2>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+                {blogPosts.map((post, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-2xl border border-border bg-card p-6 shadow-xs hover:border-primary/40 transition-colors flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-2.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+                          {post.category}
+                        </span>
+                        <span className="text-[10px] font-mono text-muted-foreground">
+                          {post.readTime}
+                        </span>
+                      </div>
+
+                      <h3 className="text-base font-bold text-foreground leading-snug">
+                        {post.title}
+                      </h3>
+
+                      <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                        {post.excerpt}
+                      </p>
+                    </div>
+
+                    <div className="mt-5 pt-4 border-t border-border/80 flex items-center justify-between text-xs">
+                      <div className="flex items-center text-muted-foreground font-mono text-[11px]">
+                        <Calendar className="h-3 w-3 mr-1 text-primary" />
+                        <span>{post.date} &bull; {post.author}</span>
+                      </div>
+                      <Link href="https://github.com/IST-ZenithenLab/ZenithenOpen" target="_blank" rel="noreferrer">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-xs text-primary hover:text-primary hover:bg-primary/10 cursor-pointer"
+                        >
+                          <span>Read Article</span>
+                          <ChevronRight className="ml-1 h-3 w-3" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </div>
