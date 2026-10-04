@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/auth-context";
 import { useTheme } from "@/components/theme/theme-provider";
+import { useNavigation } from "@/components/navigation/navigation-context";
 
 const NAV_LINKS = [
   { name: "Leaderboard", href: "/leaderboard", icon: Trophy },
@@ -27,6 +28,7 @@ export function Navbar() {
   const pathname = usePathname();
   const { user, openLoginModal, logout } = useAuth();
   const { toggleMenu, isMenuOpen, menuAnchor, theme } = useTheme();
+  const { isSidebarOpen, toggleSidebar } = useNavigation();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
 
@@ -50,8 +52,45 @@ export function Navbar() {
       )}
     >
       <div className="w-full flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Brand Area: Logo button triggers theme menu; Name links to homepage (First page) */}
-        <div className="flex items-center flex-1 justify-start space-x-3">
+        {/* Brand Area: Hamburger Trigger + Logo Theme Button + Homepage Link */}
+        <div className="flex items-center flex-1 justify-start space-x-2.5">
+          {/* Integrated 3-Line Hamburger Menu Button */}
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            aria-label={isSidebarOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={isSidebarOpen}
+            aria-controls="sidebar-navigation"
+            title={isSidebarOpen ? "Close navigation (Esc)" : "Open navigation"}
+            className={cn(
+              "flex h-9 w-9 items-center justify-center rounded-xl border border-border/80 bg-card/80 text-muted-foreground",
+              "hover:text-foreground hover:bg-muted hover:border-primary/40 active:scale-95 transition-all cursor-pointer",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+              isSidebarOpen && "bg-primary/15 text-primary border-primary/40 ring-1 ring-primary/40"
+            )}
+          >
+            <div className="flex flex-col items-center justify-center space-y-1 w-4 h-4" aria-hidden="true">
+              <span
+                className={cn(
+                  "block h-0.5 w-3.5 bg-current rounded-full transition-transform duration-200",
+                  isSidebarOpen && "translate-y-1.5 rotate-45"
+                )}
+              />
+              <span
+                className={cn(
+                  "block h-0.5 w-3 bg-current rounded-full transition-opacity duration-150",
+                  isSidebarOpen && "opacity-0"
+                )}
+              />
+              <span
+                className={cn(
+                  "block h-0.5 w-3.5 bg-current rounded-full transition-transform duration-200",
+                  isSidebarOpen && "-translate-y-1.5 -rotate-45"
+                )}
+              />
+            </div>
+          </button>
+
           {/* Logo Theme Trigger Button */}
           <button
             type="button"
@@ -62,7 +101,7 @@ export function Navbar() {
             aria-expanded={isThemeActiveOnNavbar}
             title="Click to change theme"
             className={cn(
-              "group relative flex h-10 w-10 items-center justify-center rounded-xl transition-all cursor-pointer",
+              "group relative flex h-9 w-9 items-center justify-center rounded-xl transition-all cursor-pointer",
               "bg-gradient-to-br from-primary via-secondary to-accent p-0.5 shadow-md shadow-primary/20",
               "hover:scale-105 active:scale-95 transition-transform",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
@@ -70,20 +109,20 @@ export function Navbar() {
             )}
           >
             <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-card transition-colors group-hover:bg-card/80">
-              <Code2 className="h-5 w-5 text-primary group-hover:text-secondary transition-colors" />
+              <Code2 className="h-4.5 w-4.5 text-primary group-hover:text-secondary transition-colors" />
             </div>
           </button>
 
           {/* Brand Name Link - Returns to First Page */}
           <Link
             href="/"
-            className="flex flex-col group select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md px-1 -ml-1 transition-all"
+            className="flex flex-col group select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md px-1 transition-all"
             title="Go to ZenithenOpen Homepage"
           >
-            <span className="text-lg font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+            <span className="text-base sm:text-lg font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
               Zenithen<span className="text-primary">Open</span>
             </span>
-            <span className="text-[10px] font-medium text-muted-foreground tracking-wider uppercase group-hover:text-foreground transition-colors">
+            <span className="text-[9px] sm:text-[10px] font-medium text-muted-foreground tracking-wider uppercase group-hover:text-foreground transition-colors">
               Open Source Community
             </span>
           </Link>
