@@ -210,7 +210,7 @@ export default function ProgramsPage() {
                 {featuredProjects.map((project) => (
                   <Card
                     key={project.id}
-                    className="group relative overflow-hidden flex flex-col justify-between hover:shadow-md hover:border-primary/40 transition-all border-border bg-card"
+                    className="group relative overflow-hidden flex flex-col justify-between hover:shadow-md hover:border-primary/40 transition-colors duration-150 border-border bg-card"
                   >
                     <CardHeader>
                       <div className="flex items-start justify-between gap-3">
@@ -279,7 +279,7 @@ export default function ProgramsPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5 transition-all"
+              className="rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5 transition-colors duration-150"
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
                 <div className="flex items-start space-x-4">

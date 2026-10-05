@@ -1115,14 +1115,13 @@ export function FloatingOrgBadges({ isPaused = false }: { isPaused?: boolean }) 
     };
   }, [isPaused]);
 
-  if (isPaused) {
-    return null;
-  }
-
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none will-change-transform transform-gpu"
+      className={`absolute inset-0 z-0 overflow-hidden pointer-events-none select-none will-change-transform transform-gpu transition-opacity duration-200 ${
+        isPaused ? "invisible opacity-0" : "visible opacity-100"
+      }`}
+      aria-hidden={isPaused}
       aria-label="Floating GitHub organization badges constellation"
     >
       {CONSTELLATION_ORGS.map((org) => {

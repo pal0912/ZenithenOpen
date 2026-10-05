@@ -116,16 +116,14 @@ export function SidebarMenu() {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{
-              type: "spring",
-              damping: 30,
-              stiffness: 320,
-              mass: 0.8,
+              duration: 0.22,
+              ease: [0.16, 1, 0.3, 1],
             }}
             className={cn(
               "fixed top-0 bottom-0 left-0 z-50",
               "w-[300px] sm:w-[360px] max-w-[85vw] h-full",
               "flex flex-col justify-between",
-              "bg-card border-r border-border shadow-2xl shadow-black/80",
+              "bg-card border-r border-border shadow-xl shadow-black/40",
               "text-foreground select-none will-change-transform transform-gpu"
             )}
           >
@@ -153,7 +151,7 @@ export function SidebarMenu() {
                   aria-label="Close navigation"
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground",
-                    "hover:text-foreground hover:bg-muted/80 border border-transparent hover:border-border transition-all cursor-pointer",
+                    "hover:text-foreground hover:bg-muted/80 border border-transparent hover:border-border transition-colors duration-150 cursor-pointer",
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   )}
                 >
@@ -179,7 +177,7 @@ export function SidebarMenu() {
                           href={item.href}
                           onClick={closeSidebar}
                           className={cn(
-                            "group flex items-center justify-between rounded-xl px-3 py-2.5 transition-all text-left border",
+                            "group flex items-center justify-between rounded-xl px-3 py-2.5 transition-colors duration-150 text-left border",
                             isActive
                               ? "bg-muted/90 border-border text-foreground shadow-xs font-medium"
                               : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40 hover:border-border/40"
@@ -207,7 +205,7 @@ export function SidebarMenu() {
                           </div>
                           <ChevronRight
                             className={cn(
-                              "h-4 w-4 shrink-0 transition-all",
+                              "h-4 w-4 shrink-0 transition-transform duration-150",
                               isActive
                                 ? "text-primary opacity-100"
                                 : "text-muted-foreground opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5"

@@ -91,19 +91,22 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isMenuOpen, closeMenu]);
 
+  const contextValue = React.useMemo(
+    () => ({
+      theme,
+      setTheme,
+      isMenuOpen,
+      menuAnchor,
+      openMenu,
+      closeMenu,
+      toggleMenu,
+      mounted,
+    }),
+    [theme, setTheme, isMenuOpen, menuAnchor, openMenu, closeMenu, toggleMenu, mounted]
+  );
+
   return (
-    <ThemeContext.Provider
-      value={{
-        theme,
-        setTheme,
-        isMenuOpen,
-        menuAnchor,
-        openMenu,
-        closeMenu,
-        toggleMenu,
-        mounted,
-      }}
-    >
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );
