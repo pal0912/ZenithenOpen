@@ -1,8 +1,9 @@
 /**
  * ZenithenOpen Design System — Theme Tokens
  *
- * Exactly 6 themes defined via semantic CSS custom properties.
- * Default theme: Sage Collective (applied to :root and [data-theme="sage-collective"]).
+ * Exactly 7 themes defined via semantic CSS custom properties:
+ * 3 Light Themes: Sage Collective (default), Aqua Circuit, Violet Nexus
+ * 4 Dark Themes: Monochrome, Obsidian Pulse, Midnight Aurora, Carbon Ember
  */
 
 :root,
@@ -68,66 +69,97 @@
   --n-btn-glow: rgba(255, 255, 255, 0.25);
 }
 
-[data-theme="arctic-forge"] {
-  --theme-id: "arctic-forge";
-  --background: #F8FAFC;
-  --foreground: #0F172A;
-  --card: #FFFFFF;
-  --card-foreground: #0F172A;
-  --popover: #FFFFFF;
-  --popover-foreground: #0F172A;
-  --border: #E2E8F0;
-  --input: #E2E8F0;
-  --primary: #1976D2;
+[data-theme="obsidian-pulse"] {
+  --theme-id: "obsidian-pulse";
+  --background: #080B12;
+  --foreground: #F8FAFC;
+  --card: #0F131C;
+  --card-foreground: #F8FAFC;
+  --popover: #0F131C;
+  --popover-foreground: #F8FAFC;
+  --border: #202938;
+  --input: #202938;
+  --primary: #3B82F6;
   --primary-foreground: #FFFFFF;
-  --secondary: #1565C0;
-  --secondary-foreground: #FFFFFF;
-  --accent: #16A34A;
+  --secondary: #151B27;
+  --secondary-foreground: #F8FAFC;
+  --accent: #22C55E;
   --accent-foreground: #FFFFFF;
-  --muted: #F1F5F9;
-  --muted-foreground: #64748B;
-  --destructive: #DC2626;
+  --muted: #151B27;
+  --muted-foreground: #94A3B8;
+  --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --ring: #1976D2;
-  --glow: rgba(25, 118, 210, 0.2);
-  --glow-secondary: rgba(21, 101, 192, 0.15);
-  --grid-line: rgba(15, 23, 42, 0.05);
-  --glass-bg: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(226, 232, 240, 0.8);
-  --n-btn-bg: #FFFFFF;
-  --n-btn-border: #E2E8F0;
-  --n-btn-glow: rgba(25, 118, 210, 0.25);
+  --ring: #3B82F6;
+  --glow: rgba(59, 130, 246, 0.22);
+  --glow-secondary: rgba(96, 165, 250, 0.15);
+  --grid-line: rgba(248, 250, 252, 0.04);
+  --glass-bg: rgba(15, 19, 28, 0.9);
+  --glass-border: rgba(32, 41, 56, 0.8);
+  --n-btn-bg: #0F131C;
+  --n-btn-border: #202938;
+  --n-btn-glow: rgba(59, 130, 246, 0.25);
 }
 
-[data-theme="indigo-core"] {
-  --theme-id: "indigo-core";
-  --background: #F8FAFF;
-  --foreground: #111827;
-  --card: #FFFFFF;
-  --card-foreground: #111827;
-  --popover: #FFFFFF;
-  --popover-foreground: #111827;
-  --border: #E4E7EC;
-  --input: #E4E7EC;
-  --primary: #3F51B5;
+[data-theme="midnight-aurora"] {
+  --theme-id: "midnight-aurora";
+  --background: #080A16;
+  --foreground: #F5F3FF;
+  --card: #101225;
+  --card-foreground: #F5F3FF;
+  --popover: #101225;
+  --popover-foreground: #F5F3FF;
+  --border: #252947;
+  --input: #252947;
+  --primary: #8B5CF6;
   --primary-foreground: #FFFFFF;
-  --secondary: #303F9F;
-  --secondary-foreground: #FFFFFF;
-  --accent: #16A34A;
+  --secondary: #171A32;
+  --secondary-foreground: #F5F3FF;
+  --accent: #22C55E;
   --accent-foreground: #FFFFFF;
-  --muted: #E8EAF6;
-  --muted-foreground: #667085;
-  --destructive: #DC2626;
+  --muted: #171A32;
+  --muted-foreground: #9CA3C8;
+  --destructive: #F43F5E;
   --destructive-foreground: #FFFFFF;
-  --ring: #3F51B5;
-  --glow: rgba(63, 81, 181, 0.2);
-  --glow-secondary: rgba(48, 63, 159, 0.15);
-  --grid-line: rgba(17, 24, 39, 0.05);
-  --glass-bg: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(228, 231, 236, 0.8);
-  --n-btn-bg: #FFFFFF;
-  --n-btn-border: #E4E7EC;
-  --n-btn-glow: rgba(63, 81, 181, 0.25);
+  --ring: #8B5CF6;
+  --glow: rgba(139, 92, 246, 0.22);
+  --glow-secondary: rgba(167, 139, 250, 0.15);
+  --grid-line: rgba(245, 243, 255, 0.04);
+  --glass-bg: rgba(16, 18, 37, 0.9);
+  --glass-border: rgba(37, 41, 71, 0.8);
+  --n-btn-bg: #101225;
+  --n-btn-border: #252947;
+  --n-btn-glow: rgba(139, 92, 246, 0.25);
+}
+
+[data-theme="carbon-ember"] {
+  --theme-id: "carbon-ember";
+  --background: #0D0D0F;
+  --foreground: #FAFAFA;
+  --card: #151518;
+  --card-foreground: #FAFAFA;
+  --popover: #151518;
+  --popover-foreground: #FAFAFA;
+  --border: #29292E;
+  --input: #29292E;
+  --primary: #F97316;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1D1D21;
+  --secondary-foreground: #FAFAFA;
+  --accent: #22C55E;
+  --accent-foreground: #FFFFFF;
+  --muted: #1D1D21;
+  --muted-foreground: #A1A1AA;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  --ring: #F97316;
+  --glow: rgba(249, 115, 22, 0.22);
+  --glow-secondary: rgba(251, 146, 60, 0.15);
+  --grid-line: rgba(250, 250, 250, 0.04);
+  --glass-bg: rgba(21, 21, 24, 0.9);
+  --glass-border: rgba(41, 41, 46, 0.8);
+  --n-btn-bg: #151518;
+  --n-btn-border: #29292E;
+  --n-btn-glow: rgba(249, 115, 22, 0.25);
 }
 
 [data-theme="aqua-circuit"] {

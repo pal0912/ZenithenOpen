@@ -61,7 +61,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var valid=["monochrome","arctic-forge","indigo-core","aqua-circuit","violet-nexus","sage-collective"];var t=localStorage.getItem("zenithen-theme");if(!t||valid.indexOf(t)===-1){t="sage-collective";localStorage.setItem("zenithen-theme","sage-collective");}document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","sage-collective");}})();`,
+            __html: `(function(){try{var valid=["aqua-circuit","violet-nexus","sage-collective","monochrome","obsidian-pulse","midnight-aurora","carbon-ember"];var t=null;try{var p=new URLSearchParams(window.location.search);var q=p.get("theme");if(q){if(q==="arctic-forge"||q==="indigo-core"){t="monochrome";localStorage.setItem("zenithen-theme","monochrome");}else if(valid.indexOf(q)!==-1){t=q;localStorage.setItem("zenithen-theme",q);}}}catch(_){}if(!t){t=localStorage.getItem("zenithen-theme");}if(t==="arctic-forge"||t==="indigo-core"){t="monochrome";localStorage.setItem("zenithen-theme","monochrome");}else if(!t||valid.indexOf(t)===-1){t="sage-collective";localStorage.setItem("zenithen-theme","sage-collective");}document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","sage-collective");}})();`,
           }}
         />
       </head>

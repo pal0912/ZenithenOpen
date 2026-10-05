@@ -29,13 +29,39 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [menuAnchor, setMenuAnchor] = React.useState<MenuAnchor>("floating");
   const [mounted, setMounted] = React.useState(false);
 
-  // Synchronize with DOM attribute set by pre-hydration script
+  // Synchronize with DOM attribute set by pre-hydration script & handle migration
   React.useEffect(() => {
     try {
-      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) as ThemeId | null;
-      if (savedTheme && THEMES.some((t) => t.id === savedTheme)) {
-        setThemeState(savedTheme);
-        document.documentElement.setAttribute("data-theme", savedTheme);
+      // Check URL parameters (?theme=...)
+      let initialTheme: ThemeId | null = null;
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const qTheme = params.get("theme");
+        if (qTheme === "arctic-forge" || qTheme === "indigo-core") {
+          initialTheme = "monochrome";
+          localStorage.setItem(THEME_STORAGE_KEY, "monochrome");
+        } else if (qTheme && THEMES.some((t) => t.id === qTheme)) {
+          initialTheme = qTheme as ThemeId;
+          localStorage.setItem(THEME_STORAGE_KEY, qTheme);
+        }
+      } catch {
+        // Ignore URL parsing errors
+      }
+
+      if (!initialTheme) {
+        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+        // Automatic migration of removed themes to Monochrome
+        if (savedTheme === "arctic-forge" || savedTheme === "indigo-core") {
+          initialTheme = "monochrome";
+          localStorage.setItem(THEME_STORAGE_KEY, "monochrome");
+        } else if (savedTheme && THEMES.some((t) => t.id === savedTheme)) {
+          initialTheme = savedTheme as ThemeId;
+        }
+      }
+
+      if (initialTheme) {
+        setThemeState(initialTheme);
+        document.documentElement.setAttribute("data-theme", initialTheme);
       } else {
         const domTheme = document.documentElement.getAttribute("data-theme") as ThemeId | null;
         if (domTheme && THEMES.some((t) => t.id === domTheme)) {
@@ -54,11 +80,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
-  const setTheme = React.useCallback((newTheme: ThemeId) => {
-    setThemeState(newTheme);
+  const setTheme = React.useCallback((themeCandidate: ThemeId | string) => {
+    let resolvedTheme: ThemeId = DEFAULT_THEME;
+    // Guard against programmatic calls with deleted themes
+    if (themeCandidate === "arctic-forge" || themeCandidate === "indigo-core") {
+      resolvedTheme = "monochrome";
+    } else if (THEMES.some((t) => t.id === themeCandidate)) {
+      resolvedTheme = themeCandidate as ThemeId;
+    }
+
+    setThemeState(resolvedTheme);
     try {
-      localStorage.setItem(THEME_STORAGE_KEY, newTheme);
-      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem(THEME_STORAGE_KEY, resolvedTheme);
+      document.documentElement.setAttribute("data-theme", resolvedTheme);
     } catch (e) {
       console.warn("Unable to persist theme to localStorage:", e);
     }
