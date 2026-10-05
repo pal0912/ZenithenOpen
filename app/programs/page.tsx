@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
+  ArrowRight,
   Rocket,
   Code2,
   FolderGit2,
@@ -137,7 +138,7 @@ export default function ProgramsPage() {
   const currentProgram = PROGRAMS.find((p) => p.id === currentSelectedId) || PROGRAMS[0];
 
   const CurrentIcon = currentProgram.icon;
-  const allProjects = MOCK_PROJECTS;
+  const featuredProjects = MOCK_PROJECTS.slice(0, 2);
 
   return (
     <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 transition-colors">
@@ -183,22 +184,30 @@ export default function ProgramsPage() {
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="space-y-6"
             >
-              <div>
-                <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-primary font-mono">
-                  <FolderGit2 className="h-4 w-4" />
-                  <span>Ecosystem Repositories</span>
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div>
+                  <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-primary font-mono">
+                    <FolderGit2 className="h-4 w-4" />
+                    <span>Ecosystem Repositories</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground mt-1">
+                    Campus Project Catalog
+                  </h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-xl">
+                    Open-source software maintained by IST engineers and student contributors.
+                  </p>
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground mt-1">
-                  Campus Project Catalog
-                </h2>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-xl">
-                  Open-source software maintained by IST engineers and student contributors.
-                </p>
+                <Link href="/projects">
+                  <Button variant="outline" size="sm" className="group text-xs border-border shrink-0 cursor-pointer">
+                    <span>View Project Directory</span>
+                    <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </Link>
               </div>
 
-              {/* All Project Cards displayed directly on the same page */}
+              {/* Project Cards Grid matching Picture 3 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {allProjects.map((project) => (
+                {featuredProjects.map((project) => (
                   <Card
                     key={project.id}
                     className="group relative overflow-hidden flex flex-col justify-between hover:shadow-md hover:border-primary/40 transition-all border-border bg-card"

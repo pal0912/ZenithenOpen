@@ -15,21 +15,21 @@ export function HeroSection() {
       {/* Floating Badges Constellation of Top GitHub Organizations - Smoothly fades out when menu opens */}
       <div
         className={cn(
-          "absolute inset-0 overflow-hidden pointer-events-none transition-all duration-500 ease-in-out",
+          "absolute inset-0 overflow-hidden pointer-events-none transition-all duration-300 ease-in-out",
           isSidebarOpen
-            ? "opacity-0 scale-95 pointer-events-none"
+            ? "opacity-0 scale-98 pointer-events-none"
             : "opacity-100 scale-100"
         )}
         aria-hidden={isSidebarOpen}
       >
-        <FloatingOrgBadges />
+        <FloatingOrgBadges isPaused={isSidebarOpen} />
       </div>
 
-      {/* Ambient background glow highlights responding to theme tokens */}
+      {/* Ambient background glow highlights responding to theme tokens with GPU acceleration */}
       <div
         className={cn(
-          "absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[480px] blur-[130px] pointer-events-none rounded-full transition-opacity duration-500",
-          isSidebarOpen ? "opacity-30" : "opacity-100"
+          "absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[400px] blur-3xl pointer-events-none rounded-full transition-opacity duration-300 transform-gpu will-change-[opacity]",
+          isSidebarOpen ? "opacity-20" : "opacity-70"
         )}
         style={{
           background: "radial-gradient(circle, var(--glow) 0%, transparent 70%)",
@@ -37,8 +37,8 @@ export function HeroSection() {
       />
       <div
         className={cn(
-          "absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[360px] blur-[120px] pointer-events-none rounded-full transition-opacity duration-500",
-          isSidebarOpen ? "opacity-30" : "opacity-100"
+          "absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[320px] blur-3xl pointer-events-none rounded-full transition-opacity duration-300 transform-gpu will-change-[opacity]",
+          isSidebarOpen ? "opacity-20" : "opacity-70"
         )}
         style={{
           background: "radial-gradient(circle, var(--glow-secondary) 0%, transparent 70%)",

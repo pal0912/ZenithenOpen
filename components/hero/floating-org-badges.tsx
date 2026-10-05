@@ -1074,28 +1074,55 @@ const CONSTELLATION_ORGS: ConstellationOrg[] = [
   },
 ];
 
-export function FloatingOrgBadges() {
-  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
+export function FloatingOrgBadges({ isPaused = false }: { isPaused?: boolean }) {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const targetOffset = React.useRef({ x: 0, y: 0 });
+  const currentOffset = React.useRef({ x: 0, y: 0 });
+  const rafId = React.useRef<number | null>(null);
 
-  // Subtle interactive parallax mouse tracking
+  // High-performance direct DOM RAF parallax: ZERO React re-renders on mouse movement
   useEffect(() => {
+    if (isPaused) {
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+      return;
+    }
+
+    let isDestroyed = false;
+
+    const updateParallax = () => {
+      if (isDestroyed || !containerRef.current) return;
+      // Butter-smooth lerp interpolation
+      currentOffset.current.x += (targetOffset.current.x - currentOffset.current.x) * 0.08;
+      currentOffset.current.y += (targetOffset.current.y - currentOffset.current.y) * 0.08;
+
+      containerRef.current.style.transform = `translate3d(${currentOffset.current.x}px, ${currentOffset.current.y}px, 0)`;
+      rafId.current = requestAnimationFrame(updateParallax);
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
       const { innerWidth, innerHeight } = window;
-      const x = (e.clientX / innerWidth - 0.5) * 20; // max 20px tilt
-      const y = (e.clientY / innerHeight - 0.5) * 20;
-      setMouseOffset({ x, y });
+      targetOffset.current.x = (e.clientX / innerWidth - 0.5) * 16;
+      targetOffset.current.y = (e.clientY / innerHeight - 0.5) * 16;
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+    rafId.current = requestAnimationFrame(updateParallax);
+
+    return () => {
+      isDestroyed = true;
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+    };
+  }, [isPaused]);
+
+  if (isPaused) {
+    return null;
+  }
 
   return (
     <div
-      className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none transition-transform duration-700 ease-out"
-      style={{
-        transform: `translate3d(${mouseOffset.x * 0.4}px, ${mouseOffset.y * 0.4}px, 0)`,
-      }}
+      ref={containerRef}
+      className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none will-change-transform transform-gpu"
       aria-label="Floating GitHub organization badges constellation"
     >
       {CONSTELLATION_ORGS.map((org) => {
@@ -1128,7 +1155,7 @@ export function FloatingOrgBadges() {
         return (
           <div
             key={org.id}
-            className={`absolute pointer-events-auto ${zLayer} ${depthOpacity} transition-opacity duration-300`}
+            className={`absolute pointer-events-auto ${zLayer} ${depthOpacity} transition-opacity duration-300 will-change-transform`}
             style={{
               top: `${org.top}%`,
               left: `${org.left}%`,
@@ -1136,7 +1163,7 @@ export function FloatingOrgBadges() {
             }}
           >
             <div
-              className={`${animClass}`}
+              className={`${animClass} will-change-transform`}
               style={{
                 animationDelay: `${org.delay}s`,
               }}
@@ -1146,16 +1173,16 @@ export function FloatingOrgBadges() {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`@${org.handle} (${org.name}) on GitHub`}
-                className={`group relative flex items-center justify-center ${containerSize} rounded-2xl border border-border/80 bg-card/90 backdrop-blur-md shadow-md shadow-black/20 hover:scale-120 hover:border-primary hover:bg-card hover:shadow-xl hover:shadow-primary/25 hover:z-50 transition-all duration-300 cursor-pointer`}
+                className={`group relative flex items-center justify-center ${containerSize} rounded-2xl border border-border/80 bg-card shadow-md shadow-black/20 hover:scale-120 hover:border-primary hover:bg-card hover:shadow-xl hover:shadow-primary/25 hover:z-50 transition-all duration-200 cursor-pointer`}
               >
                 {/* Dynamic GitHub CDN avatar */}
                 <img
                   src={`https://github.com/${org.handle}.png?size=96`}
                   alt={org.name}
-                  loading="eager"
-                  className={`${logoSize} rounded-xl object-contain filter group-hover:brightness-105 transition-all duration-200`}
+                  loading="lazy"
+                  decoding="async"
+                  className={`${logoSize} rounded-xl object-contain filter group-hover:brightness-105 transition-all duration-150`}
                   onError={(e) => {
-                    // Fallback to unavatar CDN if needed
                     const target = e.target as HTMLImageElement;
                     if (!target.src.includes("unavatar.io")) {
                       target.src = `https://unavatar.io/github/${org.handle}`;
@@ -1164,7 +1191,7 @@ export function FloatingOrgBadges() {
                 />
 
                 {/* Subtle hover pill tooltip */}
-                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-[11px] font-mono tracking-tight text-white bg-[#0f172a]/95 border border-white/15 backdrop-blur-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-[11px] font-mono tracking-tight text-white bg-[#0f172a] border border-white/15 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none whitespace-nowrap z-50">
                   @{org.handle}
                 </span>
               </a>
