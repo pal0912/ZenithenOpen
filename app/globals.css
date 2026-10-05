@@ -98,14 +98,23 @@ body {
 
 .animate-float-1 {
   animation: float-constellation-1 6s ease-in-out infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .animate-float-2 {
   animation: float-constellation-2 7.5s ease-in-out infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .animate-float-3 {
   animation: float-constellation-3 9s ease-in-out infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 /* Ultra-premium glassmorphism card primitives linked to theme variables */

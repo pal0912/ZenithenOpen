@@ -98,10 +98,10 @@ export function SidebarMenu() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.22, ease: "easeInOut" }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
             onClick={closeSidebar}
             aria-hidden="true"
-            className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs transition-colors"
+            className="fixed inset-0 z-50 bg-black/60 transition-colors will-change-[opacity]"
           />
 
           {/* Left-Side Sliding Navigation Drawer */}
@@ -117,16 +117,16 @@ export function SidebarMenu() {
             exit={{ x: "-100%" }}
             transition={{
               type: "spring",
-              damping: 28,
-              stiffness: 300,
-              mass: 0.85,
+              damping: 30,
+              stiffness: 320,
+              mass: 0.8,
             }}
             className={cn(
               "fixed top-0 bottom-0 left-0 z-50",
               "w-[300px] sm:w-[360px] max-w-[85vw] h-full",
               "flex flex-col justify-between",
-              "bg-card/98 backdrop-blur-2xl border-r border-border shadow-2xl shadow-black/80",
-              "text-foreground select-none"
+              "bg-card border-r border-border shadow-2xl shadow-black/80",
+              "text-foreground select-none will-change-transform transform-gpu"
             )}
           >
             {/* Header: Brand & Close X Button */}
