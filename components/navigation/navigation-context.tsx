@@ -85,20 +85,33 @@ export function NavigationProvider({
     };
   }, [isSidebarOpen, popupSection]);
 
+  const contextValue = React.useMemo(
+    () => ({
+      isSidebarOpen,
+      openSidebar,
+      closeSidebar,
+      toggleSidebar,
+      activeSection,
+      setActiveSection,
+      popupSection,
+      openPopup,
+      closePopup,
+    }),
+    [
+      isSidebarOpen,
+      openSidebar,
+      closeSidebar,
+      toggleSidebar,
+      activeSection,
+      setActiveSection,
+      popupSection,
+      openPopup,
+      closePopup,
+    ]
+  );
+
   return (
-    <NavigationContext.Provider
-      value={{
-        isSidebarOpen,
-        openSidebar,
-        closeSidebar,
-        toggleSidebar,
-        activeSection,
-        setActiveSection,
-        popupSection,
-        openPopup,
-        closePopup,
-      }}
-    >
+    <NavigationContext.Provider value={contextValue}>
       {children}
     </NavigationContext.Provider>
   );

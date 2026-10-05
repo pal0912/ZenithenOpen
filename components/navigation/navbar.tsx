@@ -66,7 +66,7 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300",
+        "sticky top-0 z-50 w-full transition-colors duration-150",
         scrolled
           ? "border-b border-border/80 bg-background/90 backdrop-blur-xl shadow-xs"
           : "border-b border-transparent bg-background/70 backdrop-blur-md"
@@ -85,7 +85,7 @@ export function Navbar() {
             title={isSidebarOpen ? "Close navigation (Esc)" : "Open navigation"}
             className={cn(
               "flex h-9 w-9 items-center justify-center rounded-xl border border-border/80 bg-card/80 text-muted-foreground",
-              "hover:text-foreground hover:bg-muted hover:border-primary/40 active:scale-95 transition-all cursor-pointer",
+              "hover:text-foreground hover:bg-muted hover:border-primary/40 active:scale-95 transition-colors duration-150 cursor-pointer",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
               isSidebarOpen && "bg-primary/15 text-primary border-primary/40 ring-1 ring-primary/40"
             )}
@@ -165,7 +165,7 @@ export function Navbar() {
                   type="button"
                   onClick={() => setActiveSection(item.id)}
                   className={cn(
-                    "px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all cursor-pointer border",
+                    "px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors duration-150 cursor-pointer border",
                     isSelected
                       ? "bg-primary text-primary-foreground border-primary shadow-xs font-semibold"
                       : "bg-card/80 border-border text-muted-foreground hover:text-foreground hover:bg-muted hover:border-border"
