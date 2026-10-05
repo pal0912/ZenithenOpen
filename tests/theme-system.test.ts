@@ -57,8 +57,8 @@ function runTests() {
   const noneRemovedExist = removedThemes.every((id) => !themeIds.includes(id as any));
   assert(noneRemovedExist, "Removed legacy themes (obsidian, git-graph, aurora, deep-ocean, cyberpunk, solar) are absent");
 
-  // Test 4: Default theme is Monochrome
-  assert(DEFAULT_THEME === "monochrome", "Default theme is correctly set to 'monochrome'");
+  // Test 4: Default theme is Sage Collective
+  assert(DEFAULT_THEME === "sage-collective", "Default theme is correctly set to 'sage-collective'");
 
   // Test 5: Monochrome theme colors and appearance preserved exactly
   const monochromeTheme = THEMES.find((t) => t.id === "monochrome");

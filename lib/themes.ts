@@ -38,7 +38,7 @@ export interface Theme {
   colors: ThemeColors;
 }
 
-export const DEFAULT_THEME: ThemeId = "monochrome";
+export const DEFAULT_THEME: ThemeId = "sage-collective";
 export const THEME_STORAGE_KEY = "zenithen-theme";
 
 export const THEMES: Theme[] = [
