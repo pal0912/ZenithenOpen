@@ -55,13 +55,13 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      data-theme="obsidian"
+      data-theme="monochrome"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("zenithen-theme")||"obsidian";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","obsidian");}})();`,
+            __html: `(function(){try{var valid=["monochrome","arctic-forge","indigo-core","aqua-circuit","violet-nexus","sage-collective"];var t=localStorage.getItem("zenithen-theme");if(!t||valid.indexOf(t)===-1){t="monochrome";localStorage.setItem("zenithen-theme","monochrome");}document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","monochrome");}})();`,
           }}
         />
       </head>

@@ -40,8 +40,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         const domTheme = document.documentElement.getAttribute("data-theme") as ThemeId | null;
         if (domTheme && THEMES.some((t) => t.id === domTheme)) {
           setThemeState(domTheme);
+          localStorage.setItem(THEME_STORAGE_KEY, domTheme);
         } else {
+          setThemeState(DEFAULT_THEME);
           document.documentElement.setAttribute("data-theme", DEFAULT_THEME);
+          localStorage.setItem(THEME_STORAGE_KEY, DEFAULT_THEME);
         }
       }
     } catch {

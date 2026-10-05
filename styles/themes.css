@@ -1,166 +1,11 @@
 /**
  * ZenithenOpen Design System — Theme Tokens
  *
- * All 7 themes defined via semantic CSS custom properties.
- * Default theme: Obsidian (applied to :root and [data-theme="obsidian"]).
+ * Exactly 6 themes defined via semantic CSS custom properties.
+ * Default theme: Monochrome (applied to :root and [data-theme="monochrome"]).
  */
 
 :root,
-[data-theme="obsidian"] {
-  --theme-id: "obsidian";
-  --background: #07090e;
-  --foreground: #f8fafc;
-  --card: #0d111a;
-  --card-foreground: #f8fafc;
-  --popover: #0d111a;
-  --popover-foreground: #f8fafc;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.1);
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
-  --secondary: #8b5cf6;
-  --secondary-foreground: #ffffff;
-  --accent: #10b981;
-  --accent-foreground: #ffffff;
-  --muted: #131926;
-  --muted-foreground: #94a3b8;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --ring: #3b82f6;
-  --glow: rgba(59, 130, 246, 0.25);
-  --glow-secondary: rgba(139, 92, 246, 0.2);
-  --grid-line: rgba(255, 255, 255, 0.04);
-  --glass-bg: rgba(13, 17, 26, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --n-btn-bg: #0d111a;
-  --n-btn-border: rgba(255, 255, 255, 0.16);
-  --n-btn-glow: rgba(59, 130, 246, 0.35);
-}
-
-[data-theme="git-graph"] {
-  --theme-id: "git-graph";
-  --background: #0a0f14;
-  --foreground: #e6edf3;
-  --card: #111822;
-  --card-foreground: #e6edf3;
-  --popover: #111822;
-  --popover-foreground: #e6edf3;
-  --border: rgba(56, 189, 248, 0.14);
-  --input: rgba(56, 189, 248, 0.16);
-  --primary: #2ea043;
-  --primary-foreground: #ffffff;
-  --secondary: #38bdf8;
-  --secondary-foreground: #0a0f14;
-  --accent: #3fb950;
-  --accent-foreground: #ffffff;
-  --muted: #16202e;
-  --muted-foreground: #7d8590;
-  --destructive: #f85149;
-  --destructive-foreground: #ffffff;
-  --ring: #2ea043;
-  --glow: rgba(46, 160, 67, 0.28);
-  --glow-secondary: rgba(56, 189, 248, 0.22);
-  --grid-line: rgba(56, 189, 248, 0.04);
-  --glass-bg: rgba(17, 24, 34, 0.85);
-  --glass-border: rgba(56, 189, 248, 0.14);
-  --n-btn-bg: #111822;
-  --n-btn-border: rgba(46, 160, 67, 0.35);
-  --n-btn-glow: rgba(46, 160, 67, 0.4);
-}
-
-[data-theme="aurora"] {
-  --theme-id: "aurora";
-  --background: #0b0d1e;
-  --foreground: #f3f4f6;
-  --card: #12162e;
-  --card-foreground: #f3f4f6;
-  --popover: #12162e;
-  --popover-foreground: #f3f4f6;
-  --border: rgba(6, 182, 212, 0.16);
-  --input: rgba(6, 182, 212, 0.18);
-  --primary: #06b6d4;
-  --primary-foreground: #0b0d1e;
-  --secondary: #a855f7;
-  --secondary-foreground: #ffffff;
-  --accent: #22c55e;
-  --accent-foreground: #0b0d1e;
-  --muted: #181d3d;
-  --muted-foreground: #9ca3af;
-  --destructive: #f43f5e;
-  --destructive-foreground: #ffffff;
-  --ring: #06b6d4;
-  --glow: rgba(6, 182, 212, 0.3);
-  --glow-secondary: rgba(168, 85, 247, 0.25);
-  --grid-line: rgba(6, 182, 212, 0.05);
-  --glass-bg: rgba(18, 22, 46, 0.85);
-  --glass-border: rgba(6, 182, 212, 0.16);
-  --n-btn-bg: #12162e;
-  --n-btn-border: rgba(6, 182, 212, 0.35);
-  --n-btn-glow: rgba(6, 182, 212, 0.45);
-}
-
-[data-theme="deep-ocean"] {
-  --theme-id: "deep-ocean";
-  --background: #05111d;
-  --foreground: #f0f9ff;
-  --card: #0a1d30;
-  --card-foreground: #f0f9ff;
-  --popover: #0a1d30;
-  --popover-foreground: #f0f9ff;
-  --border: rgba(20, 184, 166, 0.16);
-  --input: rgba(20, 184, 166, 0.18);
-  --primary: #14b8a6;
-  --primary-foreground: #05111d;
-  --secondary: #38bdf8;
-  --secondary-foreground: #05111d;
-  --accent: #06b6d4;
-  --accent-foreground: #05111d;
-  --muted: #0f2842;
-  --muted-foreground: #7dd3fc;
-  --destructive: #f87171;
-  --destructive-foreground: #ffffff;
-  --ring: #14b8a6;
-  --glow: rgba(20, 184, 166, 0.28);
-  --glow-secondary: rgba(56, 189, 248, 0.22);
-  --grid-line: rgba(20, 184, 166, 0.04);
-  --glass-bg: rgba(10, 29, 48, 0.85);
-  --glass-border: rgba(20, 184, 166, 0.16);
-  --n-btn-bg: #0a1d30;
-  --n-btn-border: rgba(20, 184, 166, 0.35);
-  --n-btn-glow: rgba(20, 184, 166, 0.45);
-}
-
-[data-theme="cyberpunk"] {
-  --theme-id: "cyberpunk";
-  --background: #090514;
-  --foreground: #ffffff;
-  --card: #130b29;
-  --card-foreground: #ffffff;
-  --popover: #130b29;
-  --popover-foreground: #ffffff;
-  --border: rgba(255, 0, 127, 0.25);
-  --input: rgba(255, 0, 127, 0.28);
-  --primary: #fcee0a;
-  --primary-foreground: #000000;
-  --secondary: #ff007f;
-  --secondary-foreground: #ffffff;
-  --accent: #00f0ff;
-  --accent-foreground: #000000;
-  --muted: #1d123d;
-  --muted-foreground: #d8b4fe;
-  --destructive: #ff3366;
-  --destructive-foreground: #ffffff;
-  --ring: #fcee0a;
-  --glow: rgba(255, 0, 127, 0.35);
-  --glow-secondary: rgba(252, 238, 10, 0.25);
-  --grid-line: rgba(255, 0, 127, 0.06);
-  --glass-bg: rgba(19, 11, 41, 0.88);
-  --glass-border: rgba(255, 0, 127, 0.25);
-  --n-btn-bg: #130b29;
-  --n-btn-border: rgba(255, 0, 127, 0.5);
-  --n-btn-glow: rgba(255, 0, 127, 0.55);
-}
-
 [data-theme="monochrome"] {
   --theme-id: "monochrome";
   --background: #000000;
@@ -192,35 +37,159 @@
   --n-btn-glow: rgba(255, 255, 255, 0.25);
 }
 
-[data-theme="solar"] {
-  --theme-id: "solar";
-  --background: #0f0d0b;
-  --foreground: #fffbeb;
-  --card: #1a1612;
-  --card-foreground: #fffbeb;
-  --popover: #1a1612;
-  --popover-foreground: #fffbeb;
-  --border: rgba(245, 158, 11, 0.18);
-  --input: rgba(245, 158, 11, 0.22);
-  --primary: #f59e0b;
-  --primary-foreground: #0f0d0b;
-  --secondary: #f97316;
-  --secondary-foreground: #ffffff;
-  --accent: #fbbf24;
-  --accent-foreground: #0f0d0b;
-  --muted: #26201a;
-  --muted-foreground: #d97706;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --ring: #f59e0b;
-  --glow: rgba(245, 158, 11, 0.28);
-  --glow-secondary: rgba(249, 115, 22, 0.22);
-  --grid-line: rgba(245, 158, 11, 0.05);
-  --glass-bg: rgba(26, 22, 18, 0.88);
-  --glass-border: rgba(245, 158, 11, 0.18);
-  --n-btn-bg: #1a1612;
-  --n-btn-border: rgba(245, 158, 11, 0.4);
-  --n-btn-glow: rgba(245, 158, 11, 0.45);
+[data-theme="arctic-forge"] {
+  --theme-id: "arctic-forge";
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --primary: #1976D2;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1565C0;
+  --secondary-foreground: #FFFFFF;
+  --accent: #16A34A;
+  --accent-foreground: #FFFFFF;
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --ring: #1976D2;
+  --glow: rgba(25, 118, 210, 0.2);
+  --glow-secondary: rgba(21, 101, 192, 0.15);
+  --grid-line: rgba(15, 23, 42, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(226, 232, 240, 0.8);
+  --n-btn-bg: #FFFFFF;
+  --n-btn-border: #E2E8F0;
+  --n-btn-glow: rgba(25, 118, 210, 0.25);
+}
+
+[data-theme="indigo-core"] {
+  --theme-id: "indigo-core";
+  --background: #F8FAFF;
+  --foreground: #111827;
+  --card: #FFFFFF;
+  --card-foreground: #111827;
+  --popover: #FFFFFF;
+  --popover-foreground: #111827;
+  --border: #E4E7EC;
+  --input: #E4E7EC;
+  --primary: #3F51B5;
+  --primary-foreground: #FFFFFF;
+  --secondary: #303F9F;
+  --secondary-foreground: #FFFFFF;
+  --accent: #16A34A;
+  --accent-foreground: #FFFFFF;
+  --muted: #E8EAF6;
+  --muted-foreground: #667085;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --ring: #3F51B5;
+  --glow: rgba(63, 81, 181, 0.2);
+  --glow-secondary: rgba(48, 63, 159, 0.15);
+  --grid-line: rgba(17, 24, 39, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(228, 231, 236, 0.8);
+  --n-btn-bg: #FFFFFF;
+  --n-btn-border: #E4E7EC;
+  --n-btn-glow: rgba(63, 81, 181, 0.25);
+}
+
+[data-theme="aqua-circuit"] {
+  --theme-id: "aqua-circuit";
+  --background: #F7FCFC;
+  --foreground: #102A2E;
+  --card: #FFFFFF;
+  --card-foreground: #102A2E;
+  --popover: #FFFFFF;
+  --popover-foreground: #102A2E;
+  --border: #D9EDEE;
+  --input: #D9EDEE;
+  --primary: #0097A7;
+  --primary-foreground: #FFFFFF;
+  --secondary: #007C89;
+  --secondary-foreground: #FFFFFF;
+  --accent: #16A34A;
+  --accent-foreground: #FFFFFF;
+  --muted: #E0F7FA;
+  --muted-foreground: #607D80;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --ring: #0097A7;
+  --glow: rgba(0, 151, 167, 0.2);
+  --glow-secondary: rgba(0, 124, 137, 0.15);
+  --grid-line: rgba(16, 42, 46, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(217, 237, 238, 0.8);
+  --n-btn-bg: #FFFFFF;
+  --n-btn-border: #D9EDEE;
+  --n-btn-glow: rgba(0, 151, 167, 0.25);
+}
+
+[data-theme="violet-nexus"] {
+  --theme-id: "violet-nexus";
+  --background: #FBF9FC;
+  --foreground: #211A24;
+  --card: #FFFFFF;
+  --card-foreground: #211A24;
+  --popover: #FFFFFF;
+  --popover-foreground: #211A24;
+  --border: #E9E1EB;
+  --input: #E9E1EB;
+  --primary: #8E24AA;
+  --primary-foreground: #FFFFFF;
+  --secondary: #7B1FA2;
+  --secondary-foreground: #FFFFFF;
+  --accent: #16A34A;
+  --accent-foreground: #FFFFFF;
+  --muted: #F3E5F5;
+  --muted-foreground: #756A78;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --ring: #8E24AA;
+  --glow: rgba(142, 36, 170, 0.2);
+  --glow-secondary: rgba(123, 31, 162, 0.15);
+  --grid-line: rgba(33, 26, 36, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(233, 225, 235, 0.8);
+  --n-btn-bg: #FFFFFF;
+  --n-btn-border: #E9E1EB;
+  --n-btn-glow: rgba(142, 36, 170, 0.25);
+}
+
+[data-theme="sage-collective"] {
+  --theme-id: "sage-collective";
+  --background: #FAFCF8;
+  --foreground: #1F2933;
+  --card: #FFFFFF;
+  --card-foreground: #1F2933;
+  --popover: #FFFFFF;
+  --popover-foreground: #1F2933;
+  --border: #E1E8DC;
+  --input: #E1E8DC;
+  --primary: #6B8E23;
+  --primary-foreground: #FFFFFF;
+  --secondary: #557317;
+  --secondary-foreground: #FFFFFF;
+  --accent: #16A34A;
+  --accent-foreground: #FFFFFF;
+  --muted: #F1F5EC;
+  --muted-foreground: #68756A;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --ring: #6B8E23;
+  --glow: rgba(107, 142, 35, 0.2);
+  --glow-secondary: rgba(85, 115, 23, 0.15);
+  --grid-line: rgba(31, 41, 51, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(225, 232, 220, 0.8);
+  --n-btn-bg: #FFFFFF;
+  --n-btn-border: #E1E8DC;
+  --n-btn-glow: rgba(107, 142, 35, 0.25);
 }
 
 /* Smooth transition when changing themes */
