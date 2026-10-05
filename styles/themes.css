@@ -2,10 +2,41 @@
  * ZenithenOpen Design System — Theme Tokens
  *
  * Exactly 6 themes defined via semantic CSS custom properties.
- * Default theme: Monochrome (applied to :root and [data-theme="monochrome"]).
+ * Default theme: Sage Collective (applied to :root and [data-theme="sage-collective"]).
  */
 
 :root,
+[data-theme="sage-collective"] {
+  --theme-id: "sage-collective";
+  --background: #FAFCF8;
+  --foreground: #1F2933;
+  --card: #FFFFFF;
+  --card-foreground: #1F2933;
+  --popover: #FFFFFF;
+  --popover-foreground: #1F2933;
+  --border: #E1E8DC;
+  --input: #E1E8DC;
+  --primary: #6B8E23;
+  --primary-foreground: #FFFFFF;
+  --secondary: #557317;
+  --secondary-foreground: #FFFFFF;
+  --accent: #16A34A;
+  --accent-foreground: #FFFFFF;
+  --muted: #F1F5EC;
+  --muted-foreground: #68756A;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --ring: #6B8E23;
+  --glow: rgba(107, 142, 35, 0.2);
+  --glow-secondary: rgba(85, 115, 23, 0.15);
+  --grid-line: rgba(31, 41, 51, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(225, 232, 220, 0.8);
+  --n-btn-bg: #FFFFFF;
+  --n-btn-border: #E1E8DC;
+  --n-btn-glow: rgba(107, 142, 35, 0.25);
+}
+
 [data-theme="monochrome"] {
   --theme-id: "monochrome";
   --background: #000000;
@@ -159,37 +190,6 @@
   --n-btn-bg: #FFFFFF;
   --n-btn-border: #E9E1EB;
   --n-btn-glow: rgba(142, 36, 170, 0.25);
-}
-
-[data-theme="sage-collective"] {
-  --theme-id: "sage-collective";
-  --background: #FAFCF8;
-  --foreground: #1F2933;
-  --card: #FFFFFF;
-  --card-foreground: #1F2933;
-  --popover: #FFFFFF;
-  --popover-foreground: #1F2933;
-  --border: #E1E8DC;
-  --input: #E1E8DC;
-  --primary: #6B8E23;
-  --primary-foreground: #FFFFFF;
-  --secondary: #557317;
-  --secondary-foreground: #FFFFFF;
-  --accent: #16A34A;
-  --accent-foreground: #FFFFFF;
-  --muted: #F1F5EC;
-  --muted-foreground: #68756A;
-  --destructive: #DC2626;
-  --destructive-foreground: #FFFFFF;
-  --ring: #6B8E23;
-  --glow: rgba(107, 142, 35, 0.2);
-  --glow-secondary: rgba(85, 115, 23, 0.15);
-  --grid-line: rgba(31, 41, 51, 0.05);
-  --glass-bg: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(225, 232, 220, 0.8);
-  --n-btn-bg: #FFFFFF;
-  --n-btn-border: #E1E8DC;
-  --n-btn-glow: rgba(107, 142, 35, 0.25);
 }
 
 /* Smooth transition when changing themes */
