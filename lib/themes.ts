@@ -1,14 +1,14 @@
 /**
  * ZenithenOpen Design System — Centralized Theme Registry
  * 
- * Defines the contract, metadata, swatches, and color tokens for all 6 themes.
+ * Defines the contract, metadata, swatches, and color tokens for all 7 themes.
  * Components must consume semantic CSS variables rather than hardcoded hex values.
  */
 
 export type ThemeId =
+  | "sage-collective"
   | "aqua-circuit"
   | "violet-nexus"
-  | "sage-collective"
   | "monochrome"
   | "obsidian-pulse"
   | "midnight-aurora"
@@ -43,7 +43,29 @@ export const DEFAULT_THEME: ThemeId = "sage-collective";
 export const THEME_STORAGE_KEY = "zenithen-theme";
 
 export const THEMES: Theme[] = [
-  // LIGHT THEMES — 3
+  // LIGHT THEMES — 3 (Default: Sage Collective)
+  {
+    id: "sage-collective",
+    name: "Sage Collective",
+    tagline: "Calm natural tones built around community and collaboration.",
+    swatches: ["#FAFCF8", "#6B8E23", "#DCEDC8"],
+    colors: {
+      background: "#FAFCF8",
+      foreground: "#1F2933",
+      card: "#FFFFFF",
+      cardForeground: "#1F2933",
+      border: "#E1E8DC",
+      primary: "#6B8E23",
+      primaryForeground: "#FFFFFF",
+      secondary: "#557317",
+      secondaryForeground: "#FFFFFF",
+      accent: "#16A34A",
+      accentForeground: "#FFFFFF",
+      muted: "#F1F5EC",
+      mutedForeground: "#68756A",
+      glow: "rgba(107, 142, 35, 0.2)",
+    },
+  },
   {
     id: "aqua-circuit",
     name: "Aqua Circuit",
@@ -86,28 +108,6 @@ export const THEMES: Theme[] = [
       muted: "#F3E5F5",
       mutedForeground: "#756A78",
       glow: "rgba(142, 36, 170, 0.2)",
-    },
-  },
-  {
-    id: "sage-collective",
-    name: "Sage Collective",
-    tagline: "Calm natural tones built around community and collaboration.",
-    swatches: ["#FAFCF8", "#6B8E23", "#DCEDC8"],
-    colors: {
-      background: "#FAFCF8",
-      foreground: "#1F2933",
-      card: "#FFFFFF",
-      cardForeground: "#1F2933",
-      border: "#E1E8DC",
-      primary: "#6B8E23",
-      primaryForeground: "#FFFFFF",
-      secondary: "#557317",
-      secondaryForeground: "#FFFFFF",
-      accent: "#16A34A",
-      accentForeground: "#FFFFFF",
-      muted: "#F1F5EC",
-      mutedForeground: "#68756A",
-      glow: "rgba(107, 142, 35, 0.2)",
     },
   },
 
