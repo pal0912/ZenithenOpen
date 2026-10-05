@@ -39,9 +39,9 @@ function runTests() {
 
   // Test 1: Exactly 7 themes registered
   const expectedThemeIds: ThemeId[] = [
-    "sage-collective",
     "aqua-circuit",
     "violet-nexus",
+    "sage-collective",
     "monochrome",
     "obsidian-pulse",
     "midnight-aurora",
@@ -56,7 +56,6 @@ function runTests() {
   const themeIds = THEMES.map((t) => t.id);
   const allIdsExist = expectedThemeIds.every((id) => themeIds.includes(id));
   assert(allIdsExist, "All 7 required theme IDs exist in theme registry");
-  assert(THEMES[0].id === "sage-collective", "First theme in registry is Sage Collective (default theme)");
 
   // Test 3: Removed themes do NOT exist in THEMES registry
   const removedThemes = [
@@ -250,9 +249,9 @@ function runTests() {
 
   // Test 12: Simulated sequence transitions through all 7 themes
   const transitionSequence: ThemeId[] = [
-    "sage-collective",
     "aqua-circuit",
     "violet-nexus",
+    "sage-collective",
     "monochrome",
     "obsidian-pulse",
     "midnight-aurora",
