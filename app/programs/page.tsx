@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
@@ -14,6 +14,8 @@ import {
   Coins,
   ExternalLink,
   CheckCircle2,
+  Compass,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,8 +28,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GithubIcon } from "@/components/ui/icons";
-import { MOCK_PROJECTS } from "@/lib/data/mock-data";
+import { MOCK_PROJECTS, MOCK_OPPORTUNITIES } from "@/lib/data/mock-data";
 import { useNavigation } from "@/components/navigation/navigation-context";
+import { cn } from "@/lib/utils";
 
 interface ProgramItem {
   id: string;
@@ -131,6 +134,7 @@ const PROGRAMS: ProgramItem[] = [
 
 export default function ProgramsPage() {
   const { activeSection } = useNavigation();
+  const [isExploreOpen, setIsExploreOpen] = React.useState(true);
 
   // Default to Open Source
   const defaultProgramId = "open-source";
@@ -139,6 +143,7 @@ export default function ProgramsPage() {
 
   const CurrentIcon = currentProgram.icon;
   const featuredProjects = MOCK_PROJECTS.slice(0, 2);
+  const featuredOpportunities = MOCK_OPPORTUNITIES.slice(0, 4);
 
   return (
     <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 transition-colors">
@@ -274,64 +279,199 @@ export default function ProgramsPage() {
               </div>
             </motion.div>
           ) : (
-            <motion.div
-              key={currentProgram.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5 transition-colors duration-150"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
-                <div className="flex items-start space-x-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 border border-primary/25 text-primary shrink-0 shadow-xs">
-                    <CurrentIcon className="h-7 w-7" />
-                  </div>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-md bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-xs font-semibold text-primary uppercase font-mono">
-                        {currentProgram.badge}
-                      </span>
-                      <span className="rounded-md bg-muted border border-border px-2 py-0.5 text-[10px] font-semibold text-muted-foreground font-mono">
-                        Program Information
-                      </span>
+            <div className="space-y-8">
+              <motion.div
+                key={currentProgram.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="rounded-2xl border-2 border-primary/30 bg-card p-6 sm:p-10 shadow-lg shadow-primary/5 transition-colors duration-150"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-5">
+                  <div className="flex items-start space-x-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 border border-primary/25 text-primary shrink-0 shadow-xs">
+                      <CurrentIcon className="h-7 w-7" />
                     </div>
-                    <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground mt-2">
-                      {currentProgram.title}
-                    </h2>
-                    <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
-                      {currentProgram.description}
-                    </p>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-md bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-xs font-semibold text-primary uppercase font-mono">
+                          {currentProgram.badge}
+                        </span>
+                        <span className="rounded-md bg-muted border border-border px-2 py-0.5 text-[10px] font-semibold text-muted-foreground font-mono">
+                          Program Information
+                        </span>
+                      </div>
+                      <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground mt-2">
+                        {currentProgram.title}
+                      </h2>
+                      <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
+                        {currentProgram.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="shrink-0 sm:self-start">
+                    {currentProgram.id === "open-source" ? (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setIsExploreOpen((prev) => !prev);
+                          if (!isExploreOpen) {
+                            setTimeout(() => {
+                              document.getElementById("explore-open-source")?.scrollIntoView({ behavior: "smooth" });
+                            }, 100);
+                          }
+                        }}
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer shadow-md shadow-primary/25 gap-1.5"
+                      >
+                        <Compass className="h-3.5 w-3.5" />
+                        <span>{isExploreOpen ? "Hide Open Issues" : "Explore Open Issues"}</span>
+                        <ChevronDown
+                          className={cn(
+                            "h-3.5 w-3.5 transition-transform duration-200",
+                            isExploreOpen && "rotate-180"
+                          )}
+                        />
+                      </Button>
+                    ) : (
+                      <Link href={currentProgram.actionHref}>
+                        <Button
+                          size="sm"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer shadow-md shadow-primary/25"
+                        >
+                          <span>{currentProgram.actionLabel}</span>
+                          <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </div>
 
-                <div className="shrink-0 sm:self-start">
-                  <Link href={currentProgram.actionHref}>
-                    <Button
-                      size="sm"
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold cursor-pointer shadow-md shadow-primary/25"
-                    >
-                      <span>{currentProgram.actionLabel}</span>
-                      <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-                    </Button>
-                  </Link>
+                {/* Key Bullet Highlights */}
+                <div className="mt-8 pt-6 border-t border-border/70 space-y-3">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-primary font-mono">
+                    Key Initiatives & Highlights
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {currentProgram.details.map((detail, index) => (
+                      <div key={index} className="flex items-start space-x-2.5 text-xs sm:text-sm text-foreground">
+                        <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                        <span className="leading-snug text-muted-foreground">{detail}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </motion.div>
 
-              {/* Key Bullet Highlights */}
-              <div className="mt-8 pt-6 border-t border-border/70 space-y-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-primary font-mono">
-                  Key Initiatives & Highlights
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {currentProgram.details.map((detail, index) => (
-                    <div key={index} className="flex items-start space-x-2.5 text-xs sm:text-sm text-foreground">
-                      <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                      <span className="leading-snug text-muted-foreground">{detail}</span>
+              {/* Explore Open Source Section - rendered on the same page */}
+              {currentProgram.id === "open-source" && isExploreOpen && (
+                <motion.div
+                  id="explore-open-source"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className="space-y-6 pt-2"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div>
+                      <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-primary font-mono">
+                        <Compass className="h-4 w-4" />
+                        <span>Gateway to Contribution</span>
+                      </div>
+                      <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground mt-1">
+                        Explore Open Source Issues
+                      </h2>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-xl">
+                        Triaged starter issues and good-first-issues across official IST-ZenithenLab repositories.
+                      </p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
+                    <Link href="/opportunities">
+                      <Button variant="outline" size="sm" className="group text-xs border-border shrink-0 cursor-pointer">
+                        <span>View Full Opportunity Board</span>
+                        <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                      </Button>
+                    </Link>
+                  </div>
+
+                  {/* Issues Cards Grid matching programs/projects */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {featuredOpportunities.map((opp) => (
+                      <Card
+                        key={opp.id}
+                        className="group relative overflow-hidden flex flex-col justify-between hover:shadow-md hover:border-primary/40 transition-colors duration-150 border-border bg-card"
+                      >
+                        <CardHeader>
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[11px] font-mono font-semibold text-primary">
+                                  {opp.repoFullName}#{opp.issueNumber}
+                                </span>
+                              </div>
+                              <CardTitle className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                                <a
+                                  href={opp.issueUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="hover:underline"
+                                >
+                                  {opp.title}
+                                </a>
+                              </CardTitle>
+                            </div>
+                            <Badge
+                              variant="outline"
+                              className="text-xs text-emerald-700 bg-emerald-500/10 border-emerald-500/30 font-semibold px-2.5 py-0.5 rounded-md capitalize shrink-0"
+                            >
+                              {opp.difficulty}
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="flex flex-wrap gap-1.5 mt-1">
+                            {opp.labels.map((label) => (
+                              <span
+                                key={label.name}
+                                className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground border border-border/50"
+                              >
+                                {label.name}
+                              </span>
+                            ))}
+                          </div>
+                        </CardContent>
+                        <CardFooter className="pt-3 border-t border-border/60 flex items-center justify-between mt-auto">
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <span
+                              className="h-2 w-2 rounded-full"
+                              style={{
+                                backgroundColor:
+                                  opp.language === "TypeScript"
+                                    ? "#3178c6"
+                                    : opp.language === "C++"
+                                    ? "#f34b7d"
+                                    : "#10b981",
+                              }}
+                            />
+                            <span className="font-semibold text-foreground">{opp.language}</span>
+                          </div>
+                          <a
+                            href={opp.issueUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Button size="sm" variant="outline" className="text-xs gap-1.5 shadow-xs cursor-pointer">
+                              <GithubIcon className="h-3.5 w-3.5" />
+                              <span>View on GitHub</span>
+                              <ExternalLink className="h-3 w-3" />
+                            </Button>
+                          </a>
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </div>
           )}
         </div>
       </div>

@@ -89,10 +89,98 @@ export const MOCK_PROJECTS: Project[] = [
 ];
 
 /**
- * Clean opportunity board - zero fake issues.
- * Filtered from GitHub issues tagged `good-first-issue` on connected repositories.
+ * Curated open-source starter opportunities for IST-ZenithenLab repositories.
  */
-export const MOCK_OPPORTUNITIES: Opportunity[] = [];
+export const MOCK_OPPORTUNITIES: Opportunity[] = [
+  {
+    id: "opp-zenithen-open-1",
+    title: "Add responsive search & filter drawer for mobile devices",
+    repository: "ZenithenOpen",
+    repoFullName: "IST-ZenithenLab/ZenithenOpen",
+    issueNumber: 14,
+    issueUrl: "https://github.com/IST-ZenithenLab/ZenithenOpen/issues/14",
+    language: "TypeScript",
+    labels: [
+      { name: "good-first-issue", color: "#7057ff" },
+      { name: "frontend", color: "#0075ca" },
+      { name: "ui/ux", color: "#e4e669" },
+    ],
+    difficulty: "beginner",
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    commentsCount: 3,
+    mentorAssigned: {
+      name: "IST-ZenithenLab",
+      username: "IST-ZenithenLab",
+      avatarUrl: "https://github.com/IST-ZenithenLab.png?size=200",
+    },
+  },
+  {
+    id: "opp-zenithen-open-2",
+    title: "Implement smooth dark/light theme switch transition",
+    repository: "ZenithenOpen",
+    repoFullName: "IST-ZenithenLab/ZenithenOpen",
+    issueNumber: 18,
+    issueUrl: "https://github.com/IST-ZenithenLab/ZenithenOpen/issues/18",
+    language: "TypeScript",
+    labels: [
+      { name: "good-first-issue", color: "#7057ff" },
+      { name: "framer-motion", color: "#ff69b4" },
+      { name: "enhancement", color: "#a2eeef" },
+    ],
+    difficulty: "beginner",
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    commentsCount: 2,
+    mentorAssigned: {
+      name: "IST-ZenithenLab",
+      username: "IST-ZenithenLab",
+      avatarUrl: "https://github.com/IST-ZenithenLab.png?size=200",
+    },
+  },
+  {
+    id: "opp-zenithen-lab-1",
+    title: "Implement Dijkstra Shortest Path algorithm with benchmark tests",
+    repository: "ZenithenLab",
+    repoFullName: "IST-ZenithenLab/ZenithenLab",
+    issueNumber: 7,
+    issueUrl: "https://github.com/IST-ZenithenLab/ZenithenLab/issues/7",
+    language: "C++",
+    labels: [
+      { name: "good-first-issue", color: "#7057ff" },
+      { name: "algorithms", color: "#008672" },
+      { name: "graph-theory", color: "#d93f0b" },
+    ],
+    difficulty: "beginner",
+    createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    commentsCount: 5,
+    mentorAssigned: {
+      name: "IST-ZenithenLab",
+      username: "IST-ZenithenLab",
+      avatarUrl: "https://github.com/IST-ZenithenLab.png?size=200",
+    },
+  },
+  {
+    id: "opp-zenithen-lab-2",
+    title: "Add fast I/O template and modular arithmetic helpers for contests",
+    repository: "ZenithenLab",
+    repoFullName: "IST-ZenithenLab/ZenithenLab",
+    issueNumber: 11,
+    issueUrl: "https://github.com/IST-ZenithenLab/ZenithenLab/issues/11",
+    language: "C++",
+    labels: [
+      { name: "good-first-issue", color: "#7057ff" },
+      { name: "competitive-programming", color: "#f9d0c4" },
+      { name: "templates", color: "#bfdadc" },
+    ],
+    difficulty: "beginner",
+    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    commentsCount: 1,
+    mentorAssigned: {
+      name: "IST-ZenithenLab",
+      username: "IST-ZenithenLab",
+      avatarUrl: "https://github.com/IST-ZenithenLab.png?size=200",
+    },
+  },
+];
 
 /**
  * First PR Hall of Fame - awaits real merged contributions from students.
