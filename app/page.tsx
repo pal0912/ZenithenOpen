@@ -20,7 +20,6 @@ import {
   MOCK_PROJECTS,
   MOCK_OPPORTUNITIES,
   MOCK_LEADERBOARD,
-  MOCK_LEARNING_PATHS,
 } from "@/lib/data/mock-data";
 
 export default function HomePage() {
@@ -193,9 +192,9 @@ export default function HomePage() {
                 Once repositories are connected and issues are labeled with <code className="text-accent bg-accent/10 px-1 py-0.5 rounded border border-accent/20 font-mono">good-first-issue</code> on GitHub, they will appear dynamically here.
               </p>
               <div className="mt-6">
-                <Link href="/learning">
+                <Link href="/programs">
                   <Button size="sm" variant="default" className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground">
-                    Prepare with Roadmaps
+                    Explore Programs
                   </Button>
                 </Link>
               </div>
@@ -234,9 +233,9 @@ export default function HomePage() {
                   <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
                     Contributions will be ranked automatically by merged PRs and code reviews once GitHub accounts are linked.
                   </p>
-                  <Link href="/learning" className="inline-block mt-4">
+                  <Link href="/programs" className="inline-block mt-4">
                     <Button size="sm" variant="outline" className="text-xs border-border">
-                      Start First Roadmap
+                      Explore Programs
                     </Button>
                   </Link>
                 </div>
@@ -272,54 +271,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Learning Paths Teaser */}
-      <section className="py-20 border-t border-border bg-background">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center space-x-2 rounded-full border border-secondary/30 bg-secondary/10 px-3.5 py-1 text-xs text-secondary mb-4 font-medium">
-            <GraduationCap className="h-3.5 w-3.5 text-secondary" />
-            <span>Structured Curriculums</span>
-          </div>
-
-          <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
-            From First Commit to Google Summer of Code
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
-            Guided roadmaps curated for IST students to master open source and distributed software development.
-          </p>
-
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-left">
-            {MOCK_LEARNING_PATHS.map((path) => (
-              <div
-                key={path.id}
-                className="rounded-xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-md transition-all hover:-translate-y-1"
-              >
-                <div
-                  className="h-10 w-10 rounded-xl flex items-center justify-center mb-4"
-                  style={{ backgroundColor: `${path.color}15`, border: `1px solid ${path.color}30` }}
-                >
-                  <BookOpen className="h-5 w-5" style={{ color: path.color }} />
-                </div>
-                <h3 className="font-bold text-foreground text-base">{path.title}</h3>
-                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{path.description}</p>
-                <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground font-mono">{path.estimatedWeeks} Weeks</span>
-                  <Badge variant="outline" className="text-[10px] border-border">
-                    {path.level}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-10">
-            <Link href="/learning">
-              <Button size="lg" className="shadow-md bg-primary hover:bg-primary/90 text-primary-foreground">
-                Explore All Curriculum Modules
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* 7. Bottom Call to Action */}
       <section className="py-24 border-t border-border bg-gradient-to-b from-card/30 via-background to-card/60">
@@ -332,10 +283,10 @@ export default function HomePage() {
             Connect with campus mentors, choose a roadmap, and see your code merged into production.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <Link href="/learning">
+            <Link href="/programs">
               <Button size="lg" className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md">
                 <Compass className="h-5 w-5" />
-                <span>Start Learning</span>
+                <span>Explore Programs</span>
               </Button>
             </Link>
             <Link href="/mentorship">

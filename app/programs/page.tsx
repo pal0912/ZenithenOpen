@@ -107,8 +107,8 @@ const PROGRAMS: ProgramItem[] = [
       "One-on-one proposal reviews with past accepted IST scholars",
       "Milestone execution support for mid-term and final evaluations",
     ],
-    actionLabel: "Learn GSoC Roadmap",
-    actionHref: "/learning",
+    actionLabel: "View GSoC Resources",
+    actionHref: "/resources",
     icon: Globe2,
   },
   {
@@ -141,8 +141,8 @@ const PROGRAMS: ProgramItem[] = [
       "Full application bootcamp with coding challenge preparation",
       "Stipend guidance and international mentor networking",
     ],
-    actionLabel: "Explore Fellowship Paths",
-    actionHref: "/learning",
+    actionLabel: "Explore Fellowship Resources",
+    actionHref: "/resources",
     icon: Coins,
   },
 ];

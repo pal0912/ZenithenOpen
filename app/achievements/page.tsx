@@ -70,9 +70,9 @@ export default function AchievementsPage() {
               When your first pull request is merged, you will be invited to submit your quote and take your place in the Hall of Fame.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Link href="/learning">
+              <Link href="/resources">
                 <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs shadow-xs cursor-pointer">
-                  <span>Start Learning Roadmap</span>
+                  <span>Explore Resources & Guides</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
