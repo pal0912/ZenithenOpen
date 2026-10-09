@@ -294,6 +294,16 @@ export default function ProgramsPage() {
                   </Card>
                 ))}
               </div>
+
+              {/* Student Contributor Leaderboard */}
+              <div className="pt-8 border-t border-border/80">
+                <StudentLeaderboardSection
+                  timeframe={competitionTimeframe}
+                  setTimeframe={setCompetitionTimeframe}
+                  podiumStudents={podiumStudents}
+                  remainingStudents={remainingStudents}
+                />
+              </div>
             </motion.div>
           ) : (
             <div className="space-y-8">
@@ -382,298 +392,321 @@ export default function ProgramsPage() {
 
               {/* Student Competition Arena - rendered on the same page */}
               {currentProgram.id === "open-source" && isCompetitionOpen && (
-                <motion.div
-                  id="student-competition"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                  className="space-y-6 pt-2"
-                >
-                  {/* Competition Header & Filter Tabs */}
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border/80 pb-6">
-                    <div>
-                      <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-primary font-mono">
-                        <Trophy className="h-4 w-4 text-amber-500" />
-                        <span>Student Competition Arena</span>
-                      </div>
-                      <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground mt-1">
-                        Campus Contributor Leaderboard
-                      </h2>
-                      <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-xl">
-                        Tracking top student developers across weekly sprints, monthly rankings, and all-time achievements.
-                      </p>
-                    </div>
-
-                    {/* Timeframe Switcher */}
-                    <div className="flex flex-wrap items-center gap-1.5 p-1 bg-muted/70 rounded-xl border border-border shrink-0">
-                      <button
-                        onClick={() => setCompetitionTimeframe("week")}
-                        className={cn(
-                          "px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5",
-                          competitionTimeframe === "week"
-                            ? "bg-primary text-primary-foreground shadow-xs"
-                            : "text-muted-foreground hover:text-foreground hover:bg-card/60"
-                        )}
-                      >
-                        <Flame className="h-3.5 w-3.5 text-amber-400" />
-                        <span>Top of the Week</span>
-                      </button>
-                      <button
-                        onClick={() => setCompetitionTimeframe("month")}
-                        className={cn(
-                          "px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5",
-                          competitionTimeframe === "month"
-                            ? "bg-primary text-primary-foreground shadow-xs"
-                            : "text-muted-foreground hover:text-foreground hover:bg-card/60"
-                        )}
-                      >
-                        <Trophy className="h-3.5 w-3.5 text-amber-400" />
-                        <span>Top of the Month</span>
-                      </button>
-                      <button
-                        onClick={() => setCompetitionTimeframe("overall")}
-                        className={cn(
-                          "px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5",
-                          competitionTimeframe === "overall"
-                            ? "bg-primary text-primary-foreground shadow-xs"
-                            : "text-muted-foreground hover:text-foreground hover:bg-card/60"
-                        )}
-                      >
-                        <Award className="h-3.5 w-3.5 text-blue-400" />
-                        <span>Overall</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Top 3 Podium Showcase */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
-                    {podiumStudents.map((student) => {
-                      const stats = student[competitionTimeframe];
-                      const isFirst = stats.rank === 1;
-                      const isSecond = stats.rank === 2;
-
-                      return (
-                        <Card
-                          key={student.id}
-                          className={cn(
-                            "relative overflow-hidden flex flex-col justify-between transition-all duration-200 border-border bg-card hover:shadow-lg",
-                            isFirst && "border-amber-500/50 bg-gradient-to-b from-amber-500/10 via-card to-card shadow-md shadow-amber-500/5 md:-translate-y-1.5",
-                            isSecond && "border-slate-400/50 bg-gradient-to-b from-slate-400/10 via-card to-card",
-                            stats.rank === 3 && "border-amber-700/40 bg-gradient-to-b from-amber-700/10 via-card to-card"
-                          )}
-                        >
-                          <CardHeader className="pb-3">
-                            {/* Rank Ribbon */}
-                            <div className="flex items-center justify-between mb-3">
-                              <Badge
-                                variant="outline"
-                                className={cn(
-                                  "font-bold text-xs px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs",
-                                  isFirst && "bg-amber-500/20 text-amber-600 border-amber-500/40",
-                                  isSecond && "bg-slate-400/20 text-slate-600 border-slate-400/40",
-                                  stats.rank === 3 && "bg-amber-700/20 text-amber-700 border-amber-700/40"
-                                )}
-                              >
-                                {isFirst ? "🥇 1st Place Champion" : isSecond ? "🥈 2nd Place" : "🥉 3rd Place"}
-                              </Badge>
-                            </div>
-
-                            {/* Student Profile Info */}
-                            <div className="flex items-center space-x-3">
-                              <img
-                                src={student.avatarUrl}
-                                alt={student.name}
-                                className="h-12 w-12 rounded-full border-2 border-primary/30 bg-muted/80 shrink-0 p-0.5"
-                              />
-                              <div className="min-w-0 flex-1">
-                                <CardTitle className="text-base font-bold text-foreground truncate">
-                                  {student.name}
-                                </CardTitle>
-                                <p className="text-xs text-muted-foreground font-mono truncate">
-                                  @{student.username}
-                                </p>
-                                <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
-                                  {student.department} • {student.year}
-                                </p>
-                              </div>
-                            </div>
-                          </CardHeader>
-
-                          <CardContent className="pt-0 space-y-3.5">
-                            {/* Badge */}
-                            <div className="flex items-center gap-1.5">
-                              <span className={cn("text-[11px] font-semibold px-2 py-0.5 rounded-md border", student.badgeColor)}>
-                                {student.badge}
-                              </span>
-                            </div>
-
-                            {/* Competition Stats Metrics */}
-                            <div className="grid grid-cols-4 gap-1.5 p-2 rounded-xl bg-muted/50 border border-border/60 text-center">
-                              <div>
-                                <div className="text-base font-extrabold text-foreground">
-                                  {stats.points}
-                                </div>
-                                <div className="text-[10px] uppercase font-mono text-muted-foreground font-semibold">
-                                  Points
-                                </div>
-                              </div>
-                              <div>
-                                <div className="text-base font-extrabold text-primary">
-                                  {stats.prs}
-                                </div>
-                                <div className="text-[10px] uppercase font-mono text-muted-foreground font-semibold">
-                                  PRs
-                                </div>
-                              </div>
-                              <div>
-                                <div className="text-base font-extrabold text-emerald-600">
-                                  {stats.qualityPrs}
-                                </div>
-                                <div className="text-[10px] uppercase font-mono text-muted-foreground font-semibold">
-                                  Quality PR
-                                </div>
-                              </div>
-                              <div>
-                                <div className="text-base font-extrabold text-foreground">
-                                  {stats.reviews}
-                                </div>
-                                <div className="text-[10px] uppercase font-mono text-muted-foreground font-semibold">
-                                  Reviews
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Top Contribution Highlight */}
-                            <div className="p-2.5 rounded-xl bg-primary/5 border border-primary/15 space-y-1">
-                              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-primary flex items-center gap-1">
-                                <Sparkles className="h-3 w-3" />
-                                <span>Top Contribution</span>
-                              </div>
-                              <p className="text-xs text-foreground font-medium leading-snug line-clamp-2">
-                                {stats.topContribution.title}
-                              </p>
-                              <div className="text-[11px] text-muted-foreground font-mono pt-0.5">
-                                {stats.topContribution.repo}
-                              </div>
-                            </div>
-                          </CardContent>
-
-                          <CardFooter className="pt-3 border-t border-border/60 mt-auto">
-                            <a
-                              href={`https://github.com/${student.username}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="w-full"
-                            >
-                              <Button size="sm" variant="outline" className="w-full text-xs gap-1.5 cursor-pointer shadow-xs">
-                                <GithubIcon className="h-3.5 w-3.5" />
-                                <span>View GitHub Profile</span>
-                                <ExternalLink className="h-3 w-3 ml-auto text-muted-foreground" />
-                              </Button>
-                            </a>
-                          </CardFooter>
-                        </Card>
-                      );
-                    })}
-                  </div>
-
-                  {/* Rest of Competitors (Ranks 4+) */}
-                  <div className="mt-8 space-y-3 pt-4 border-t border-border/80">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-mono">
-                        Contender Rankings (Ranks 4 - 6)
-                      </h3>
-                      <Link href="/leaderboard">
-                        <Button variant="ghost" size="sm" className="text-xs text-primary hover:text-primary/90 h-7 px-2">
-                          <span>See All Student Rankings</span>
-                          <ArrowRight className="h-3 w-3 ml-1" />
-                        </Button>
-                      </Link>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {remainingStudents.map((student) => {
-                        const stats = student[competitionTimeframe];
-                        return (
-                          <Card
-                            key={student.id}
-                            className="flex flex-col justify-between border-border bg-card p-4 hover:border-primary/40 hover:shadow-sm transition-all"
-                          >
-                            <div className="space-y-2.5">
-                              <div className="flex items-center justify-between">
-                                <span className="font-mono text-xs font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-md">
-                                  #{stats.rank}
-                                </span>
-                                <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-md border", student.badgeColor)}>
-                                  {student.badge}
-                                </span>
-                              </div>
-
-                              <div className="flex items-center space-x-2.5">
-                                <img
-                                  src={student.avatarUrl}
-                                  alt={student.name}
-                                  className="h-9 w-9 rounded-full border border-border bg-muted p-0.5"
-                                />
-                                <div className="min-w-0 flex-1">
-                                  <h4 className="text-sm font-bold text-foreground truncate">
-                                    {student.name}
-                                  </h4>
-                                  <p className="text-[11px] text-muted-foreground font-mono truncate">
-                                    @{student.username} • {student.department}
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="grid grid-cols-4 gap-1 p-2 rounded-lg bg-muted/40 text-center text-xs">
-                                <div>
-                                  <div className="font-bold text-foreground">{stats.points}</div>
-                                  <div className="text-[9px] text-muted-foreground font-mono">PTS</div>
-                                </div>
-                                <div>
-                                  <div className="font-bold text-primary">{stats.prs}</div>
-                                  <div className="text-[9px] text-muted-foreground font-mono">PRS</div>
-                                </div>
-                                <div>
-                                  <div className="font-bold text-emerald-600">{stats.qualityPrs}</div>
-                                  <div className="text-[9px] text-muted-foreground font-mono">Q-PR</div>
-                                </div>
-                                <div>
-                                  <div className="font-bold text-foreground">{stats.reviews}</div>
-                                  <div className="text-[9px] text-muted-foreground font-mono">REVIEWS</div>
-                                </div>
-                              </div>
-
-                              <p className="text-[11px] text-muted-foreground line-clamp-1 italic">
-                                &ldquo;{stats.topContribution.title}&rdquo;
-                              </p>
-                            </div>
-
-                            <div className="pt-3 mt-3 border-t border-border/50">
-                              <a
-                                href={`https://github.com/${student.username}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full"
-                              >
-                                <Button size="sm" variant="ghost" className="w-full text-xs h-7 gap-1 text-muted-foreground hover:text-foreground">
-                                  <GithubIcon className="h-3 w-3" />
-                                  <span>GitHub</span>
-                                  <ExternalLink className="h-2.5 w-2.5 ml-auto" />
-                                </Button>
-                              </a>
-                            </div>
-                          </Card>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </motion.div>
+                <StudentLeaderboardSection
+                  timeframe={competitionTimeframe}
+                  setTimeframe={setCompetitionTimeframe}
+                  podiumStudents={podiumStudents}
+                  remainingStudents={remainingStudents}
+                />
               )}
             </div>
           )}
         </div>
       </div>
     </div>
+  );
+}
+
+interface StudentLeaderboardSectionProps {
+  timeframe: CompetitionTimeframe;
+  setTimeframe: (timeframe: CompetitionTimeframe) => void;
+  podiumStudents: typeof STUDENT_COMPETITORS;
+  remainingStudents: typeof STUDENT_COMPETITORS;
+}
+
+function StudentLeaderboardSection({
+  timeframe,
+  setTimeframe,
+  podiumStudents,
+  remainingStudents,
+}: StudentLeaderboardSectionProps) {
+  return (
+    <motion.div
+      id="student-competition"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="space-y-6 pt-2"
+    >
+      {/* Competition Header & Filter Tabs */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border/80 pb-6">
+        <div>
+          <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-primary font-mono">
+            <Trophy className="h-4 w-4 text-amber-500" />
+            <span>Student Competition Arena</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground mt-1">
+            Campus Contributor Leaderboard
+          </h2>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-xl">
+            Tracking top student developers across weekly sprints, monthly rankings, and all-time achievements.
+          </p>
+        </div>
+
+        {/* Timeframe Switcher */}
+        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-muted/70 rounded-xl border border-border shrink-0">
+          <button
+            onClick={() => setTimeframe("week")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5",
+              timeframe === "week"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-card/60"
+            )}
+          >
+            <Flame className="h-3.5 w-3.5 text-amber-400" />
+            <span>Top of the Week</span>
+          </button>
+          <button
+            onClick={() => setTimeframe("month")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5",
+              timeframe === "month"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-card/60"
+            )}
+          >
+            <Trophy className="h-3.5 w-3.5 text-amber-400" />
+            <span>Top of the Month</span>
+          </button>
+          <button
+            onClick={() => setTimeframe("overall")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5",
+              timeframe === "overall"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-card/60"
+            )}
+          >
+            <Award className="h-3.5 w-3.5 text-blue-400" />
+            <span>Overall</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Top 3 Podium Showcase */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
+        {podiumStudents.map((student) => {
+          const stats = student[timeframe];
+          const isFirst = stats.rank === 1;
+          const isSecond = stats.rank === 2;
+
+          return (
+            <Card
+              key={student.id}
+              className={cn(
+                "relative overflow-hidden flex flex-col justify-between border-2 transition-all duration-200",
+                isFirst && "border-amber-500/50 bg-gradient-to-b from-amber-500/10 via-card to-card shadow-md shadow-amber-500/5 md:-translate-y-1.5",
+                isSecond && "border-slate-400/50 bg-gradient-to-b from-slate-400/10 via-card to-card",
+                stats.rank === 3 && "border-amber-700/40 bg-gradient-to-b from-amber-700/10 via-card to-card"
+              )}
+            >
+              <CardHeader className="pb-3">
+                {/* Rank Ribbon */}
+                <div className="flex items-center justify-between mb-3">
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "font-bold text-xs px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs",
+                      isFirst && "bg-amber-500/20 text-amber-600 border-amber-500/40",
+                      isSecond && "bg-slate-400/20 text-slate-600 border-slate-400/40",
+                      stats.rank === 3 && "bg-amber-700/20 text-amber-700 border-amber-700/40"
+                    )}
+                  >
+                    {isFirst ? "🥇 1st Place Champion" : isSecond ? "🥈 2nd Place" : "🥉 3rd Place"}
+                  </Badge>
+                </div>
+
+                {/* Student Profile Info */}
+                <div className="flex items-center space-x-3">
+                  <img
+                    src={student.avatarUrl}
+                    alt={student.name}
+                    className="h-12 w-12 rounded-full border-2 border-primary/30 bg-muted/80 shrink-0 p-0.5"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-base font-bold text-foreground truncate">
+                      {student.name}
+                    </CardTitle>
+                    <p className="text-xs text-muted-foreground font-mono truncate">
+                      @{student.username}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
+                      {student.department} • {student.year}
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <CardContent className="pt-0 space-y-3.5">
+                {/* Badge */}
+                <div className="flex items-center gap-1.5">
+                  <span className={cn("text-[11px] font-semibold px-2 py-0.5 rounded-md border", student.badgeColor)}>
+                    {student.badge}
+                  </span>
+                </div>
+
+                {/* Competition Stats Metrics */}
+                <div className="grid grid-cols-4 gap-1.5 p-2 rounded-xl bg-muted/50 border border-border/60 text-center">
+                  <div>
+                    <div className="text-base font-extrabold text-foreground">
+                      {stats.points}
+                    </div>
+                    <div className="text-[10px] uppercase font-mono text-muted-foreground font-semibold">
+                      Points
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-base font-extrabold text-primary">
+                      {stats.prs}
+                    </div>
+                    <div className="text-[10px] uppercase font-mono text-muted-foreground font-semibold">
+                      PRs
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-base font-extrabold text-emerald-600">
+                      {stats.qualityPrs}
+                    </div>
+                    <div className="text-[10px] uppercase font-mono text-muted-foreground font-semibold">
+                      Quality PR
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-base font-extrabold text-foreground">
+                      {stats.reviews}
+                    </div>
+                    <div className="text-[10px] uppercase font-mono text-muted-foreground font-semibold">
+                      Reviews
+                    </div>
+                  </div>
+                </div>
+
+                {/* Top Contribution Highlight */}
+                <div className="p-2.5 rounded-xl bg-primary/5 border border-primary/15 space-y-1">
+                  <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-primary flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    <span>Top Contribution</span>
+                  </div>
+                  <p className="text-xs text-foreground font-medium leading-snug line-clamp-2">
+                    {stats.topContribution.title}
+                  </p>
+                  <div className="text-[11px] text-muted-foreground font-mono pt-0.5">
+                    {stats.topContribution.repo}
+                  </div>
+                </div>
+              </CardContent>
+
+              <CardFooter className="pt-3 border-t border-border/60 mt-auto">
+                <a
+                  href={`https://github.com/${student.username}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full"
+                >
+                  <Button size="sm" variant="outline" className="w-full text-xs gap-1.5 cursor-pointer shadow-xs">
+                    <GithubIcon className="h-3.5 w-3.5" />
+                    <span>View GitHub Profile</span>
+                    <ExternalLink className="h-3 w-3 ml-auto text-muted-foreground" />
+                  </Button>
+                </a>
+              </CardFooter>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Rest of Competitors (Ranks 4+) */}
+      <div className="mt-8 space-y-3 pt-4 border-t border-border/80">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-mono">
+            Contender Rankings (Ranks 4 - 6)
+          </h3>
+          <Link href="/leaderboard">
+            <Button variant="ghost" size="sm" className="text-xs text-primary hover:text-primary/90 h-7 px-2">
+              <span>See All Student Rankings</span>
+              <ArrowRight className="h-3 w-3 ml-1" />
+            </Button>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {remainingStudents.map((student) => {
+            const stats = student[timeframe];
+            return (
+              <Card
+                key={student.id}
+                className="flex flex-col justify-between border-border bg-card p-4 hover:border-primary/40 hover:shadow-sm transition-all"
+              >
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-md">
+                      #{stats.rank}
+                    </span>
+                    <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-md border", student.badgeColor)}>
+                      {student.badge}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-2.5">
+                    <img
+                      src={student.avatarUrl}
+                      alt={student.name}
+                      className="h-9 w-9 rounded-full border border-border bg-muted p-0.5"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-sm font-bold text-foreground truncate">
+                        {student.name}
+                      </h4>
+                      <p className="text-[11px] text-muted-foreground font-mono truncate">
+                        @{student.username} • {student.department}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-1 p-2 rounded-lg bg-muted/40 text-center text-xs">
+                    <div>
+                      <div className="font-bold text-foreground">{stats.points}</div>
+                      <div className="text-[9px] text-muted-foreground font-mono">PTS</div>
+                    </div>
+                    <div>
+                      <div className="font-bold text-primary">{stats.prs}</div>
+                      <div className="text-[9px] text-muted-foreground font-mono">PRS</div>
+                    </div>
+                    <div>
+                      <div className="font-bold text-emerald-600">{stats.qualityPrs}</div>
+                      <div className="text-[9px] text-muted-foreground font-mono">Q-PR</div>
+                    </div>
+                    <div>
+                      <div className="font-bold text-foreground">{stats.reviews}</div>
+                      <div className="text-[9px] text-muted-foreground font-mono">REVIEWS</div>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-muted-foreground line-clamp-1 italic">
+                    &ldquo;{stats.topContribution.title}&rdquo;
+                  </p>
+                </div>
+
+                <div className="pt-3 mt-3 border-t border-border/50">
+                  <a
+                    href={`https://github.com/${student.username}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full"
+                  >
+                    <Button size="sm" variant="ghost" className="w-full text-xs h-7 gap-1 text-muted-foreground hover:text-foreground">
+                      <GithubIcon className="h-3 w-3" />
+                      <span>GitHub</span>
+                      <ExternalLink className="h-2.5 w-2.5 ml-auto" />
+                    </Button>
+                  </a>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    </motion.div>
   );
 }
