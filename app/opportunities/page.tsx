@@ -107,10 +107,10 @@ export default function OpportunitiesPage() {
               Once organization repositories are connected and labeled with <code className="text-accent bg-accent/15 px-1 py-0.5 rounded border border-accent/30 font-mono">good-first-issue</code>, they will stream automatically into this board.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Link href="/learning">
+              <Link href="/resources">
                 <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground text-xs shadow-xs cursor-pointer">
                   <BookOpen className="h-4 w-4" />
-                  <span>Prepare with Roadmaps</span>
+                  <span>View Resources & Guides</span>
                 </Button>
               </Link>
               <Link href="/mentorship">

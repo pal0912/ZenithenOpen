@@ -107,9 +107,9 @@ export default function LeaderboardPage() {
               When student pull requests and code reviews are merged in GitHub repositories, rankings are computed automatically.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Link href="/learning">
+              <Link href="/programs">
                 <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground text-xs shadow-xs cursor-pointer">
-                  <span>Start a Learning Roadmap</span>
+                  <span>Explore Programs & Competitions</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>

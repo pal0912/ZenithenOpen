@@ -107,9 +107,9 @@ export default function MentorshipPage() {
               >
                 <span>Submit Mentorship Request</span>
               </Button>
-              <Link href="/learning">
+              <Link href="/resources">
                 <Button variant="outline" className="text-xs border-border">
-                  Follow Self-Guided Roadmaps
+                  Explore Learning Resources
                 </Button>
               </Link>
             </div>
