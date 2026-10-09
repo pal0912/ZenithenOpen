@@ -22,6 +22,9 @@ import {
   Sparkles,
   GitPullRequest,
   GitCommit,
+  Plus,
+  X,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +36,8 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Project } from "@/types";
 import { GithubIcon } from "@/components/ui/icons";
 import { MOCK_PROJECTS } from "@/lib/data/mock-data";
 import {
@@ -153,7 +158,87 @@ export default function ProgramsPage() {
   const currentProgram = PROGRAMS.find((p) => p.id === currentSelectedId) || PROGRAMS[0];
 
   const CurrentIcon = currentProgram.icon;
-  const featuredProjects = MOCK_PROJECTS.slice(0, 2);
+  const [campusProjects, setCampusProjects] = React.useState<Project[]>(() => MOCK_PROJECTS.slice(0, 2));
+  const [isAddProjectOpen, setIsAddProjectOpen] = React.useState(false);
+  const [newProjectName, setNewProjectName] = React.useState("");
+  const [newProjectRepo, setNewProjectRepo] = React.useState("");
+  const [newProjectTagline, setNewProjectTagline] = React.useState("");
+  const [newProjectLang, setNewProjectLang] = React.useState("TypeScript");
+  const [newProjectStudentId, setNewProjectStudentId] = React.useState("");
+  const [newProjectTags, setNewProjectTags] = React.useState("");
+  const [repoError, setRepoError] = React.useState("");
+  const [submitSuccess, setSubmitSuccess] = React.useState(false);
+
+  const handleAddProjectSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedRepo = newProjectRepo.trim().toLowerCase();
+    const trimmedId = newProjectStudentId.trim().toLowerCase();
+
+    // Verification: Must be under IST organization or have IST student credentials
+    const isIstAffiliated =
+      trimmedRepo.includes("github.com/ist-zenithenlab") ||
+      trimmedRepo.startsWith("ist-zenithenlab/") ||
+      trimmedId.includes("ist");
+
+    if (!isIstAffiliated) {
+      setRepoError("Access restricted: Only projects engineered by IST student developers and maintained under official IST repositories (e.g. https://github.com/IST-ZenithenLab/...) can be listed.");
+      return;
+    }
+
+    const colorMap: Record<string, string> = {
+      TypeScript: "#3178c6",
+      "C++": "#f34b7d",
+      Python: "#3572A5",
+      Go: "#00ADD8",
+      Rust: "#dea584",
+    };
+
+    const formattedUrl = newProjectRepo.trim().startsWith("http")
+      ? newProjectRepo.trim()
+      : `https://github.com/${newProjectRepo.trim()}`;
+
+    const newProject: Project = {
+      id: `proj-${Date.now()}`,
+      slug: newProjectName.toLowerCase().replace(/\s+/g, "-"),
+      name: newProjectName.trim(),
+      tagline: newProjectTagline.trim(),
+      description: `Official open-source IST campus project engineered by IST student developer ${newProjectStudentId.trim()}.`,
+      repositoryUrl: formattedUrl,
+      stars: 1,
+      forks: 0,
+      openIssuesCount: 0,
+      goodFirstIssuesCount: 0,
+      primaryLanguage: newProjectLang,
+      languageColor: colorMap[newProjectLang] || "#3178c6",
+      tags: newProjectTags
+        ? newProjectTags.split(",").map((t) => t.trim()).filter(Boolean)
+        : ["IST", "Campus Project", "Open Source"],
+      featured: true,
+      status: "Active",
+      maintainers: [
+        {
+          name: `IST Student (${newProjectStudentId.trim()})`,
+          username: newProjectStudentId.trim(),
+          avatarUrl: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(newProjectStudentId)}`,
+        },
+      ],
+      updatedAt: new Date().toISOString(),
+    };
+
+    setCampusProjects((prev) => [newProject, ...prev]);
+    setSubmitSuccess(true);
+    setRepoError("");
+
+    setTimeout(() => {
+      setSubmitSuccess(false);
+      setIsAddProjectOpen(false);
+      setNewProjectName("");
+      setNewProjectRepo("");
+      setNewProjectTagline("");
+      setNewProjectStudentId("");
+      setNewProjectTags("");
+    }, 1200);
+  };
 
   // Sorted students for competition arena based on active timeframe
   const sortedStudents = [...STUDENT_COMPETITORS].sort(
@@ -219,17 +304,178 @@ export default function ProgramsPage() {
                     Open-source software maintained by IST engineers and student contributors.
                   </p>
                 </div>
-                <Link href="/projects">
-                  <Button variant="outline" size="sm" className="group text-xs border-border shrink-0 cursor-pointer">
-                    <span>View Project Directory</span>
-                    <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </Link>
+                <Button
+                  onClick={() => setIsAddProjectOpen((prev) => !prev)}
+                  size="sm"
+                  className="group text-xs bg-primary hover:bg-primary/90 text-primary-foreground shrink-0 cursor-pointer shadow-md shadow-primary/20 gap-1.5"
+                >
+                  <Plus className="h-3.5 w-3.5 transition-transform group-hover:rotate-90 duration-200" />
+                  <span>add new project?</span>
+                </Button>
               </div>
+
+              {/* Add New Project Inline Form Modal / Card */}
+              <AnimatePresence>
+                {isAddProjectOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden"
+                  >
+                    <Card className="border-2 border-primary/40 bg-card/95 backdrop-blur-md shadow-xl p-5 sm:p-6 rounded-2xl">
+                      <div className="flex items-center justify-between border-b border-border/80 pb-3 mb-4">
+                        <div className="flex items-center space-x-2">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-primary">
+                            <Plus className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-base font-bold text-foreground">
+                              Add New IST Campus Project
+                            </CardTitle>
+                            <p className="text-[11px] text-muted-foreground font-mono">
+                              Verified submissions for IST student developers only
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setIsAddProjectOpen(false)}
+                          className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-foreground cursor-pointer"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      {/* IST Only Notice Banner */}
+                      <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-300 flex items-start gap-2.5">
+                        <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
+                        <div>
+                          <strong className="font-semibold">IST Campus Verification:</strong> Only open-source projects engineered by IST student developers and maintained under official IST student repositories (<code className="font-mono font-bold bg-amber-500/20 px-1 py-0.5 rounded">IST-ZenithenLab/*</code>) or student handles can be listed on our platform.
+                        </div>
+                      </div>
+
+                      {/* Form */}
+                      <form onSubmit={handleAddProjectSubmit} className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-foreground">Project Name *</label>
+                            <Input
+                              required
+                              placeholder="e.g. ZenithenDocs"
+                              value={newProjectName}
+                              onChange={(e) => setNewProjectName(e.target.value)}
+                              className="text-xs bg-muted/50 border-border"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-foreground">Repository URL * (IST Only)</label>
+                            <Input
+                              required
+                              placeholder="https://github.com/IST-ZenithenLab/..."
+                              value={newProjectRepo}
+                              onChange={(e) => {
+                                setNewProjectRepo(e.target.value);
+                                setRepoError("");
+                              }}
+                              className={cn(
+                                "text-xs bg-muted/50 border-border font-mono",
+                                repoError && "border-rose-500 focus-visible:ring-rose-500"
+                              )}
+                            />
+                            {repoError && (
+                              <p className="text-[11px] text-rose-500 font-semibold">{repoError}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-semibold text-foreground">Tagline / Pitch *</label>
+                          <Input
+                            required
+                            placeholder="Official documentation portal and knowledge hub for IST developers"
+                            value={newProjectTagline}
+                            onChange={(e) => setNewProjectTagline(e.target.value)}
+                            className="text-xs bg-muted/50 border-border"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-foreground">Primary Language *</label>
+                            <select
+                              value={newProjectLang}
+                              onChange={(e) => setNewProjectLang(e.target.value)}
+                              className="w-full text-xs bg-muted/50 border border-border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                            >
+                              <option value="TypeScript">TypeScript</option>
+                              <option value="C++">C++</option>
+                              <option value="Python">Python</option>
+                              <option value="Go">Go</option>
+                              <option value="Rust">Rust</option>
+                            </select>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-foreground">IST Student Lead / ID *</label>
+                            <Input
+                              required
+                              placeholder="e.g. 2024IST-CSE-042 or @student-ist"
+                              value={newProjectStudentId}
+                              onChange={(e) => setNewProjectStudentId(e.target.value)}
+                              className="text-xs bg-muted/50 border-border font-mono"
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-foreground">Tags (comma-separated)</label>
+                            <Input
+                              placeholder="Next.js, Tailwind, Docs"
+                              value={newProjectTags}
+                              onChange={(e) => setNewProjectTags(e.target.value)}
+                              className="text-xs bg-muted/50 border-border"
+                            />
+                          </div>
+                        </div>
+
+                        {submitSuccess && (
+                          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                            <span>Project successfully verified and published to the Campus Project Catalog!</span>
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/80">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setIsAddProjectOpen(false)}
+                            className="text-xs cursor-pointer"
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            type="submit"
+                            size="sm"
+                            className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xs gap-1.5 cursor-pointer"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                            <span>Add Project to Catalog</span>
+                          </Button>
+                        </div>
+                      </form>
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Project Cards Grid matching Picture 3 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {featuredProjects.map((project) => (
+                {campusProjects.map((project) => (
                   <Card
                     key={project.id}
                     className="group relative overflow-hidden flex flex-col justify-between hover:shadow-md hover:border-primary/40 transition-colors duration-150 border-border bg-card"
@@ -302,6 +548,7 @@ export default function ProgramsPage() {
                   setTimeframe={setCompetitionTimeframe}
                   podiumStudents={podiumStudents}
                   remainingStudents={remainingStudents}
+                  isCampusReposOnly={true}
                 />
               </div>
             </motion.div>
@@ -412,6 +659,7 @@ interface StudentLeaderboardSectionProps {
   setTimeframe: (timeframe: CompetitionTimeframe) => void;
   podiumStudents: typeof STUDENT_COMPETITORS;
   remainingStudents: typeof STUDENT_COMPETITORS;
+  isCampusReposOnly?: boolean;
 }
 
 function StudentLeaderboardSection({
@@ -419,7 +667,21 @@ function StudentLeaderboardSection({
   setTimeframe,
   podiumStudents,
   remainingStudents,
+  isCampusReposOnly = false,
 }: StudentLeaderboardSectionProps) {
+  // Only students contributing to official campus repos are shown when on campus repos view
+  const campusRepoFilter = (student: (typeof STUDENT_COMPETITORS)[number]) => {
+    const repo = student[timeframe].topContribution.repo.toLowerCase();
+    return repo.startsWith("ist-zenithenlab/") || repo.includes("zenithen");
+  };
+
+  const displayPodium = isCampusReposOnly
+    ? podiumStudents.filter(campusRepoFilter)
+    : podiumStudents;
+
+  const displayRemaining = isCampusReposOnly
+    ? remainingStudents.filter(campusRepoFilter)
+    : remainingStudents;
   return (
     <motion.div
       id="student-competition"
@@ -433,13 +695,15 @@ function StudentLeaderboardSection({
         <div>
           <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-primary font-mono">
             <Trophy className="h-4 w-4 text-amber-500" />
-            <span>Student Competition Arena</span>
+            <span>{isCampusReposOnly ? "IST Campus Repositories Contributors" : "Student Competition Arena"}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground mt-1">
-            Campus Contributor Leaderboard
+            {isCampusReposOnly ? "Campus Repository Contributor Leaderboard" : "Campus Contributor Leaderboard"}
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-xl">
-            Tracking top student developers across weekly sprints, monthly rankings, and all-time achievements.
+            {isCampusReposOnly
+              ? "Only student developers actively contributing to official IST campus repositories (ZenithenOpen & ZenithenLab) are featured on this page."
+              : "Tracking top student developers across weekly sprints, monthly rankings, and all-time achievements."}
           </p>
         </div>
 
@@ -486,7 +750,7 @@ function StudentLeaderboardSection({
 
       {/* Top 3 Podium Showcase */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
-        {podiumStudents.map((student) => {
+        {displayPodium.map((student) => {
           const stats = student[timeframe];
           const isFirst = stats.rank === 1;
           const isSecond = stats.rank === 2;
@@ -591,8 +855,13 @@ function StudentLeaderboardSection({
                   <p className="text-xs text-foreground font-medium leading-snug line-clamp-2">
                     {stats.topContribution.title}
                   </p>
-                  <div className="text-[11px] text-muted-foreground font-mono pt-0.5">
-                    {stats.topContribution.repo}
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground font-mono pt-0.5">
+                    <span>{stats.topContribution.repo}</span>
+                    {isCampusReposOnly && (
+                      <span className="text-[9px] bg-primary/10 text-primary border border-primary/25 px-1.5 py-0.5 rounded font-mono font-semibold">
+                        Campus Repo
+                      </span>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -631,7 +900,7 @@ function StudentLeaderboardSection({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {remainingStudents.map((student) => {
+          {displayRemaining.map((student) => {
             const stats = student[timeframe];
             return (
               <Card
