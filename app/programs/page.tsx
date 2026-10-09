@@ -476,11 +476,6 @@ export default function ProgramsPage() {
                               >
                                 {isFirst ? "🥇 1st Place Champion" : isSecond ? "🥈 2nd Place" : "🥉 3rd Place"}
                               </Badge>
-
-                              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 font-mono">
-                                <Flame className="h-3 w-3" />
-                                {student.streakDays}d streak
-                              </span>
                             </div>
 
                             {/* Student Profile Info */}
@@ -513,7 +508,7 @@ export default function ProgramsPage() {
                             </div>
 
                             {/* Competition Stats Metrics */}
-                            <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-muted/50 border border-border/60 text-center">
+                            <div className="grid grid-cols-4 gap-1.5 p-2 rounded-xl bg-muted/50 border border-border/60 text-center">
                               <div>
                                 <div className="text-base font-extrabold text-foreground">
                                   {stats.points}
@@ -527,7 +522,15 @@ export default function ProgramsPage() {
                                   {stats.prs}
                                 </div>
                                 <div className="text-[10px] uppercase font-mono text-muted-foreground font-semibold">
-                                  PRs Merged
+                                  PRs
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-base font-extrabold text-emerald-600">
+                                  {stats.qualityPrs}
+                                </div>
+                                <div className="text-[10px] uppercase font-mono text-muted-foreground font-semibold">
+                                  Quality PR
                                 </div>
                               </div>
                               <div>
@@ -622,7 +625,7 @@ export default function ProgramsPage() {
                                 </div>
                               </div>
 
-                              <div className="grid grid-cols-3 gap-1 p-2 rounded-lg bg-muted/40 text-center text-xs">
+                              <div className="grid grid-cols-4 gap-1 p-2 rounded-lg bg-muted/40 text-center text-xs">
                                 <div>
                                   <div className="font-bold text-foreground">{stats.points}</div>
                                   <div className="text-[9px] text-muted-foreground font-mono">PTS</div>
@@ -630,6 +633,10 @@ export default function ProgramsPage() {
                                 <div>
                                   <div className="font-bold text-primary">{stats.prs}</div>
                                   <div className="text-[9px] text-muted-foreground font-mono">PRS</div>
+                                </div>
+                                <div>
+                                  <div className="font-bold text-emerald-600">{stats.qualityPrs}</div>
+                                  <div className="text-[9px] text-muted-foreground font-mono">Q-PR</div>
                                 </div>
                                 <div>
                                   <div className="font-bold text-foreground">{stats.reviews}</div>
