@@ -28,6 +28,7 @@ import { runRedisCacheTests } from "./redis-cache.test";
 import { runGitHubSyncTests } from "./github-sync.test";
 import { runLeaderboardRouteTests } from "./leaderboard-route.test";
 import { runContributionsRouteTests } from "./contributions-route.test";
+import { runMembersRouteTests } from "./members-route.test";
 import { SuiteResult } from "./test-utils";
 
 async function main() {
@@ -49,6 +50,7 @@ async function main() {
     results.push(await runGitHubSyncTests());
     results.push(await runLeaderboardRouteTests());
     results.push(await runContributionsRouteTests());
+    results.push(await runMembersRouteTests());
   } catch (error) {
     console.error("\n[FATAL ERROR IN TEST RUNNER]:", error);
     process.exit(1);
