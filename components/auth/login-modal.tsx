@@ -57,7 +57,8 @@ export function LoginModal() {
       });
       const data = await res.json();
 
-      if (!res.ok || !data.verified) {
+      const isValid = Boolean(data.valid || data.verified);
+      if (!res.ok || !isValid) {
         setErrorMessage(data.error || "Invalid USN. Ensure you enter a valid IST enrollment number.");
         setIsVerifying(false);
         return;
@@ -72,7 +73,7 @@ export function LoginModal() {
     }
   };
 
-  // Step 2: Associate with GitHub username & log in
+  // Step 2: Associate with GitHub username & log in via backend API
   const handleConnectGitHub = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
@@ -91,10 +92,27 @@ export function LoginModal() {
 
     setIsConnectingGithub(true);
     try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          usn: verifiedStudent.usn,
+          githubUsername: cleanUsername,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setErrorMessage(data.error || "Failed to authenticate student profile on server.");
+        setIsConnectingGithub(false);
+        return;
+      }
+
       loginUser(verifiedStudent, cleanUsername);
       closeLoginModal();
     } catch {
-      setErrorMessage("Failed to authenticate user profile.");
+      setErrorMessage("Unable to connect to authentication server. Please try again.");
     } finally {
       setIsConnectingGithub(false);
     }
