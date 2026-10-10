@@ -25,6 +25,7 @@ import { runDbLayerTests } from "./db-layer.test";
 import { runPrismaSchemaTests } from "./prisma-schema.test";
 import { runDataContractsTests } from "./data-contracts.test";
 import { runRedisCacheTests } from "./redis-cache.test";
+import { runGitHubSyncTests } from "./github-sync.test";
 import { SuiteResult } from "./test-utils";
 
 async function main() {
@@ -43,6 +44,7 @@ async function main() {
     results.push(await runPrismaSchemaTests());
     results.push(await runDataContractsTests());
     results.push(await runRedisCacheTests());
+    results.push(await runGitHubSyncTests());
   } catch (error) {
     console.error("\n[FATAL ERROR IN TEST RUNNER]:", error);
     process.exit(1);
