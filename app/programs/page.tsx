@@ -43,6 +43,7 @@ import { MOCK_PROJECTS } from "@/lib/data/mock-data";
 import {
   STUDENT_COMPETITORS,
   CompetitionTimeframe,
+  StudentContributor,
 } from "@/lib/data/student-competition";
 import { useNavigation } from "@/components/navigation/navigation-context";
 import { cn } from "@/lib/utils";
@@ -151,6 +152,29 @@ export default function ProgramsPage() {
   const { activeSection } = useNavigation();
   const [isCompetitionOpen, setIsCompetitionOpen] = React.useState(true);
   const [competitionTimeframe, setCompetitionTimeframe] = React.useState<CompetitionTimeframe>("week");
+  const [competitors, setCompetitors] = React.useState<StudentContributor[]>(STUDENT_COMPETITORS);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    async function loadLeaderboard() {
+      try {
+        const res = await fetch(`/api/students/leaderboard?timeframe=${competitionTimeframe}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted && data.success && Array.isArray(data.competitors) && data.competitors.length > 0) {
+            setCompetitors(data.competitors);
+          }
+        }
+      } catch (err) {
+        console.warn("[Competition Arena] Live leaderboard fetch notice:", err);
+      }
+    }
+
+    loadLeaderboard();
+    return () => {
+      isMounted = false;
+    };
+  }, [competitionTimeframe]);
 
   // Default to Open Source
   const defaultProgramId = "open-source";
@@ -241,7 +265,7 @@ export default function ProgramsPage() {
   };
 
   // Sorted students for competition arena based on active timeframe
-  const sortedStudents = [...STUDENT_COMPETITORS].sort(
+  const sortedStudents = [...competitors].sort(
     (a, b) => a[competitionTimeframe].rank - b[competitionTimeframe].rank
   );
   const podiumStudents = sortedStudents.slice(0, 3);
@@ -657,8 +681,8 @@ export default function ProgramsPage() {
 interface StudentLeaderboardSectionProps {
   timeframe: CompetitionTimeframe;
   setTimeframe: (timeframe: CompetitionTimeframe) => void;
-  podiumStudents: typeof STUDENT_COMPETITORS;
-  remainingStudents: typeof STUDENT_COMPETITORS;
+  podiumStudents: StudentContributor[];
+  remainingStudents: StudentContributor[];
   isCampusReposOnly?: boolean;
 }
 
@@ -670,7 +694,7 @@ function StudentLeaderboardSection({
   isCampusReposOnly = false,
 }: StudentLeaderboardSectionProps) {
   // Only students contributing to official campus repos are shown when on campus repos view
-  const campusRepoFilter = (student: (typeof STUDENT_COMPETITORS)[number]) => {
+  const campusRepoFilter = (student: StudentContributor) => {
     const repo = student[timeframe].topContribution.repo.toLowerCase();
     return repo.startsWith("ist-zenithenlab/") || repo.includes("zenithen");
   };
