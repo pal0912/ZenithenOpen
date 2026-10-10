@@ -27,6 +27,7 @@ import { runDataContractsTests } from "./data-contracts.test";
 import { runRedisCacheTests } from "./redis-cache.test";
 import { runGitHubSyncTests } from "./github-sync.test";
 import { runLeaderboardRouteTests } from "./leaderboard-route.test";
+import { runContributionsRouteTests } from "./contributions-route.test";
 import { SuiteResult } from "./test-utils";
 
 async function main() {
@@ -47,6 +48,7 @@ async function main() {
     results.push(await runRedisCacheTests());
     results.push(await runGitHubSyncTests());
     results.push(await runLeaderboardRouteTests());
+    results.push(await runContributionsRouteTests());
   } catch (error) {
     console.error("\n[FATAL ERROR IN TEST RUNNER]:", error);
     process.exit(1);
