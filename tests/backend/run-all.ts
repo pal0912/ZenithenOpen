@@ -10,11 +10,21 @@
  * 5. Data Contracts & State Integrity (lib/data/mock-data.ts, student-competition.ts)
  */
 
+// Load local environment for tests if available
+if (typeof (process as any).loadEnvFile === "function") {
+  try {
+    (process as any).loadEnvFile(".env");
+  } catch {
+    // Ignore if file doesn't exist in CI
+  }
+}
+
 import { runAuthVerificationTests } from "./auth-verification.test";
 import { runApiRoutesTests } from "./api-routes.test";
 import { runDbLayerTests } from "./db-layer.test";
 import { runPrismaSchemaTests } from "./prisma-schema.test";
 import { runDataContractsTests } from "./data-contracts.test";
+import { runRedisCacheTests } from "./redis-cache.test";
 import { SuiteResult } from "./test-utils";
 
 async function main() {
@@ -32,6 +42,7 @@ async function main() {
     results.push(await runDbLayerTests());
     results.push(await runPrismaSchemaTests());
     results.push(await runDataContractsTests());
+    results.push(await runRedisCacheTests());
   } catch (error) {
     console.error("\n[FATAL ERROR IN TEST RUNNER]:", error);
     process.exit(1);
