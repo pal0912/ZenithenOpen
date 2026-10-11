@@ -1,5 +1,5 @@
 # ZenithenOpen 🚀
-### Production-Grade Open-Source Community Platform for IST & IST-ZenithenLab
+### Production-Grade Open-Source Community Platform for IST & IST-ZenithenLab.
 
 [![ZenithenOpen CI](https://github.com/IST-ZenithenLab/ZenithenOpen/actions/workflows/ci.yml/badge.svg)](https://github.com/IST-ZenithenLab/ZenithenOpen/actions/workflows/ci.yml)
 [![Next.js](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)](https://nextjs.org/)
