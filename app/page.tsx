@@ -215,105 +215,137 @@ export default function HomePage() {
                 Triaged GitHub issues curated for first-time open-source contributors with mentor assistance.
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <a
-                href="https://github.com/IST-ZenithenLab/ZenithenOpen/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button size="sm" variant="default" className="text-xs gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs cursor-pointer">
-                  <GithubIcon className="h-3.5 w-3.5" />
-                  <span>ZenithenOpen (Good First)</span>
-                  <ExternalLink className="h-3 w-3" />
-                </Button>
-              </a>
-              <Link href="/opportunities">
-                <Button variant="outline" size="sm" className="group text-xs border-border cursor-pointer">
-                  <span>Browse Opportunities</span>
-                  <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
-            </div>
+            <Link href="/opportunities">
+              <Button variant="outline" size="sm" className="group text-xs border-border cursor-pointer">
+                <span>Browse Opportunities</span>
+                <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </Link>
           </div>
 
-          {featuredOpportunities.length === 0 ? (
-            <div className="rounded-2xl border border-border bg-card p-12 text-center shadow-xs">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/10 border border-accent/20 text-accent mb-4">
-                <Compass className="h-7 w-7" />
-              </div>
-              <h3 className="text-lg font-bold text-foreground">No Open Issues Ingested Yet</h3>
-              <p className="mt-2 text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
-                Once repositories are connected and issues are labeled with <code className="text-accent bg-accent/10 px-1 py-0.5 rounded border border-accent/20 font-mono">good-first-issue</code> on GitHub, they will appear dynamically here.
-              </p>
-              <div className="mt-6">
-                <Link href="/programs">
-                  <Button size="sm" variant="default" className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer">
-                    Explore Programs
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredOpportunities.map((opp) => {
-                const targetIssueLink = opp.repoFullName.includes("ZenithenOpen")
-                  ? (opp.issueUrl || "https://github.com/IST-ZenithenLab/ZenithenOpen/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue")
-                  : (opp.issueUrl || "https://github.com/IST-ZenithenLab/First-PR");
-
-                const targetRepoLink = opp.repoFullName.includes("ZenithenOpen")
-                  ? "https://github.com/IST-ZenithenLab/ZenithenOpen/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue"
-                  : "https://github.com/IST-ZenithenLab/First-PR";
-
-                return (
-                  <Card
-                    key={opp.id}
-                    className="flex flex-col justify-between hover:shadow-md hover:border-primary/40 transition-all border-border bg-card p-5 group"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 1. ZenithenOpen Good First Issues Card */}
+            <Card className="flex flex-col justify-between hover:shadow-md hover:border-primary/40 transition-all border-border bg-card p-6 group">
+              <div>
+                <div className="flex items-center justify-between text-xs font-mono text-primary mb-2">
+                  <a
+                    href="https://github.com/IST-ZenithenLab/ZenithenOpen/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline flex items-center gap-1.5 font-semibold text-primary"
                   >
-                    <div>
-                      <div className="flex items-center justify-between text-[11px] font-mono text-primary mb-2">
-                        <a
-                          href={targetRepoLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline flex items-center gap-1 text-primary"
-                          title="Open on GitHub"
-                        >
-                          <span>{opp.repoFullName}#{opp.issueNumber}</span>
-                        </a>
-                        <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-600 border-emerald-500/30 capitalize">
-                          {opp.difficulty}
-                        </Badge>
-                      </div>
-                      <h3 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                        <a href={targetIssueLink} target="_blank" rel="noopener noreferrer">
-                          {opp.title}
-                        </a>
-                      </h3>
-                      <div className="mt-3 flex flex-wrap gap-1">
-                        {opp.labels.slice(0, 2).map((l) => (
-                          <span key={l.name} className="px-2 py-0.5 rounded text-[10px] bg-muted text-muted-foreground">
-                            {l.name}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs">
-                      <span className="font-semibold text-foreground">{opp.language}</span>
-                      <a
-                        href={targetIssueLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
-                      >
-                        <span>Take Issue</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
+                    <GithubIcon className="h-3.5 w-3.5" />
+                    <span>IST-ZenithenLab/ZenithenOpen</span>
+                  </a>
+                  <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-500 border-emerald-500/30">
+                    Good First Issues
+                  </Badge>
+                </div>
+                <h3 className="text-base font-bold text-foreground group-hover:text-primary transition-colors mt-2">
+                  <a
+                    href="https://github.com/IST-ZenithenLab/ZenithenOpen/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    ZenithenOpen — Community Platform Good First Issues
+                  </a>
+                </h3>
+                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                  Curated beginner-friendly tasks and bug fixes on the official open-source platform. Claim issues labeled with good-first-issue to start your contributor journey.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  <span className="px-2 py-0.5 rounded text-[10px] bg-primary/10 text-primary border border-primary/20 font-medium">
+                    good-first-issue
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] bg-muted text-muted-foreground border border-border/50">
+                    TypeScript
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] bg-muted text-muted-foreground border border-border/50">
+                    Next.js
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] bg-muted text-muted-foreground border border-border/50">
+                    Tailwind CSS
+                  </span>
+                </div>
+              </div>
+              <div className="mt-6 pt-3 border-t border-border flex items-center justify-between text-xs">
+                <span className="font-semibold text-foreground flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-[#3178c6]" />
+                  <span>TypeScript</span>
+                </span>
+                <a
+                  href="https://github.com/IST-ZenithenLab/ZenithenOpen/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-primary hover:underline font-semibold"
+                >
+                  <span>Explore Good First Issues</span>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </Card>
+
+            {/* 2. First-PR Onboarding Repo Card */}
+            <Card className="flex flex-col justify-between hover:shadow-md hover:border-primary/40 transition-all border-border bg-card p-6 group">
+              <div>
+                <div className="flex items-center justify-between text-xs font-mono text-primary mb-2">
+                  <a
+                    href="https://github.com/IST-ZenithenLab/First-PR"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline flex items-center gap-1.5 font-semibold text-primary"
+                  >
+                    <GithubIcon className="h-3.5 w-3.5" />
+                    <span>IST-ZenithenLab/First-PR</span>
+                  </a>
+                  <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/30">
+                    First PR Repo
+                  </Badge>
+                </div>
+                <h3 className="text-base font-bold text-foreground group-hover:text-primary transition-colors mt-2">
+                  <a
+                    href="https://github.com/IST-ZenithenLab/First-PR"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    First-PR — Practice Your First Pull Request
+                  </a>
+                </h3>
+                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                  The designated campus starter repository for beginners to learn Git workflow basics: fork the repo, create a branch, submit your pull request, and get celebrated.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  <span className="px-2 py-0.5 rounded text-[10px] bg-primary/10 text-primary border border-primary/20 font-medium">
+                    first-pr
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] bg-muted text-muted-foreground border border-border/50">
+                    onboarding
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] bg-muted text-muted-foreground border border-border/50">
+                    Git Workflow
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] bg-muted text-muted-foreground border border-border/50">
+                    Markdown
+                  </span>
+                </div>
+              </div>
+              <div className="mt-6 pt-3 border-t border-border flex items-center justify-between text-xs">
+                <span className="font-semibold text-foreground flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-[#083fa1]" />
+                  <span>Markdown / Git</span>
+                </span>
+                <a
+                  href="https://github.com/IST-ZenithenLab/First-PR"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-primary hover:underline font-semibold"
+                >
+                  <span>Open First-PR Repo</span>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </Card>
+          </div>
         </div>
       </section>
 
