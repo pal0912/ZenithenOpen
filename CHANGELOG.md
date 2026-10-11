@@ -5,6 +5,19 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.8.0] - 2026-10-11
+
+### 👤 Member Profile Dynamic Controller & Settings
+
+- **Individual Member Profile Endpoint (`app/api/members/[username]/route.ts`)**:
+  - Implemented `GET /api/members/[username]` returning complete public member profile, verified contribution statistics, skills, achievements, and recent PR ledger with Next.js 15 async route parameters.
+  - Implemented `PATCH /api/members/[username]` with Zod schema validation for authenticated profile updates (bio, department, study year, LinkedIn, portfolio, skills, mentorship topics).
+  - Integrated Upstash Redis caching with explicit invalidation upon profile edits.
+- **Backend Test Suite Expansion (`tests/backend/member-profile.test.ts`)**:
+  - Added 10 assertions verifying 404 responses, valid profiles, Zod validation errors, and profile persistence across 388 passing assertions.
+
+---
+
 ## [1.7.0] - 2026-10-11
 
 ### ⚡ Real-Time GitHub Webhook Ingestion Engine
