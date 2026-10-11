@@ -6,6 +6,7 @@
 import { TestSuite, SuiteResult } from "./test-utils";
 import { GET } from "../../app/api/health/route";
 import { getEnv, validateProductionEnv } from "../../lib/env";
+import packageJson from "../../package.json";
 
 export async function runHealthRouteTests(): Promise<SuiteResult> {
   const suite = new TestSuite("Production Health Probe & Environment Validator");
@@ -23,7 +24,11 @@ export async function runHealthRouteTests(): Promise<SuiteResult> {
     data.status === "healthy" || data.status === "degraded",
     "Health status reports 'healthy' or 'degraded'"
   );
-  suite.assertEqual(data.version, "1.0.0", "Version matches release 1.0.0");
+  suite.assertEqual(
+    data.version,
+    packageJson.version,
+    `Version matches package.json (${packageJson.version})`
+  );
   suite.assert(typeof data.uptimeSeconds === "number", "uptimeSeconds is a number");
   suite.assert(data.uptimeSeconds >= 0, "uptimeSeconds is non-negative");
   suite.assert(typeof data.latencyMs === "number", "latencyMs is recorded");

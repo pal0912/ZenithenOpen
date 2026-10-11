@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { isDatabaseConfigured } from "@/lib/db";
 import { getRedisClient } from "@/lib/redis/client";
+import packageJson from "@/package.json";
 
 export const dynamic = "force-dynamic";
 
@@ -64,7 +65,7 @@ export async function GET() {
 
   const payload = {
     status: isHealthy ? "healthy" : "degraded",
-    version: "1.0.0",
+    version: packageJson.version,
     uptimeSeconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     latencyMs: totalLatencyMs,
