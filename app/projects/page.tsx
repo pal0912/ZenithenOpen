@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import {
   FolderGit2,
   Search,
@@ -118,7 +117,7 @@ export default function ProjectsPage() {
         setProjRepoUrl("");
         setProjTags("");
       }, 1800);
-    } catch (err: any) {
+    } catch (_err: unknown) {
       setFormError("Network error connecting to projects service.");
     } finally {
       setSubmitting(false);

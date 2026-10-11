@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-  ShieldCheck,
   CheckCircle2,
   AlertCircle,
   GraduationCap,

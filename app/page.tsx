@@ -10,9 +10,6 @@ import {
   Compass,
   Users2,
   ExternalLink,
-  BookOpen,
-  GitPullRequest,
-  Award,
 } from "lucide-react";
 import { HeroSection } from "@/components/dashboard/hero-section";
 import { LiveMetricsDashboard } from "@/components/dashboard/live-metrics";
@@ -25,7 +22,7 @@ import { StudentContributor } from "@/lib/data/student-competition";
 
 export default function HomePage() {
   const [featuredProjects, setFeaturedProjects] = React.useState<Project[]>([]);
-  const [featuredOpportunities, setFeaturedOpportunities] = React.useState<Opportunity[]>([]);
+  const [_featuredOpportunities, setFeaturedOpportunities] = React.useState<Opportunity[]>([]);
   const [topContributors, setTopContributors] = React.useState<StudentContributor[]>([]);
 
   React.useEffect(() => {
