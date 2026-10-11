@@ -46,12 +46,12 @@ export default function HomePage() {
       })
       .catch((err) => console.warn("[HomePage] Opportunities fetch notice:", err));
 
-    // 3. Fetch monthly top competitors
-    fetch("/api/students/leaderboard?timeframe=month")
+    // 3. Fetch monthly top competitors (top 7)
+    fetch("/api/students/leaderboard?timeframe=month&limit=7")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.success && Array.isArray(data.competitors)) {
-          setTopContributors(data.competitors.slice(0, 4));
+          setTopContributors(data.competitors.slice(0, 7));
         }
       })
       .catch((err) => console.warn("[HomePage] Leaderboard fetch notice:", err));
@@ -374,46 +374,63 @@ export default function HomePage() {
                   <Trophy className="mx-auto h-8 w-8 text-secondary mb-2" />
                   <p className="text-sm font-semibold text-foreground">Leaderboard Awaiting First Pull Request</p>
                   <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
-                    Contributions will be ranked automatically by merged PRs and code reviews once GitHub accounts are linked.
+                    Contributions will be ranked automatically by merged PRs and code reviews once students link their GitHub accounts.
                   </p>
-                  <Link href="/programs" className="inline-block mt-4">
+                  <Link href="/programs#student-competition" className="inline-block mt-4">
                     <Button size="sm" variant="outline" className="text-xs border-border cursor-pointer">
-                      Explore Programs
+                      Explore Open Source Arena
                     </Button>
                   </Link>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {topContributors.map((student, idx) => (
-                    <div
-                      key={student.id}
-                      className="p-4 rounded-xl border border-border bg-card flex items-center justify-between hover:border-primary/40 transition-colors"
-                    >
-                      <div className="flex items-center space-x-3.5">
-                        <span className="font-mono font-bold text-xs text-muted-foreground w-6">
-                          #{idx + 1}
-                        </span>
-                        <img
-                          src={student.avatarUrl}
-                          alt={student.name}
-                          className="h-10 w-10 rounded-full border border-border object-cover"
-                        />
-                        <div>
-                          <p className="font-bold text-foreground text-sm leading-tight">{student.name}</p>
-                          <p className="text-xs text-muted-foreground font-mono">@{student.username}</p>
+                  {topContributors.map((student, idx) => {
+                    const stats = (student.month as unknown as { mergedPrs?: number; qualityPrs?: number; prs?: number }) || {};
+                    const mergedCount = stats.mergedPrs ?? student.month.prs ?? 0;
+                    const qualityCount = stats.qualityPrs ?? student.month.qualityPrs ?? 0;
+
+                    return (
+                      <div
+                        key={student.id}
+                        className="p-4 rounded-xl border border-border bg-card flex items-center justify-between hover:border-primary/40 transition-colors"
+                      >
+                        <div className="flex items-center space-x-3.5">
+                          <span className="font-mono font-bold text-xs text-muted-foreground w-6">
+                            #{idx + 1}
+                          </span>
+                          <img
+                            src={student.avatarUrl}
+                            alt={student.name}
+                            className="h-10 w-10 rounded-full border border-border object-cover"
+                          />
+                          <div>
+                            <p className="font-bold text-foreground text-sm leading-tight">{student.name}</p>
+                            <p className="text-xs text-muted-foreground font-mono">@{student.username}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2 text-right">
+                          <span className="font-bold text-xs font-mono px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20">
+                            {mergedCount} Merged
+                          </span>
+                          {qualityCount > 0 && (
+                            <span className="font-semibold text-[11px] font-mono px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                              {qualityCount} Quality
+                            </span>
+                          )}
                         </div>
                       </div>
-                      <div className="flex items-center space-x-3 text-right">
-                        <div className="hidden sm:block">
-                          <p className="text-xs font-semibold text-foreground">{student.month.prs} PRs</p>
-                          <p className="text-[10px] text-emerald-600">{student.month.qualityPrs} quality</p>
-                        </div>
-                        <span className="font-extrabold text-foreground text-sm font-mono px-3 py-1 rounded-lg bg-muted">
-                          {student.month.points} pts
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
+
+                  {/* Option at the bottom to view all students */}
+                  <div className="pt-2 text-center">
+                    <Link href="/programs#student-competition">
+                      <Button variant="outline" size="sm" className="w-full text-xs font-semibold gap-1.5 border-border hover:bg-muted cursor-pointer">
+                        <span>View All Campus Contributors in Open Source Arena</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
@@ -430,18 +447,47 @@ export default function HomePage() {
                 </h2>
               </div>
 
-              <div className="rounded-xl border border-border bg-card p-8 text-center shadow-xs">
-                <Sparkles className="mx-auto h-8 w-8 text-accent mb-2" />
-                <p className="text-sm font-semibold text-foreground">Celebrate Your First Contribution</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Every student who merges their first pull request receives permanent recognition in the community Hall of Fame.
-                </p>
-                <Link href="/programs" className="inline-block mt-4">
-                  <Button size="sm" variant="outline" className="text-xs border-border cursor-pointer">
-                    Join Sprint Arena
-                  </Button>
-                </Link>
-              </div>
+              {topContributors.some((s) => ((s.overall as unknown as { mergedPrs?: number })?.mergedPrs ?? s.overall?.prs ?? 0) > 0) ? (
+                <div className="space-y-3">
+                  {topContributors
+                    .filter((s) => ((s.overall as unknown as { mergedPrs?: number })?.mergedPrs ?? s.overall?.prs ?? 0) > 0)
+                    .slice(0, 3)
+                    .map((student) => (
+                      <div
+                        key={`hof-${student.id}`}
+                        className="p-4 rounded-xl border border-accent/30 bg-card/60 flex items-center justify-between"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <img
+                            src={student.avatarUrl}
+                            alt={student.name}
+                            className="h-10 w-10 rounded-full border border-border object-cover"
+                          />
+                          <div>
+                            <p className="font-bold text-sm text-foreground">{student.name}</p>
+                            <p className="text-xs text-muted-foreground font-mono">@{student.username}</p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="bg-accent/10 text-accent border-accent/30 text-xs font-semibold px-2.5 py-1">
+                          Shipped First PR 🚀
+                        </Badge>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-border bg-card p-8 text-center shadow-xs">
+                  <Sparkles className="mx-auto h-8 w-8 text-accent mb-2" />
+                  <p className="text-sm font-semibold text-foreground">Celebrate Your First Contribution</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Every student who merges their first pull request receives permanent recognition in the community Hall of Fame.
+                  </p>
+                  <Link href="/programs#student-competition" className="inline-block mt-4">
+                    <Button size="sm" variant="outline" className="text-xs border-border cursor-pointer">
+                      Join Sprint Arena
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

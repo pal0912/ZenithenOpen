@@ -4,18 +4,18 @@
  * 
  * Fetches real student rankings across week, month, and overall timeframes
  * aggregating live Supabase PostgreSQL data with Upstash Redis caching.
+ * ZERO MOCK DATA - Real authenticated campus contributors only.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../lib/db/prisma";
 import { getCached, setCached } from "../../../../lib/redis/client";
 import {
-  STUDENT_COMPETITORS,
   StudentContributor,
   CompetitionTimeframe,
   TopContributionInfo,
 } from "../../../../lib/data/student-competition";
-import { calculateContributionPoints, syncStudentGitHubData } from "../../../../lib/github/sync";
+import { syncStudentGitHubData } from "../../../../lib/github/sync";
 import { ContributionStatus } from "@prisma/client";
 
 function getBadgeForRank(rank: number): { badge: string; badgeColor: string } {
@@ -59,25 +59,14 @@ function computeTimeframeStats(
     : contributions;
 
   const prs = filtered.length;
-  const qualityPrs = filtered.filter((c) => c.isQualityPr).length;
-  
-  // Convert to points calculation format
-  const mappedItems = filtered.map((c, index) => ({
-    id: String(index),
-    title: c.title,
-    url: c.url,
-    prNumber: index + 1,
-    repoName: "IST-ZenithenLab/ZenithenOpen",
-    status: c.status,
-    isQualityPr: c.isQualityPr,
-    createdAt: c.createdAt.toISOString(),
-  }));
-
-  const points = calculateContributionPoints(mappedItems);
+  const mergedPrs = filtered.filter((c) => c.status === ContributionStatus.MERGED).length;
+  const qualityPrs = filtered.filter((c) => c.isQualityPr && c.status === ContributionStatus.MERGED).length;
+  const openPrs = filtered.filter((c) => c.status === ContributionStatus.OPEN).length;
+  const closedPrs = filtered.filter((c) => c.status === ContributionStatus.CLOSED).length;
 
   // Determine top contribution
   const qualityOrMerged = filtered.find(
-    (c) => c.isQualityPr || c.status === ContributionStatus.MERGED
+    (c) => (c.isQualityPr && c.status === ContributionStatus.MERGED) || c.status === ContributionStatus.MERGED
   ) || filtered[0];
 
   const topContribution: TopContributionInfo = qualityOrMerged
@@ -90,16 +79,19 @@ function computeTimeframeStats(
           : qualityOrMerged.createdAt.toISOString().split("T")[0],
       }
     : {
-        title: "Initial Repository Setup",
+        title: "No Merged PR Yet",
         repo: "IST-ZenithenLab/ZenithenOpen",
         prUrl: "https://github.com/IST-ZenithenLab/ZenithenOpen",
         mergedDate: new Date().toISOString().split("T")[0],
       };
 
   return {
-    points,
+    points: mergedPrs * 100 + qualityPrs * 50 + openPrs * 25, // Internal weight for sorting
     prs,
+    mergedPrs,
     qualityPrs,
+    openPrs,
+    closedPrs,
     reviews: Math.floor(prs * 0.5),
     commits: prs * 3,
     topContribution,
@@ -114,22 +106,24 @@ export async function GET(request: NextRequest) {
       timeframeParam === "month" || timeframeParam === "overall"
         ? timeframeParam
         : "week";
+    const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")!, 10) : undefined;
 
     const cacheKey = `leaderboard:${timeframe}`;
 
     // 1. Check Redis cache
     const cachedLeaderboard = await getCached<StudentContributor[]>(cacheKey);
     if (cachedLeaderboard && cachedLeaderboard.length > 0) {
+      const result = limit ? cachedLeaderboard.slice(0, limit) : cachedLeaderboard;
       return NextResponse.json({
         success: true,
         source: "cache",
         timeframe,
         totalContributors: cachedLeaderboard.length,
-        competitors: cachedLeaderboard,
+        competitors: result,
       });
     }
 
-    // 2. Fetch live registered users with GitHub accounts and contributions from Supabase
+    // 2. Fetch purely real registered users with GitHub accounts from Supabase PostgreSQL
     let dbContributors: StudentContributor[] = [];
 
     try {
@@ -158,8 +152,8 @@ export async function GET(request: NextRequest) {
             id: u.id,
             name: u.name,
             username: gh.username,
-            avatarUrl: gh.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(u.name)}`,
-            department: u.department || "Engineering",
+            avatarUrl: gh.avatarUrl || `https://github.com/${gh.username}.png`,
+            department: u.department || "School of Computing",
             year: u.yearOfStudy || "Campus Contributor",
             badge: "Campus Pioneer 🌟",
             badgeColor: "bg-blue-500/10 text-blue-500 border-blue-500/30",
@@ -170,27 +164,30 @@ export async function GET(request: NextRequest) {
         });
       }
     } catch (dbErr) {
-      console.warn("[Leaderboard] Database query notice (using mock fallback):", dbErr);
+      console.warn("[Leaderboard] Database query notice:", dbErr);
     }
 
-    // 3. Combine live database contributors with baseline competitors
-    // If a user in database matches a mock user username, prioritize real DB metrics
-    const userMap = new Map<string, StudentContributor>();
-
-    for (const mock of STUDENT_COMPETITORS) {
-      userMap.set(mock.username.toLowerCase(), mock);
+    // 3. Sort purely by Merged PRs, then Quality PRs, then Total PRs (DevForge algorithm)
+    interface ExtendedStats {
+      mergedPrs?: number;
+      qualityPrs?: number;
+      prs?: number;
     }
 
-    for (const live of dbContributors) {
-      userMap.set(live.username.toLowerCase(), live);
-    }
+    dbContributors.sort((a, b) => {
+      const statsA = a[timeframe] as unknown as ExtendedStats;
+      const statsB = b[timeframe] as unknown as ExtendedStats;
+      const mergedDiff = (statsB.mergedPrs ?? 0) - (statsA.mergedPrs ?? 0);
+      if (mergedDiff !== 0) return mergedDiff;
 
-    const combined = Array.from(userMap.values());
+      const qualityDiff = (statsB.qualityPrs ?? 0) - (statsA.qualityPrs ?? 0);
+      if (qualityDiff !== 0) return qualityDiff;
 
-    // 4. Sort and assign ranks per timeframe
-    combined.sort((a, b) => b[timeframe].points - a[timeframe].points);
+      return (statsB.prs ?? 0) - (statsA.prs ?? 0);
+    });
 
-    combined.forEach((student, index) => {
+    // 4. Assign dynamic ranks
+    dbContributors.forEach((student, index) => {
       const rank = index + 1;
       student[timeframe].rank = rank;
       if (rank <= 3) {
@@ -201,14 +198,16 @@ export async function GET(request: NextRequest) {
     });
 
     // 5. Cache in Redis for 120 seconds
-    await setCached(cacheKey, combined, 120);
+    await setCached(cacheKey, dbContributors, 120);
+
+    const competitors = limit ? dbContributors.slice(0, limit) : dbContributors;
 
     return NextResponse.json({
       success: true,
       source: "database",
       timeframe,
-      totalContributors: combined.length,
-      competitors: combined,
+      totalContributors: dbContributors.length,
+      competitors,
     });
   } catch (error) {
     console.error("[Leaderboard] Unexpected error:", error);
@@ -216,7 +215,7 @@ export async function GET(request: NextRequest) {
       {
         success: false,
         error: "Internal server error fetching leaderboard",
-        competitors: STUDENT_COMPETITORS,
+        competitors: [],
       },
       { status: 500 }
     );
