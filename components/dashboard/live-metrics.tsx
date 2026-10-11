@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { motion } from "framer-motion";
 import {
   Users,
   GitPullRequest,
@@ -85,48 +86,88 @@ export function LiveMetricsDashboard() {
   ];
 
   return (
-    <section className="relative w-full py-14 bg-background transition-colors">
+    <section className="relative w-full py-14 bg-background transition-colors overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="pb-6 border-b border-border mb-8">
+        {/* Section Header with 3D Entrance */}
+        <motion.div
+          className="pb-6 border-b border-border mb-8 transform-gpu"
+          initial={{ opacity: 0, y: -24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        >
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             Our community
           </h2>
-        </div>
+        </motion.div>
 
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {metricCards.map((item) => {
+        {/* Metrics Grid with Hardware-Accelerated 3D Pop Entrance */}
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 [perspective:1000px]"
+        >
+          {metricCards.map((item, index) => {
             const Icon = item.icon;
-            return (
-              <Card
-                key={item.label}
-                className="group relative overflow-hidden p-6 hover:border-primary/40 hover:shadow-md transition-all border-border bg-card"
-              >
-                {/* Subtle ambient light */}
-                <div
-                  className={`absolute -right-6 -top-6 h-28 w-28 rounded-full bg-gradient-to-br ${item.glowColor} blur-2xl transition-all duration-300 group-hover:scale-150`}
-                />
+            const colIndex = index % 3;
+            const initialRotateY = colIndex === 0 ? -6 : colIndex === 2 ? 6 : 0;
 
-                <div className="relative z-10 flex items-start justify-between">
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      {item.label}
-                    </p>
-                    <p className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground font-mono">
-                      {item.formatted}
-                    </p>
-                    <p className="mt-1.5 text-xs text-muted-foreground">
-                      {item.subtext}
-                    </p>
-                  </div>
+            return (
+              <motion.div
+                key={item.label}
+                initial={{
+                  opacity: 0,
+                  y: -50,
+                  rotateX: 16,
+                  rotateY: initialRotateY,
+                  scale: 0.94,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  y: 0,
+                  rotateX: 0,
+                  rotateY: 0,
+                  scale: 1,
+                }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{
+                  duration: 0.55,
+                  delay: index * 0.06,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                whileHover={{
+                  y: -6,
+                  scale: 1.02,
+                  transition: { duration: 0.2, ease: "easeOut" },
+                }}
+                className="h-full transform-gpu will-change-transform"
+              >
+                <Card
+                  className="group relative overflow-hidden p-6 hover:border-primary/40 hover:shadow-lg transition-all border-border bg-card h-full"
+                >
+                  {/* Subtle ambient light */}
                   <div
-                    className={`rounded-xl bg-muted/50 p-3 border border-border group-hover:border-primary/40 transition-colors ${item.iconColor}`}
-                  >
-                    <Icon className="h-5 w-5" />
+                    className={`absolute -right-6 -top-6 h-28 w-28 rounded-full bg-gradient-to-br ${item.glowColor} blur-2xl transition-transform duration-300 group-hover:scale-125 pointer-events-none transform-gpu`}
+                  />
+
+                  <div className="relative z-10 flex items-start justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        {item.label}
+                      </p>
+                      <p className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground font-mono">
+                        {item.formatted}
+                      </p>
+                      <p className="mt-1.5 text-xs text-muted-foreground">
+                        {item.subtext}
+                      </p>
+                    </div>
+                    <div
+                      className={`rounded-xl bg-muted/50 p-3 border border-border group-hover:border-primary/40 transition-colors ${item.iconColor}`}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
                   </div>
-                </div>
-              </Card>
+                </Card>
+              </motion.div>
             );
           })}
         </div>
