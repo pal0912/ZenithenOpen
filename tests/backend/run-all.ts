@@ -32,6 +32,7 @@ import { runMembersRouteTests } from "./members-route.test";
 import { runProjectsRouteTests } from "./projects-route.test";
 import { runOpportunitiesRouteTests } from "./opportunities-route.test";
 import { runAchievementsRouteTests } from "./achievements-route.test";
+import { runHealthRouteTests } from "./health-route.test";
 import { SuiteResult } from "./test-utils";
 
 async function main() {
@@ -57,6 +58,7 @@ async function main() {
     results.push(await runProjectsRouteTests());
     results.push(await runOpportunitiesRouteTests());
     results.push(await runAchievementsRouteTests());
+    results.push(await runHealthRouteTests());
   } catch (error) {
     console.error("\n[FATAL ERROR IN TEST RUNNER]:", error);
     process.exit(1);
