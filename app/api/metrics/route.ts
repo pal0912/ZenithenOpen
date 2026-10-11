@@ -42,36 +42,57 @@ export async function GET() {
     let dbMembers = 0;
     let dbContributors = 0;
     let dbPrsMerged = 0;
+    let dbOpenPrs = 0;
+    let dbClosedPrs = 0;
     let dbQualityPrs = 0;
     let dbProjects = 0;
 
     try {
-      const [membersCount, contributorsCount, mergedCount, qualityCount, projectsCount] =
-        await Promise.all([
-          prisma.user.count(),
-          prisma.user.count({
-            where: {
-              contributions: {
-                some: {},
-              },
+      const [
+        membersCount,
+        contributorsCount,
+        mergedCount,
+        openCount,
+        closedCount,
+        qualityCount,
+        projectsCount,
+      ] = await Promise.all([
+        prisma.user.count(),
+        prisma.user.count({
+          where: {
+            contributions: {
+              some: {},
             },
-          }),
-          prisma.contribution.count({
-            where: {
-              status: ContributionStatus.MERGED,
-            },
-          }),
-          prisma.contribution.count({
-            where: {
-              isQualityPr: true,
-            },
-          }),
-          prisma.project.count(),
-        ]);
+          },
+        }),
+        prisma.contribution.count({
+          where: {
+            status: ContributionStatus.MERGED,
+          },
+        }),
+        prisma.contribution.count({
+          where: {
+            status: ContributionStatus.OPEN,
+          },
+        }),
+        prisma.contribution.count({
+          where: {
+            status: ContributionStatus.CLOSED,
+          },
+        }),
+        prisma.contribution.count({
+          where: {
+            isQualityPr: true,
+          },
+        }),
+        prisma.project.count(),
+      ]);
 
       dbMembers = membersCount;
       dbContributors = contributorsCount;
       dbPrsMerged = mergedCount;
+      dbOpenPrs = openCount;
+      dbClosedPrs = closedCount;
       dbQualityPrs = qualityCount;
       dbProjects = projectsCount;
     } catch (dbError) {
@@ -83,6 +104,8 @@ export async function GET() {
       totalMembers: Math.max(dbMembers, COMMUNITY_METRICS.totalMembers),
       totalContributors: Math.max(dbContributors, COMMUNITY_METRICS.totalContributors),
       prsMerged: Math.max(dbPrsMerged, COMMUNITY_METRICS.prsMerged),
+      openPrs: Math.max(dbOpenPrs, COMMUNITY_METRICS.openPrs ?? 0),
+      closedPrs: Math.max(dbClosedPrs, COMMUNITY_METRICS.closedPrs ?? 0),
       qualityPrsMerged: Math.max(dbQualityPrs, COMMUNITY_METRICS.qualityPrsMerged || 0),
       activeRepositories: Math.max(dbProjects, COMMUNITY_METRICS.activeRepositories),
       openSourceProjects: Math.max(dbProjects, COMMUNITY_METRICS.openSourceProjects),

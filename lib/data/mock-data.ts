@@ -18,6 +18,8 @@ export const COMMUNITY_METRICS: CommunityMetrics = {
   totalContributors: 0,
   qualityPrsMerged: 0,
   prsMerged: 0,
+  openPrs: 0,
+  closedPrs: 0,
   activeRepositories: 2,
   openSourceProjects: 2,
   firstPrsMerged: 0,

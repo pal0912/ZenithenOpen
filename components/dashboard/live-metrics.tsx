@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import {
   Users,
   GitPullRequest,
+  GitPullRequestClosed,
   FolderGit2,
   Award,
   Sparkles,
@@ -66,6 +67,24 @@ export function LiveMetricsDashboard() {
       iconColor: "text-accent",
     },
     {
+      label: "Open PRs",
+      value: metrics.openPrs ?? 0,
+      formatted: `${metrics.openPrs ?? 0}`,
+      subtext: "Under review & active triage",
+      icon: GitPullRequest,
+      glowColor: "from-emerald-500/20 to-emerald-500/5",
+      iconColor: "text-emerald-400",
+    },
+    {
+      label: "Closed PRs",
+      value: metrics.closedPrs ?? 0,
+      formatted: `${metrics.closedPrs ?? 0}`,
+      subtext: "Completed & archived work",
+      icon: GitPullRequestClosed,
+      glowColor: "from-rose-500/20 to-rose-500/5",
+      iconColor: "text-rose-400",
+    },
+    {
       label: "First PRs Celebrated",
       value: metrics.firstPrsMerged,
       formatted: `${metrics.firstPrsMerged}`,
@@ -103,12 +122,12 @@ export function LiveMetricsDashboard() {
 
         {/* Metrics Grid with Hardware-Accelerated 3D Pop Entrance */}
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 [perspective:1000px]"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 [perspective:1000px]"
         >
           {metricCards.map((item, index) => {
             const Icon = item.icon;
-            const colIndex = index % 3;
-            const initialRotateY = colIndex === 0 ? -6 : colIndex === 2 ? 6 : 0;
+            const colIndex = index % 4;
+            const initialRotateY = colIndex === 0 ? -6 : colIndex === 1 ? -2 : colIndex === 2 ? 2 : 6;
 
             return (
               <motion.div
