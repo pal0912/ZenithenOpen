@@ -11,14 +11,11 @@ import {
   Terminal,
   Newspaper,
   Calendar,
-  ExternalLink,
   ChevronRight,
-  Sparkles,
   Copy,
   Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { useNavigation } from "@/components/navigation/navigation-context";
 
 const VALID_RESOURCE_TABS = ["learn-to-pr", "make-first-pr", "blog"] as const;

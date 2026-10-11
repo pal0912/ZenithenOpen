@@ -119,7 +119,7 @@ export default function OpportunitiesPage() {
         setIssueUrl("");
         setIssueLabels("good-first-issue, frontend");
       }, 1800);
-    } catch (err: any) {
+    } catch (_err: unknown) {
       setFormError("Network error connecting to opportunities service.");
     } finally {
       setSubmitting(false);

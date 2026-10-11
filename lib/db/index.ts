@@ -7,7 +7,7 @@
  */
 
 import { prisma } from "./prisma";
-import { ContributionStatus, ContributionType } from "@prisma/client";
+import { ContributionStatus } from "@prisma/client";
 
 export interface StudentRecord {
   usn: string;

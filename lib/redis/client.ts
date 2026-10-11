@@ -14,7 +14,7 @@ import { Redis } from "@upstash/redis";
  */
 
 // In-memory fallback map for test/offline environments
-const memoryFallback = new Map<string, { value: any; expiresAt?: number }>();
+const memoryFallback = new Map<string, { value: unknown; expiresAt?: number }>();
 
 function getFromMemory<T>(key: string): T | null {
   const item = memoryFallback.get(key);
@@ -26,7 +26,7 @@ function getFromMemory<T>(key: string): T | null {
   return item.value as T;
 }
 
-function setToMemory(key: string, value: any, ttlSeconds?: number): void {
+function setToMemory(key: string, value: unknown, ttlSeconds?: number): void {
   if (ttlSeconds !== undefined && ttlSeconds <= 0) {
     memoryFallback.delete(key);
     return;

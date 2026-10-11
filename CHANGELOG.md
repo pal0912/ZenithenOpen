@@ -5,6 +5,21 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.3.0] - 2026-10-11
+
+### 💎 Strict Typing & Lint Hygiene
+
+- **TypeScript Type Safety & Elimination of `any`**:
+  - Replaced all untyped `any` signatures in `lib/github/sync.ts` with strongly typed `GitHubItemSignal` contracts.
+  - Hardened in-memory cache fallbacks in `lib/redis/client.ts` with type-safe `unknown` boundaries.
+  - Refactored exception handlers across Opportunities and Projects catalog routes to use `_err: unknown`.
+- **Dead Code & Unused Imports Elimination**:
+  - Removed unused icon and component imports across `app/page.tsx`, `app/programs/page.tsx`, `app/projects/page.tsx`, `app/resources/page.tsx`, `components/auth/login-modal.tsx`, `components/hero/floating-org-badges.tsx`, and `components/theme/theme-menu.tsx`.
+  - Removed unused Prisma enum imports in `lib/db/index.ts`.
+  - Achieved clean ESLint audit with zero errors.
+
+---
+
 ## [1.2.0] - 2026-10-11
 
 ### ⚡ Database Performance & Rate Limiting Defense

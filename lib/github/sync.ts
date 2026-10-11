@@ -107,10 +107,25 @@ export async function fetchGitHubUser(
   }
 }
 
+export interface GitHubItemSignal {
+  labels?: Array<{ name: string }>;
+  comments?: number;
+  body?: string | null;
+  state?: string;
+  pull_request?: { merged_at?: string | null };
+  repository_url?: string;
+  html_url?: string;
+  id?: number | string;
+  number?: number;
+  title?: string;
+  created_at?: string;
+  closed_at?: string | null;
+}
+
 /**
  * Determines whether a pull request meets Quality PR criteria
  */
-export function evaluateQualityPr(item: any): boolean {
+export function evaluateQualityPr(item: GitHubItemSignal): boolean {
   // Label-based signals
   const labels: Array<{ name: string }> = Array.isArray(item.labels) ? item.labels : [];
   const qualityLabelKeywords = [
@@ -170,9 +185,9 @@ export async function fetchUserPullRequests(
     }
 
     const data = await res.json();
-    const items = Array.isArray(data.items) ? data.items : [];
+    const items: GitHubItemSignal[] = Array.isArray(data.items) ? data.items : [];
 
-    const pullRequests: GitHubPullRequestItem[] = items.map((item: any) => {
+    const pullRequests: GitHubPullRequestItem[] = items.map((item: GitHubItemSignal) => {
       // Determine status
       let status: ContributionStatus = ContributionStatus.OPEN;
       if (item.pull_request?.merged_at) {
@@ -194,14 +209,14 @@ export async function fetchUserPullRequests(
       return {
         id: String(item.id),
         title: item.title || "Untitled PR",
-        url: item.html_url,
+        url: item.html_url || "",
         prNumber: Number(item.number),
         repoName,
         status,
         isQualityPr: evaluateQualityPr(item),
         mergedAt: item.pull_request?.merged_at || null,
         closedAt: item.closed_at || null,
-        createdAt: item.created_at,
+        createdAt: item.created_at || new Date().toISOString(),
       };
     });
 
