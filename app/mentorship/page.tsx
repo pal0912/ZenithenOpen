@@ -7,15 +7,23 @@ import {
   CheckCircle2,
   Send,
   UserCheck,
+  ExternalLink,
+  BookOpen,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MOCK_MEMBERS } from "@/lib/data/mock-data";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import type { Member } from "@/types";
 
 export default function MentorshipPage() {
   const [selectedTopic, setSelectedTopic] = React.useState<string>("All");
   const [requestModalOpen, setRequestModalOpen] = React.useState<boolean>(false);
   const [requestSent, setRequestSent] = React.useState<boolean>(false);
+  const [allMentors, setAllMentors] = React.useState<Member[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(true);
+
   const [formData, setFormData] = React.useState({
     name: "",
     email: "",
@@ -23,7 +31,29 @@ export default function MentorshipPage() {
     goal: "",
   });
 
-  const mentors = MOCK_MEMBERS.filter((m) => m.isAvailableForMentorship);
+  React.useEffect(() => {
+    async function loadMentors() {
+      try {
+        setLoading(true);
+        const res = await fetch("/api/members", { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          if (Array.isArray(json.members)) {
+            const activeMentors = json.members.filter(
+              (m: Member) => m.isAvailableForMentorship || m.role === "MENTOR"
+            );
+            setAllMentors(activeMentors);
+          }
+        }
+      } catch (err) {
+        console.error("[MentorshipPage] Error loading mentors:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadMentors();
+  }, []);
 
   const topics = [
     "All",
@@ -33,6 +63,15 @@ export default function MentorshipPage() {
     "PyTorch Open Source",
     "DevOps Roadmaps",
   ];
+
+  const filteredMentors = allMentors.filter((m) => {
+    if (selectedTopic === "All") return true;
+    const matchTopic =
+      m.mentorshipTopics?.some((t) => t.toLowerCase().includes(selectedTopic.toLowerCase())) ||
+      m.skills?.some((s) => s.name.toLowerCase().includes(selectedTopic.toLowerCase())) ||
+      m.bio?.toLowerCase().includes(selectedTopic.toLowerCase());
+    return matchTopic;
+  });
 
   const handleSendRequest = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,12 +130,18 @@ export default function MentorshipPage() {
         </div>
 
         {/* Mentors Grid or Zero State */}
-        {mentors.length === 0 ? (
+        {loading ? (
+          <div className="py-16 text-center text-xs font-mono text-muted-foreground">
+            Loading mentor directory from database...
+          </div>
+        ) : filteredMentors.length === 0 ? (
           <div className="mt-12 rounded-2xl border border-border bg-card p-16 text-center shadow-xs">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20 text-primary mb-4">
               <Users2 className="h-8 w-8" />
             </div>
-            <h3 className="text-xl font-bold text-foreground">Mentor Network Initializing</h3>
+            <h3 className="text-xl font-bold text-foreground">
+              {allMentors.length === 0 ? "Mentor Network Initializing" : `No mentors found for "${selectedTopic}"`}
+            </h3>
             <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
               Are you a senior student or GSoC contributor? Apply to become a founding mentor, review PRs, and guide first-year students.
             </p>
@@ -114,7 +159,67 @@ export default function MentorshipPage() {
               </Link>
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredMentors.map((mentor) => (
+              <Card
+                key={mentor.id}
+                className="p-6 border border-border bg-card shadow-xs flex flex-col justify-between hover:border-primary/40 transition-all"
+              >
+                <div>
+                  <div className="flex items-center space-x-3 mb-4">
+                    <img
+                      src={mentor.avatarUrl}
+                      alt={mentor.name}
+                      className="h-12 w-12 rounded-full border border-border bg-muted object-cover"
+                    />
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <h3 className="text-sm font-bold text-foreground">{mentor.name}</h3>
+                        <Badge variant="outline" className="text-[10px] font-mono border-primary/30 text-primary">
+                          {mentor.role}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground font-mono">
+                        @{mentor.username} • {mentor.department}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed mb-4">
+                    {mentor.bio || "Active mentor helping campus developers get started with open source and PR reviews."}
+                  </p>
+
+                  {mentor.mentorshipTopics && mentor.mentorshipTopics.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {mentor.mentorshipTopics.map((topic) => (
+                        <Badge key={topic} variant="secondary" className="text-[10px] font-mono">
+                          {topic}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-4 border-t border-border flex items-center justify-between">
+                  <span className="text-xs font-mono text-muted-foreground">
+                    {mentor.mergedPrCount} PRs merged
+                  </span>
+                  <Button
+                    onClick={() => {
+                      setFormData((prev) => ({ ...prev, topic: mentor.mentorshipTopics?.[0] || prev.topic }));
+                      setRequestModalOpen(true);
+                    }}
+                    size="sm"
+                    className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+                  >
+                    Request Match
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
 
         {/* Request Modal */}
         {requestModalOpen && (
