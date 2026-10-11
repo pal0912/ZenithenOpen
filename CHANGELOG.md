@@ -5,6 +5,21 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.1.0] - 2026-10-11
+
+### 🛡️ Production Hardening: Environment Validation, Health Tests & Dependabot
+
+- **Runtime Environment Validation (`lib/env.ts`)**:
+  - Implemented type-safe Zod schema validation across all production and development variables (`DATABASE_URL`, `AUTH_SECRET`, `UPSTASH_REDIS_REST_URL`, `GITHUB_TOKEN`).
+  - Added `validateProductionEnv()` preflight checks for production deployments.
+- **Production Health Probe Test Suite (`tests/backend/health-route.test.ts`)**:
+  - Added automated test suite verifying `/api/health` response schema, latency reporting, status codes (200/503), diagnostic checks for PostgreSQL & Redis, and cache-control headers.
+  - Integrated into master test runner (`tests/backend/run-all.ts`), expanding backend test coverage across 14 suites.
+- **Automated Security & Vulnerability Auditing (`.github/dependabot.yml`)**:
+  - Added GitHub Dependabot configuration for automated dependency security alerts and PRs across `npm` packages and GitHub Actions.
+
+---
+
 ## [1.0.0] - 2026-10-11
 
 ### 🚀 Production Release: ZenithenOpen Campus Open-Source Platform
