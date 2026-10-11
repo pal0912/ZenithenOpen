@@ -19,7 +19,10 @@ export function LiveMetricsDashboard() {
     fetch("/api/metrics")
       .then((res) => (res.ok ? res.json() : null))
       .then((json) => {
-        if (json) setMetrics(json.data || json);
+        if (json) {
+          const payload = json.metrics || json.data || json;
+          setMetrics(payload);
+        }
       })
       .catch(() => {});
   }, []);
