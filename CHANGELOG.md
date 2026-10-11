@@ -5,6 +5,20 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.7.0] - 2026-10-11
+
+### ⚡ Real-Time GitHub Webhook Ingestion Engine
+
+- **GitHub Event Webhook (`app/api/github/webhook/route.ts`)**:
+  - Implemented `POST /api/github/webhook` with HMAC-SHA256 signature verification (`X-Hub-Signature-256`).
+  - Ingests real-time `pull_request` (opened, closed, merged, synchronized), `pull_request_review`, and `push` events directly from GitHub.
+  - Automatically correlates webhook payloads with registered campus users, evaluates Quality PR criteria, updates PostgreSQL, and flushes Redis caches for zero-latency leaderboard synchronization.
+  - Implemented `GET /api/github/webhook` health probe returning active status and supported event types.
+- **Backend Test Suite Expansion (`tests/backend/github-webhook.test.ts`)**:
+  - Validated health probe, ping event handling, payload validation, and unhandled event skips across 375 passing assertions.
+
+---
+
 ## [1.6.0] - 2026-10-11
 
 ### 🚀 Deep GitHub Sync, Upstream Parent Fork Resolution & Multi-Activity Tracking
