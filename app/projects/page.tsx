@@ -10,32 +10,120 @@ import {
   ExternalLink,
   Filter,
   Plus,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { GithubIcon } from "@/components/ui/icons";
-import { MOCK_PROJECTS } from "@/lib/data/mock-data";
+import { Project } from "@/types";
 
 export default function ProjectsPage() {
+  const [projects, setProjects] = React.useState<Project[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [selectedLanguage, setSelectedLanguage] = React.useState<string>("All");
 
+  // Modal State for Registering a Project
+  const [createModalOpen, setCreateModalOpen] = React.useState(false);
+  const [projName, setProjName] = React.useState("");
+  const [projTagline, setProjTagline] = React.useState("");
+  const [projRepoUrl, setProjRepoUrl] = React.useState("");
+  const [projLanguage, setProjLanguage] = React.useState("TypeScript");
+  const [projTags, setProjTags] = React.useState("");
+  const [submitting, setSubmitting] = React.useState(false);
+  const [formError, setFormError] = React.useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
+
   const languages = ["All", "TypeScript", "Python", "Go", "Rust", "C++"];
 
-  const filteredProjects = MOCK_PROJECTS.filter((project) => {
-    const matchesSearch =
-      project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+  // Fetch projects from live API
+  const fetchProjects = React.useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (selectedLanguage !== "All") params.append("language", selectedLanguage);
+      if (searchQuery.trim()) params.append("search", searchQuery.trim());
 
-    const matchesLanguage =
-      selectedLanguage === "All" || project.primaryLanguage === selectedLanguage;
+      const res = await fetch(`/api/projects?${params.toString()}`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.projects)) {
+        setProjects(data.projects);
+      } else {
+        setProjects([]);
+      }
+    } catch (err) {
+      console.error("[ProjectsPage] Failed to fetch projects:", err);
+      setProjects([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedLanguage, searchQuery]);
 
-    return matchesSearch && matchesLanguage;
-  });
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchProjects();
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [fetchProjects]);
+
+  // Handle registering a new project
+  const handleCreateProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError(null);
+    setSuccessMessage(null);
+
+    if (!projName.trim() || !projRepoUrl.trim()) {
+      setFormError("Project Name and Repository URL are required.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const parsedTags = projTags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: projName.trim(),
+          tagline: projTagline.trim() || `Open-source project ${projName.trim()}`,
+          repositoryUrl: projRepoUrl.trim(),
+          primaryLanguage: projLanguage,
+          tags: parsedTags.length > 0 ? parsedTags : [projLanguage],
+          isFeatured: true,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setFormError(data.error || "Failed to register project in catalog.");
+        return;
+      }
+
+      setSuccessMessage(`Repository '${projName}' registered successfully!`);
+      await fetchProjects();
+
+      setTimeout(() => {
+        setCreateModalOpen(false);
+        setSuccessMessage(null);
+        setProjName("");
+        setProjTagline("");
+        setProjRepoUrl("");
+        setProjTags("");
+      }, 1800);
+    } catch (err: any) {
+      setFormError("Network error connecting to projects service.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="py-16 bg-background text-foreground min-h-screen transition-colors">
@@ -52,20 +140,33 @@ export default function ProjectsPage() {
                 Open-Source Project Catalog
               </h1>
               <p className="mt-1 text-sm text-muted-foreground max-w-2xl leading-relaxed">
-                Production codebases engineered by IST student developers.
+                Production codebases engineered by IST student developers and maintained under IST-ZenithenLab.
               </p>
             </div>
-            <a
-              href="https://github.com/IST-ZenithenLab"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md text-xs shrink-0 cursor-pointer">
-                <GithubIcon className="h-4 w-4" />
-                <span>Visit GitHub Org</span>
-                <ExternalLink className="h-3.5 w-3.5" />
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => {
+                  setFormError(null);
+                  setSuccessMessage(null);
+                  setCreateModalOpen(true);
+                }}
+                className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md text-xs cursor-pointer"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Register Repository</span>
               </Button>
-            </a>
+              <a
+                href="https://github.com/IST-ZenithenLab"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="outline" className="gap-2 border-border text-xs cursor-pointer">
+                  <GithubIcon className="h-4 w-4" />
+                  <span>GitHub Org</span>
+                  <ExternalLink className="h-3 w-3" />
+                </Button>
+              </a>
+            </div>
           </div>
 
           {/* Search & Filter Bar */}
@@ -102,36 +203,33 @@ export default function ProjectsPage() {
         </div>
 
         {/* Projects Grid or Zero-State */}
-        {filteredProjects.length === 0 ? (
+        {isLoading ? (
+          <div className="mt-16 flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+            <p className="text-sm font-medium">Loading open-source project catalog...</p>
+          </div>
+        ) : projects.length === 0 ? (
           <div className="mt-12 rounded-2xl border border-border bg-card p-16 text-center shadow-xs">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20 text-primary mb-4">
               <FolderGit2 className="h-8 w-8" />
             </div>
-            <h3 className="text-xl font-bold text-foreground">No Repositories Synced Yet</h3>
+            <h3 className="text-xl font-bold text-foreground">No Repositories Found</h3>
             <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-              Once you configure your <code className="text-primary font-mono bg-primary/10 px-1 py-0.5 rounded border border-primary/20">GITHUB_TOKEN</code> or trigger the sync endpoint, repositories under <code className="text-primary font-mono bg-primary/10 px-1 py-0.5 rounded border border-primary/20">IST-ZenithenLab</code> will appear here automatically.
+              No repositories match the current query. Register your campus open-source project to feature it on ZenithenOpen.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <a
-                href="https://github.com/new"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Button
+                onClick={() => setCreateModalOpen(true)}
+                className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5 shadow-xs cursor-pointer"
               >
-                <Button variant="default" className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5 shadow-xs cursor-pointer">
-                  <Plus className="h-4 w-4" />
-                  <span>Create Campus Repository</span>
-                </Button>
-              </a>
-              <Link href="/admin">
-                <Button variant="outline" className="text-xs border-border">
-                  Configure Sync in Admin
-                </Button>
-              </Link>
+                <Plus className="h-4 w-4" />
+                <span>Register Project</span>
+              </Button>
             </div>
           </div>
         ) : (
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-            {filteredProjects.map((project) => (
+            {projects.map((project) => (
               <Card
                 key={project.id}
                 className="flex flex-col justify-between hover:border-primary/40 hover:shadow-lg transition-all duration-200 border-border bg-card overflow-hidden"
@@ -221,6 +319,143 @@ export default function ProjectsPage() {
                 </div>
               </Card>
             ))}
+          </div>
+        )}
+
+        {/* Modal: Register Project */}
+        {createModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl text-foreground">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                    <FolderGit2 className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground">Register Campus Repository</h3>
+                    <p className="text-xs text-muted-foreground">Add student open-source project to catalog</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setCreateModalOpen(false)}
+                  className="text-muted-foreground hover:text-foreground p-1 text-sm cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {successMessage ? (
+                <div className="mt-6 py-6 text-center space-y-3">
+                  <CheckCircle2 className="h-10 w-10 text-emerald-500 mx-auto" />
+                  <p className="text-sm font-semibold text-foreground">Registration Successful</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{successMessage}</p>
+                </div>
+              ) : (
+                <form onSubmit={handleCreateProject} className="mt-6 space-y-4">
+                  {formError && (
+                    <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3 text-xs text-red-600 flex items-start gap-2">
+                      <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                      <span>{formError}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="text-xs font-semibold text-foreground block mb-1.5">
+                      Project Name
+                    </label>
+                    <Input
+                      required
+                      placeholder="e.g. ZenithenCore"
+                      value={projName}
+                      onChange={(e) => setProjName(e.target.value)}
+                      className="bg-background border-border text-foreground text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-foreground block mb-1.5">
+                      Repository URL
+                    </label>
+                    <Input
+                      required
+                      placeholder="https://github.com/IST-ZenithenLab/..."
+                      value={projRepoUrl}
+                      onChange={(e) => setProjRepoUrl(e.target.value)}
+                      className="bg-background border-border text-foreground text-xs font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-foreground block mb-1.5">
+                      Tagline / Brief Summary
+                    </label>
+                    <Input
+                      placeholder="High-performance utilities for campus developers"
+                      value={projTagline}
+                      onChange={(e) => setProjTagline(e.target.value)}
+                      className="bg-background border-border text-foreground text-xs"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-semibold text-foreground block mb-1.5">
+                        Primary Language
+                      </label>
+                      <select
+                        value={projLanguage}
+                        onChange={(e) => setProjLanguage(e.target.value)}
+                        className="w-full h-9 rounded-md border border-border bg-background px-3 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                      >
+                        <option value="TypeScript">TypeScript</option>
+                        <option value="Python">Python</option>
+                        <option value="Go">Go</option>
+                        <option value="Rust">Rust</option>
+                        <option value="C++">C++</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold text-foreground block mb-1.5">
+                        Tags (comma separated)
+                      </label>
+                      <Input
+                        placeholder="Systems, API, ML"
+                        value={projTags}
+                        onChange={(e) => setProjTags(e.target.value)}
+                        className="bg-background border-border text-foreground text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex justify-end space-x-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setCreateModalOpen(false)}
+                      disabled={submitting}
+                      className="text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={submitting}
+                      className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xs cursor-pointer gap-2"
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          <span>Registering...</span>
+                        </>
+                      ) : (
+                        <span>Register Project</span>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         )}
       </div>
