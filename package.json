@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "prisma generate",
     "test": "tsx tests/backend/run-all.ts",
     "test:backend": "tsx tests/backend/run-all.ts",
     "test:themes": "tsx tests/theme-system.test.ts"
