@@ -167,7 +167,7 @@ export async function GET(request: NextRequest) {
       console.warn("[Leaderboard] Database query notice:", dbErr);
     }
 
-    // 3. Sort purely by Merged PRs, then Quality PRs, then Total PRs (DevForge algorithm)
+    // 3. Sort purely by Merged PRs, then Quality PRs, then Total PRs (Merit ranking algorithm)
     interface ExtendedStats {
       mergedPrs?: number;
       qualityPrs?: number;

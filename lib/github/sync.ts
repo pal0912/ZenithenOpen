@@ -72,7 +72,7 @@ export function getGitHubHeaders(): HeadersInit {
 
 /**
  * Fetch GitHub repository stars and forks with Redis caching.
- * Resolves to the upstream parent repository if the repository is a fork (DevForge pattern).
+ * Resolves to the upstream parent repository if the repository is a fork.
  */
 export async function fetchRepositoryStats(repoFullName: string): Promise<RepoStats> {
   const cleanRepo = repoFullName.trim().toLowerCase();
@@ -94,7 +94,7 @@ export async function fetchRepositoryStats(repoFullName: string): Promise<RepoSt
     let stars = Number(data.stargazers_count || 0);
     let forks = Number(data.forks_count || 0);
 
-    // DevForge Pattern: If repository is a fork, resolve to upstream parent repository
+    // Upstream Resolution: If repository is a fork, resolve to upstream parent repository
     if (data.fork && data.parent) {
       const parentStars = Number(data.parent.stargazers_count || 0);
       const parentForks = Number(data.parent.forks_count || 0);

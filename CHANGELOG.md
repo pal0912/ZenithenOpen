@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### 🚀 Deep GitHub Sync, Upstream Parent Fork Resolution & Multi-Activity Tracking
 
-- **DevForge-Pattern Upstream Parent Repository Resolution (`lib/github/sync.ts`)**:
+- **Upstream Parent Repository Resolution (`lib/github/sync.ts`)**:
   - Automatically resolves forked repositories (`data.fork && data.parent`) to their upstream parent repositories so student contributions against forks inherit parent star and fork counts.
   - Removed artificial campus repository star/fork mocks.
 - **Deep Pagination for Full Lifetime History (`lib/github/sync.ts`)**:
@@ -37,13 +37,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [1.5.0] - 2026-10-11
 
-### ⚡ Real-Time GitHub Ingestion, DevForge-Style PR Tracking & Zero-Mock Architecture
+### ⚡ Real-Time GitHub Ingestion, Strict PR Tracking & Zero-Mock Architecture
 
 - **End-to-End Real-Time GitHub PR Ingestion (`lib/github/sync.ts`, `app/api/auth/login/route.ts`)**:
   - Automatically fetches and ingests all student Pull Requests from GitHub API (`OPEN`, `CLOSED`, `MERGED`) directly into PostgreSQL upon login.
   - Built high-performance batch upsert engine with bulk lookup and `createMany`, slashing sync roundtrips from 160 queries down to 2.
   - Automatically awards the "First PR Shipped" achievement when a student merges their first pull request.
-- **DevForge-Style Quality PR Algorithm & Repository Inspection**:
+- **Quality PR Algorithm & Repository Inspection**:
   - Campus rule: Any PR to `IST-ZenithenLab/ZenithenOpen` or any campus repository (`IST-ZenithenLab/*`) automatically qualifies as a Quality PR.
   - Public open-source threshold: Pull requests to public repositories with ≥100 stars and ≥100 forks qualify as Quality PRs.
 - **Dedicated Sync & Ingestion API (`app/api/students/sync/route.ts`)**:
