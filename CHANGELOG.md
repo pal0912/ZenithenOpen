@@ -5,6 +5,19 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.5.1] - 2026-10-11
+
+### 🎯 Strict Quality PR Algorithm (100 Stars & 100 Forks Requirement)
+
+- **Pure Merit-Based Quality PR Qualification (`lib/github/sync.ts`)**:
+  - Removed campus repository automatic exemption (`IST-ZenithenLab/*`).
+  - Strict rule: A pull request qualifies as a Quality PR **strictly if and only if** the target repository has $\ge 100$ stars AND $\ge 100$ forks.
+  - Eliminated keyword/label bypasses for sub-threshold repositories.
+- **Updated Test Suite (`tests/backend/github-sync.test.ts`)**:
+  - Validated strict star/fork thresholds with 100% pass across 368 test assertions.
+
+---
+
 ## [1.5.0] - 2026-10-11
 
 ### ⚡ Real-Time GitHub Ingestion, DevForge-Style PR Tracking & Zero-Mock Architecture

@@ -36,45 +36,45 @@ export async function runGitHubSyncTests(): Promise<SuiteResult> {
     );
   }
 
-  // --- 2. Quality PR Evaluation Logic ---
-  const qualityByLabel = evaluateQualityPr({
-    labels: [{ name: "enhancement" }],
-    comments: 0,
-    body: "short",
-  });
-  suite.assertEqual(qualityByLabel, true, "PR with 'enhancement' label qualifies as Quality PR");
+  // --- 2. Quality PR Evaluation Logic (Strict >= 100 stars AND >= 100 forks ONLY) ---
+  const qualityByStats = evaluateQualityPr(
+    { labels: [], comments: 0, body: "test" },
+    "facebook/react",
+    { stars: 220000, forks: 45000 }
+  );
+  suite.assertEqual(qualityByStats, true, "PR in repository with >= 100 stars and >= 100 forks qualifies as Quality PR");
 
-  const qualityByCoreLabel = evaluateQualityPr({
-    labels: [{ name: "core/backend" }],
-    comments: 0,
-    body: "short",
-  });
-  suite.assertEqual(qualityByCoreLabel, true, "PR with 'backend' label qualifies as Quality PR");
-
-  const qualityByComments = evaluateQualityPr({
-    labels: [],
-    comments: 3,
-    body: "short",
-  });
-  suite.assertEqual(qualityByComments, true, "PR with >= 2 code review comments qualifies as Quality PR");
-
-  const qualityByDetailedBody = evaluateQualityPr({
-    labels: [],
-    comments: 0,
-    body: "This PR refactors the student authentication state by establishing persistent relational joins with Supabase PostgreSQL and caching user leaderboards in Redis.",
-  });
+  const campusUnderThreshold = evaluateQualityPr(
+    { labels: [{ name: "enhancement" }], comments: 5, body: "campus work" },
+    "IST-ZenithenLab/ZenithenOpen",
+    { stars: 2, forks: 1 }
+  );
   suite.assertEqual(
-    qualityByDetailedBody,
-    true,
-    "PR with comprehensive body description (>= 100 chars) qualifies as Quality PR"
+    campusUnderThreshold,
+    false,
+    "Campus repository without 100 stars and 100 forks does NOT qualify as Quality PR"
   );
 
-  const nonQualityPr = evaluateQualityPr({
-    labels: [{ name: "typo" }],
-    comments: 0,
-    body: "fixed spelling",
-  });
-  suite.assertEqual(nonQualityPr, false, "Trivial PR without quality signals is not marked as Quality PR");
+  const highStarsLowForks = evaluateQualityPr(
+    { labels: [], comments: 0, body: "test" },
+    "org/repo",
+    { stars: 500, forks: 20 }
+  );
+  suite.assertEqual(highStarsLowForks, false, "PR in repository with < 100 forks does not qualify");
+
+  const lowStarsHighForks = evaluateQualityPr(
+    { labels: [], comments: 0, body: "test" },
+    "org/repo",
+    { stars: 40, forks: 250 }
+  );
+  suite.assertEqual(lowStarsHighForks, false, "PR in repository with < 100 stars does not qualify");
+
+  const nonQualityPr = evaluateQualityPr(
+    { labels: [{ name: "typo" }], comments: 0, body: "fixed spelling" },
+    "small-project",
+    { stars: 10, forks: 2 }
+  );
+  suite.assertEqual(nonQualityPr, false, "PR below 100 stars and 100 forks is not marked as Quality PR");
 
   // --- 3. Contribution Points Calculation Formula ---
   const mockPrs: GitHubPullRequestItem[] = [

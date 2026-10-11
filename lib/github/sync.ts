@@ -168,57 +168,15 @@ export interface GitHubItemSignal {
 
 /**
  * Determines whether a pull request meets Quality PR criteria:
- * 1. Campus repository (IST-ZenithenLab / ZenithenOpen) ALWAYS qualifies as Quality PR!
- * 2. Repository has >= 100 stars AND >= 100 forks
- * 3. Fallback: labels (enhancement/quality/core) or substantial review engagement
+ * Strict rule: Repository must have >= 100 stars AND >= 100 forks ONLY.
+ * No special exemptions for campus repositories.
  */
 export function evaluateQualityPr(
-  item: GitHubItemSignal,
-  repoName?: string,
+  _item: GitHubItemSignal,
+  _repoName?: string,
   repoStats?: RepoStats
 ): boolean {
-  const normalizedRepo = (repoName || "").toLowerCase();
-
-  // Rule 1: Campus repository ALWAYS counts as Quality PR
-  if (
-    normalizedRepo.startsWith("ist-zenithenlab/") ||
-    normalizedRepo === "ist-zenithenlab/zenithenopen"
-  ) {
-    return true;
-  }
-
-  // Rule 2: Open Source threshold: 100 stars and 100 forks
   if (repoStats && repoStats.stars >= 100 && repoStats.forks >= 100) {
-    return true;
-  }
-
-  // Rule 3: Label-based signals
-  const labels: Array<{ name: string }> = Array.isArray(item.labels) ? item.labels : [];
-  const qualityLabelKeywords = [
-    "quality",
-    "enhancement",
-    "feature",
-    "good first issue",
-    "hacktoberfest-accepted",
-    "approved",
-    "core",
-    "backend",
-    "architecture",
-  ];
-
-  const hasQualityLabel = labels.some((label) =>
-    qualityLabelKeywords.some((keyword) =>
-      label.name.toLowerCase().includes(keyword)
-    )
-  );
-
-  if (hasQualityLabel) return true;
-
-  // Interaction signals: discussion, review comments, or non-trivial body
-  const commentsCount = Number(item.comments || 0);
-  const bodyLength = typeof item.body === "string" ? item.body.trim().length : 0;
-
-  if (commentsCount >= 2 || bodyLength >= 100) {
     return true;
   }
 
