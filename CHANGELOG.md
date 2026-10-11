@@ -5,6 +5,22 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.2.0] - 2026-10-11
+
+### ⚡ Database Performance & Rate Limiting Defense
+
+- **Database Relational Index Optimizations (`prisma/schema.prisma`)**:
+  - Added `@@index([department])` on `User` model for sub-millisecond filtering on the Members Directory.
+  - Added compound indexes `@@index([userId, status])` and `@@index([status, mergedAt])` on `Contribution` model to accelerate real-time Leaderboard rankings and competition scoring.
+  - Added `@@index([achievementId])` on `UserAchievement` model eliminating full-table scans during badge unlock aggregations.
+- **Sliding-Window Rate Limiting Defense (`lib/redis/client.ts`)**:
+  - Implemented `checkRateLimit()` with Upstash Redis and automated in-memory fallback.
+  - Integrated HTTP `429 Too Many Requests` defense with `Retry-After` headers on `/api/auth/login` and `/api/auth/verify-usn` endpoints to prevent brute-force attacks and student enumeration.
+- **Test Suite Expansion (`tests/backend/redis-cache.test.ts`)**:
+  - Added unit test assertions verifying rate limit token consumption, token exhaustion, and window resets.
+
+---
+
 ## [1.1.0] - 2026-10-11
 
 ### 🛡️ Production Hardening: Environment Validation, Health Tests & Dependabot

@@ -74,6 +74,7 @@ model User {
 
   @@index([role])
   @@index([email])
+  @@index([department])
 }
 
 model GitHubAccount {
@@ -168,6 +169,8 @@ model Contribution {
   @@index([type])
   @@index([status])
   @@index([isQualityPr])
+  @@index([userId, status])
+  @@index([status, mergedAt])
 }
 
 model Opportunity {
@@ -275,6 +278,7 @@ model UserAchievement {
   unlockedAt    DateTime    @default(now())
 
   @@unique([userId, achievementId])
+  @@index([achievementId])
 }
 
 model CommunityMetricSnapshot {
