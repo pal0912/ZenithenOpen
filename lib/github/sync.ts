@@ -42,6 +42,8 @@ export interface SyncResult {
   mergedPrs: number;
   closedPrs: number;
   qualityPrs: number;
+  codeReviews?: number;
+  commitsCount?: number;
   points?: number;
   error?: string;
 }
@@ -69,16 +71,11 @@ export function getGitHubHeaders(): HeadersInit {
 }
 
 /**
- * Fetch GitHub repository stars and forks with Redis caching
+ * Fetch GitHub repository stars and forks with Redis caching.
+ * Resolves to the upstream parent repository if the repository is a fork.
  */
 export async function fetchRepositoryStats(repoFullName: string): Promise<RepoStats> {
   const cleanRepo = repoFullName.trim().toLowerCase();
-
-  // Campus repository optimization: IST-ZenithenLab always qualifies
-  if (cleanRepo.startsWith("ist-zenithenlab/") || cleanRepo === "ist-zenithenlab/zenithenopen") {
-    return { stars: 100, forks: 100 };
-  }
-
   const cacheKey = `github:repo:${cleanRepo}`;
   const cached = await getCached<RepoStats>(cacheKey);
   if (cached) return cached;
@@ -94,11 +91,18 @@ export async function fetchRepositoryStats(repoFullName: string): Promise<RepoSt
     }
 
     const data = await res.json();
-    const stats: RepoStats = {
-      stars: Number(data.stargazers_count || 0),
-      forks: Number(data.forks_count || 0),
-    };
+    let stars = Number(data.stargazers_count || 0);
+    let forks = Number(data.forks_count || 0);
 
+    // Upstream Resolution: If repository is a fork, resolve to upstream parent repository
+    if (data.fork && data.parent) {
+      const parentStars = Number(data.parent.stargazers_count || 0);
+      const parentForks = Number(data.parent.forks_count || 0);
+      stars = Math.max(stars, parentStars);
+      forks = Math.max(forks, parentForks);
+    }
+
+    const stats: RepoStats = { stars, forks };
     await setCached(cacheKey, stats, 3600);
     return stats;
   } catch (err) {
@@ -184,7 +188,8 @@ export function evaluateQualityPr(
 }
 
 /**
- * Fetch real user pull requests from GitHub Search API
+ * Fetch real user pull requests from GitHub Search API.
+ * Supports deep pagination up to GitHub's search cap (up to 1,000 PRs).
  */
 export async function fetchUserPullRequests(
   username: string
@@ -197,23 +202,43 @@ export async function fetchUserPullRequests(
   if (cached) return cached;
 
   try {
-    const query = encodeURIComponent(`author:${cleanUsername} type:pr`);
-    const res = await fetch(`https://api.github.com/search/issues?q=${query}&per_page=100&sort=created&order=desc`, {
-      headers: getGitHubHeaders(),
-      next: { revalidate: 300 },
-    });
+    const allItems: GitHubItemSignal[] = [];
+    let page = 1;
+    const maxPages = 10; // GitHub Search API caps at 1,000 results (10 pages * 100)
 
-    if (!res.ok) {
-      console.warn(`[GitHub] API error ${res.status} searching PRs for: ${cleanUsername}`);
-      return [];
+    while (page <= maxPages) {
+      const query = encodeURIComponent(`author:${cleanUsername} type:pr`);
+      const res = await fetch(
+        `https://api.github.com/search/issues?q=${query}&per_page=100&page=${page}&sort=created&order=desc`,
+        {
+          headers: getGitHubHeaders(),
+          next: { revalidate: 300 },
+        }
+      );
+
+      if (!res.ok) {
+        if (page === 1) {
+          console.warn(`[GitHub] API error ${res.status} searching PRs for: ${cleanUsername}`);
+        }
+        break;
+      }
+
+      const data = await res.json();
+      const items: GitHubItemSignal[] = Array.isArray(data.items) ? data.items : [];
+      if (items.length === 0) break;
+
+      allItems.push(...items);
+
+      if (items.length < 100 || allItems.length >= Number(data.total_count || 0)) {
+        break;
+      }
+
+      page++;
     }
-
-    const data = await res.json();
-    const items: GitHubItemSignal[] = Array.isArray(data.items) ? data.items : [];
 
     // Collect all distinct repositories
     const distinctRepos = new Set<string>();
-    for (const item of items) {
+    for (const item of allItems) {
       let repoName = "unknown-repo";
       if (item.repository_url) {
         const parts = item.repository_url.split("/");
@@ -225,7 +250,7 @@ export async function fetchUserPullRequests(
       if (repoName !== "unknown-repo") distinctRepos.add(repoName);
     }
 
-    // Inspect repository stars & forks for external repos
+    // Inspect repository stars & forks (resolves parent repository for forks)
     const repoStatsMap = new Map<string, RepoStats>();
     await Promise.all(
       Array.from(distinctRepos).map(async (repo) => {
@@ -234,7 +259,7 @@ export async function fetchUserPullRequests(
       })
     );
 
-    const pullRequests: GitHubPullRequestItem[] = items.map((item: GitHubItemSignal) => {
+    const pullRequests: GitHubPullRequestItem[] = allItems.map((item: GitHubItemSignal) => {
       // Determine status: MERGED, CLOSED, or OPEN
       let status: ContributionStatus = ContributionStatus.OPEN;
       if (item.pull_request?.merged_at) {
@@ -279,6 +304,133 @@ export async function fetchUserPullRequests(
   }
 }
 
+export interface GitHubReviewItem {
+  id: string;
+  title: string;
+  url: string;
+  prNumber: number;
+  repoName: string;
+  createdAt: string;
+}
+
+/**
+ * Fetch Code Reviews performed by the student on GitHub
+ */
+export async function fetchUserCodeReviews(
+  username: string
+): Promise<GitHubReviewItem[]> {
+  const cleanUsername = username.trim().toLowerCase();
+  const cacheKey = `github:reviews:${cleanUsername}`;
+  const cached = await getCached<GitHubReviewItem[]>(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const query = encodeURIComponent(`reviewed-by:${cleanUsername} type:pr`);
+    const res = await fetch(
+      `https://api.github.com/search/issues?q=${query}&per_page=100&sort=created&order=desc`,
+      {
+        headers: getGitHubHeaders(),
+        next: { revalidate: 600 },
+      }
+    );
+
+    if (!res.ok) {
+      return [];
+    }
+
+    const data = await res.json();
+    const items: GitHubItemSignal[] = Array.isArray(data.items) ? data.items : [];
+
+    const reviews: GitHubReviewItem[] = items.map((item) => {
+      let repoName = "unknown-repo";
+      if (item.repository_url) {
+        const parts = item.repository_url.split("/");
+        repoName = parts.slice(-2).join("/");
+      } else if (item.html_url) {
+        const match = item.html_url.match(/github\.com\/([^/]+\/[^/]+)/);
+        if (match) repoName = match[1];
+      }
+
+      return {
+        id: String(item.id),
+        title: `Code Review: ${item.title || "Pull Request"}`,
+        url: item.html_url || "",
+        prNumber: Number(item.number),
+        repoName,
+        createdAt: item.created_at || new Date().toISOString(),
+      };
+    });
+
+    await setCached(cacheKey, reviews, 600);
+    return reviews;
+  } catch (err) {
+    console.warn(`[GitHub] Failed to search reviews for ${cleanUsername}:`, err);
+    return [];
+  }
+}
+
+export interface GitHubCommitItem {
+  sha: string;
+  message: string;
+  url: string;
+  repoName: string;
+  committedAt: string;
+}
+
+/**
+ * Fetch public commits authored by the student on GitHub
+ */
+export async function fetchUserCommits(
+  username: string
+): Promise<GitHubCommitItem[]> {
+  const cleanUsername = username.trim().toLowerCase();
+  const cacheKey = `github:commits:${cleanUsername}`;
+  const cached = await getCached<GitHubCommitItem[]>(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const headers: Record<string, string> = {
+      ...(getGitHubHeaders() as Record<string, string>),
+      Accept: "application/vnd.github.cloak-preview+json",
+    };
+
+    const query = encodeURIComponent(`author:${cleanUsername}`);
+    const res = await fetch(
+      `https://api.github.com/search/commits?q=${query}&per_page=100&sort=author-date&order=desc`,
+      {
+        headers,
+        next: { revalidate: 600 },
+      }
+    );
+
+    if (!res.ok) {
+      return [];
+    }
+
+    const data = await res.json();
+    const items: Array<{
+      sha?: string;
+      html_url?: string;
+      commit?: { message?: string; author?: { date?: string } };
+      repository?: { full_name?: string };
+    }> = Array.isArray(data.items) ? data.items : [];
+
+    const commits: GitHubCommitItem[] = items.map((c) => ({
+      sha: c.sha || "unknown",
+      message: (c.commit?.message || "Commit").split("\n")[0].substring(0, 150),
+      url: c.html_url || "",
+      repoName: c.repository?.full_name || "unknown-repo",
+      committedAt: c.commit?.author?.date || new Date().toISOString(),
+    }));
+
+    await setCached(cacheKey, commits, 600);
+    return commits;
+  } catch (err) {
+    console.warn(`[GitHub] Failed to search commits for ${cleanUsername}:`, err);
+    return [];
+  }
+}
+
 /**
  * Calculate contribution activity score (legacy compatibility)
  */
@@ -299,7 +451,7 @@ export function calculateContributionPoints(prs: GitHubPullRequestItem[]): numbe
 }
 
 /**
- * Synchronize GitHub profile & PR contributions into live Supabase PostgreSQL
+ * Synchronize GitHub profile, Pull Requests, Code Reviews & Commits into Supabase PostgreSQL
  */
 export async function syncStudentGitHubData(
   userId: string,
@@ -307,8 +459,12 @@ export async function syncStudentGitHubData(
 ): Promise<SyncResult> {
   const cleanUsername = githubUsername.trim().toLowerCase();
 
-  // Clear PR cache to ensure real-time fetch
-  await deleteCached(`github:prs:${cleanUsername}`);
+  // Clear PR and review caches to ensure real-time fresh fetch
+  await Promise.all([
+    deleteCached(`github:prs:${cleanUsername}`),
+    deleteCached(`github:reviews:${cleanUsername}`),
+    deleteCached(`github:commits:${cleanUsername}`),
+  ]);
 
   const profile = await fetchGitHubUser(cleanUsername);
   if (!profile) {
@@ -320,17 +476,25 @@ export async function syncStudentGitHubData(
       mergedPrs: 0,
       closedPrs: 0,
       qualityPrs: 0,
+      codeReviews: 0,
+      commitsCount: 0,
       error: `GitHub user "${cleanUsername}" not found`,
     };
   }
 
-  const prs = await fetchUserPullRequests(cleanUsername);
+  // Fetch PRs, Code Reviews, and Commits in parallel
+  const [prs, codeReviews, commits] = await Promise.all([
+    fetchUserPullRequests(cleanUsername),
+    fetchUserCodeReviews(cleanUsername),
+    fetchUserCommits(cleanUsername),
+  ]);
 
   const openPrs = prs.filter((p) => p.status === ContributionStatus.OPEN).length;
   const mergedPrs = prs.filter((p) => p.status === ContributionStatus.MERGED).length;
   const closedPrs = prs.filter((p) => p.status === ContributionStatus.CLOSED).length;
   const qualityPrs = prs.filter((p) => p.isQualityPr).length;
   const points = calculateContributionPoints(prs);
+  const totalActivityCount = prs.length + codeReviews.length + commits.length;
 
   // Database persistence via Prisma
   try {
@@ -345,7 +509,7 @@ export async function syncStudentGitHubData(
         publicRepos: profile.publicRepos,
         followers: profile.followers,
         prsMergedCount: mergedPrs,
-        contributionsThisYear: prs.length,
+        contributionsThisYear: totalActivityCount,
         lastSyncedAt: new Date(),
       },
       create: {
@@ -357,12 +521,12 @@ export async function syncStudentGitHubData(
         publicRepos: profile.publicRepos,
         followers: profile.followers,
         prsMergedCount: mergedPrs,
-        contributionsThisYear: prs.length,
+        contributionsThisYear: totalActivityCount,
         lastSyncedAt: new Date(),
       },
     });
 
-    // 2. High-performance batch upsert of Contributions
+    // 2. High-performance batch upsert of Contributions (PRs + Code Reviews + Commits)
     const existingContributions = await prisma.contribution.findMany({
       where: { userId },
       select: { id: true, url: true },
@@ -375,7 +539,7 @@ export async function syncStudentGitHubData(
       userId: string;
       title: string;
       url: string;
-      prNumber: number;
+      prNumber: number | null;
       type: ContributionType;
       status: ContributionStatus;
       isQualityPr: boolean;
@@ -386,6 +550,7 @@ export async function syncStudentGitHubData(
 
     const updatePromises: Promise<unknown>[] = [];
 
+    // Ingest Pull Requests
     for (const pr of prs) {
       const existingId = existingMap.get(pr.url);
       if (existingId) {
@@ -413,6 +578,42 @@ export async function syncStudentGitHubData(
           mergedAt: pr.mergedAt ? new Date(pr.mergedAt) : null,
           closedAt: pr.closedAt ? new Date(pr.closedAt) : null,
           createdAt: new Date(pr.createdAt),
+        });
+      }
+    }
+
+    // Ingest Code Reviews
+    for (const review of codeReviews) {
+      if (!existingMap.has(review.url)) {
+        toCreate.push({
+          userId,
+          title: review.title,
+          url: review.url,
+          prNumber: review.prNumber,
+          type: ContributionType.CODE_REVIEW,
+          status: ContributionStatus.MERGED,
+          isQualityPr: false,
+          mergedAt: new Date(review.createdAt),
+          closedAt: null,
+          createdAt: new Date(review.createdAt),
+        });
+      }
+    }
+
+    // Ingest Commits
+    for (const commit of commits) {
+      if (!existingMap.has(commit.url)) {
+        toCreate.push({
+          userId,
+          title: commit.message,
+          url: commit.url,
+          prNumber: null,
+          type: ContributionType.COMMIT,
+          status: ContributionStatus.MERGED,
+          isQualityPr: false,
+          mergedAt: new Date(commit.committedAt),
+          closedAt: null,
+          createdAt: new Date(commit.committedAt),
         });
       }
     }
@@ -478,6 +679,8 @@ export async function syncStudentGitHubData(
     mergedPrs,
     closedPrs,
     qualityPrs,
+    codeReviews: codeReviews.length,
+    commitsCount: commits.length,
     points,
   };
 }
