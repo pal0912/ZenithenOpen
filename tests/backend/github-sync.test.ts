@@ -10,6 +10,8 @@ import {
   calculateContributionPoints,
   GitHubPullRequestItem,
   fetchGitHubUser,
+  fetchUserCodeReviews,
+  fetchUserCommits,
 } from "../../lib/github/sync";
 import { ContributionStatus } from "@prisma/client";
 
@@ -134,6 +136,18 @@ export async function runGitHubSyncTests(): Promise<SuiteResult> {
     notFound,
     null,
     "fetchGitHubUser safely returns null for non-existent user without throwing"
+  );
+
+  // --- 5. Code Reviews and Commits Ingestion Functions ---
+  suite.assertEqual(
+    typeof fetchUserCodeReviews,
+    "function",
+    "fetchUserCodeReviews is defined as an async ingestion function"
+  );
+  suite.assertEqual(
+    typeof fetchUserCommits,
+    "function",
+    "fetchUserCommits is defined as an async ingestion function"
   );
 
   return suite.summary();

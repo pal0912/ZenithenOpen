@@ -5,6 +5,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.6.0] - 2026-10-11
+
+### 🚀 Deep GitHub Sync, Upstream Parent Fork Resolution & Multi-Activity Tracking
+
+- **DevForge-Pattern Upstream Parent Repository Resolution (`lib/github/sync.ts`)**:
+  - Automatically resolves forked repositories (`data.fork && data.parent`) to their upstream parent repositories so student contributions against forks inherit parent star and fork counts.
+  - Removed artificial campus repository star/fork mocks.
+- **Deep Pagination for Full Lifetime History (`lib/github/sync.ts`)**:
+  - Implemented multi-page iteration up to GitHub's search API maximum of 1,000 items (10 pages $\times$ 100 PRs/page).
+- **Multi-Activity Contribution Tracking (`lib/github/sync.ts`)**:
+  - Added real-time synchronization for **Code Reviews** (`reviewed-by:{username} type:pr`) saved as `ContributionType.CODE_REVIEW`.
+  - Added real-time synchronization for public **Commits** (`author:{username}`) saved as `ContributionType.COMMIT`.
+- **Backend Tests & Validation (`tests/backend/github-sync.test.ts`)**:
+  - Added unit test assertions verifying review and commit ingestion functions.
+
+---
+
 ## [1.5.1] - 2026-10-11
 
 ### 🎯 Strict Quality PR Algorithm (100 Stars & 100 Forks Requirement)
