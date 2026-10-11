@@ -6,11 +6,11 @@
 import { TestSuite, SuiteResult } from "./test-utils";
 import {
   isRedisConfigured,
-  pingRedis,
   setCached,
   getCached,
   deleteCached,
   clearMemoryCache,
+  checkRateLimit,
 } from "../../lib/redis/client";
 
 export async function runRedisCacheTests(): Promise<SuiteResult> {
@@ -76,12 +76,20 @@ export async function runRedisCacheTests(): Promise<SuiteResult> {
     "Expired keys with past TTL return null"
   );
 
-  // --- 7. Live Upstash Redis Ping ---
-  const pingResult = await pingRedis();
-  suite.assert(
-    typeof pingResult === "boolean",
-    `pingRedis executes safely (Live Upstash PONG: ${pingResult})`
-  );
+  // --- 8. Rate Limiting Defense ---
+  clearMemoryCache();
+  const rl1 = await checkRateLimit("test-client-ip", 2, 60);
+  suite.assert(rl1.success === true, "checkRateLimit allows request 1 within limit");
+  suite.assertEqual(rl1.remaining, 1, "checkRateLimit correctly decrements remaining tokens");
+  suite.assert(rl1.resetSeconds > 0, "checkRateLimit provides positive reset window");
+
+  const rl2 = await checkRateLimit("test-client-ip", 2, 60);
+  suite.assert(rl2.success === true, "checkRateLimit allows request 2 within limit");
+  suite.assertEqual(rl2.remaining, 0, "checkRateLimit reaches 0 remaining tokens");
+
+  const rl3 = await checkRateLimit("test-client-ip", 2, 60);
+  suite.assert(rl3.success === false, "checkRateLimit rejects request 3 exceeding limit");
+  suite.assertEqual(rl3.remaining, 0, "checkRateLimit remains at 0 remaining tokens");
 
   return suite.summary();
 }

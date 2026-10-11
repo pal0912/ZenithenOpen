@@ -160,3 +160,68 @@ export async function deleteCached(key: string): Promise<boolean> {
 export function clearMemoryCache(): void {
   memoryFallback.clear();
 }
+
+export interface RateLimitResult {
+  success: boolean;
+  limit: number;
+  remaining: number;
+  resetSeconds: number;
+}
+
+/**
+ * Resilient rate limiter supporting Upstash Redis and automatic in-memory fallback
+ */
+export async function checkRateLimit(
+  identifier: string,
+  limit: number = 30,
+  windowSeconds: number = 60
+): Promise<RateLimitResult> {
+  const key = `ratelimit:${identifier}`;
+  const now = Date.now();
+
+  const client = getRedisClient();
+  if (client) {
+    try {
+      const current = await client.incr(key);
+      if (current === 1) {
+        await client.expire(key, windowSeconds);
+      }
+      const ttl = await client.ttl(key);
+      const remaining = Math.max(0, limit - current);
+      return {
+        success: current <= limit,
+        limit,
+        remaining,
+        resetSeconds: ttl > 0 ? ttl : windowSeconds,
+      };
+    } catch (error) {
+      console.warn(`[Redis RateLimit] Redis error for "${key}", falling back to memory:`, error);
+    }
+  }
+
+  // In-memory fallback
+  const memoryKey = `mem_rl:${identifier}`;
+  const record = getFromMemory<{ count: number; expiresAt: number }>(memoryKey);
+
+  if (!record || now >= record.expiresAt) {
+    setToMemory(memoryKey, { count: 1, expiresAt: now + windowSeconds * 1000 }, windowSeconds);
+    return {
+      success: true,
+      limit,
+      remaining: limit - 1,
+      resetSeconds: windowSeconds,
+    };
+  }
+
+  record.count += 1;
+  const resetSeconds = Math.max(1, Math.ceil((record.expiresAt - now) / 1000));
+  const remaining = Math.max(0, limit - record.count);
+
+  return {
+    success: record.count <= limit,
+    limit,
+    remaining,
+    resetSeconds,
+  };
+}
+
