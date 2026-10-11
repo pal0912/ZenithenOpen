@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     const featuredParam = searchParams.get("featured");
     const limit = Math.min(Math.max(parseInt(searchParams.get("limit") || "50", 10), 1), 100);
 
-    const cacheKey = `projects:list:${languageParam.toLowerCase()}:${searchParam || "all"}:${featuredParam || "all"}:${limit}`;
+    const cacheKey = `projects:v2:list:${languageParam.toLowerCase()}:${searchParam || "all"}:${featuredParam || "all"}:${limit}`;
 
     // 1. Check Redis Cache
     const cachedData = await getCached<Project[]>(cacheKey);
@@ -103,59 +103,58 @@ export async function GET(req: NextRequest) {
       dbProjects = [];
     }
 
-    // 3. Fallback to official baseline repositories if database is currently empty
-    let projects: Project[] = [];
+    // 3. Map database projects and merge with baseline verified campus repositories
+    const mappedDbProjects: Project[] = dbProjects.map((p) => {
+      const maintainers = p.maintainers?.length
+        ? p.maintainers.map((m: any) => ({
+            name: m.user?.name || "IST Maintainer",
+            username: m.user?.githubAccount?.username || "IST-ZenithenLab",
+            avatarUrl:
+              m.user?.githubAccount?.avatarUrl ||
+              "https://github.com/IST-ZenithenLab.png?size=200",
+          }))
+        : [
+            {
+              name: "IST-ZenithenLab",
+              username: "IST-ZenithenLab",
+              avatarUrl: "https://github.com/IST-ZenithenLab.png?size=200",
+            },
+          ];
 
-    if (dbProjects.length > 0) {
-      projects = dbProjects.map((p) => {
-        const maintainers = p.maintainers?.length
-          ? p.maintainers.map((m: any) => ({
-              name: m.user?.name || "IST Maintainer",
-              username: m.user?.githubAccount?.username || "IST-ZenithenLab",
-              avatarUrl:
-                m.user?.githubAccount?.avatarUrl ||
-                "https://github.com/IST-ZenithenLab.png?size=200",
-            }))
-          : [
-              {
-                name: "IST-ZenithenLab",
-                username: "IST-ZenithenLab",
-                avatarUrl: "https://github.com/IST-ZenithenLab.png?size=200",
-              },
-            ];
+      return {
+        id: p.id,
+        slug: p.slug,
+        name: p.name,
+        tagline: p.tagline,
+        description: p.description,
+        repositoryUrl: p.repositoryUrl,
+        demoUrl: p.demoUrl || undefined,
+        stars: p.starsCount,
+        forks: p.forksCount,
+        openIssuesCount: p.openIssuesCount,
+        goodFirstIssuesCount: p.goodFirstIssuesCount,
+        primaryLanguage: p.primaryLanguage,
+        languageColor: getLanguageColor(p.primaryLanguage),
+        tags: p.tags,
+        featured: p.isFeatured,
+        status: (p.status as any) || "Active",
+        maintainers,
+        updatedAt: p.updatedAt ? p.updatedAt.toISOString() : new Date().toISOString(),
+      };
+    });
 
-        return {
-          id: p.id,
-          slug: p.slug,
-          name: p.name,
-          tagline: p.tagline,
-          description: p.description,
-          repositoryUrl: p.repositoryUrl,
-          demoUrl: p.demoUrl || undefined,
-          stars: p.starsCount,
-          forks: p.forksCount,
-          openIssuesCount: p.openIssuesCount,
-          goodFirstIssuesCount: p.goodFirstIssuesCount,
-          primaryLanguage: p.primaryLanguage,
-          languageColor: getLanguageColor(p.primaryLanguage),
-          tags: p.tags,
-          featured: p.isFeatured,
-          status: (p.status as any) || "Active",
-          maintainers,
-          updatedAt: p.updatedAt ? p.updatedAt.toISOString() : new Date().toISOString(),
-        };
-      });
-    } else {
-      // Use official baseline verified repositories
-      projects = [...MOCK_PROJECTS];
-      if (languageParam !== "All") {
-        projects = projects.filter(
-          (p) => p.primaryLanguage.toLowerCase() === languageParam.toLowerCase()
-        );
-      }
-      if (featuredParam === "true") {
-        projects = projects.filter((p) => p.featured);
-      }
+    const dbSlugs = new Set(mappedDbProjects.map((p) => p.slug));
+    const extraBaseline = MOCK_PROJECTS.filter((p) => !dbSlugs.has(p.slug));
+
+    let projects: Project[] = [...mappedDbProjects, ...extraBaseline];
+
+    if (languageParam !== "All") {
+      projects = projects.filter(
+        (p) => p.primaryLanguage.toLowerCase() === languageParam.toLowerCase()
+      );
+    }
+    if (featuredParam === "true") {
+      projects = projects.filter((p) => p.featured);
     }
 
     // 4. In-memory search filter
