@@ -166,17 +166,31 @@ export default function HomePage() {
                       />
                       <span className="font-semibold text-foreground">{project.primaryLanguage}</span>
                     </div>
-                    <a
-                      href={project.repositoryUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Button size="sm" variant="default" className="text-xs gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs cursor-pointer">
-                        <GithubIcon className="h-3.5 w-3.5" />
-                        <span>GitHub</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </Button>
-                    </a>
+                    <div className="flex items-center gap-2">
+                      {project.slug === "zenithen-open" && (
+                        <a
+                          href="https://github.com/IST-ZenithenLab/ZenithenOpen/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Button size="sm" variant="outline" className="text-xs gap-1.5 border-border hover:border-primary/40 text-foreground cursor-pointer">
+                            <span>Good First Issues</span>
+                            <ExternalLink className="h-3 w-3" />
+                          </Button>
+                        </a>
+                      )}
+                      <a
+                        href={project.repositoryUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button size="sm" variant="default" className="text-xs gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs cursor-pointer">
+                          <GithubIcon className="h-3.5 w-3.5" />
+                          <span>GitHub</span>
+                          <ExternalLink className="h-3 w-3" />
+                        </Button>
+                      </a>
+                    </div>
                   </CardFooter>
                 </Card>
               ))}
@@ -201,12 +215,25 @@ export default function HomePage() {
                 Triaged GitHub issues curated for first-time open-source contributors with mentor assistance.
               </p>
             </div>
-            <Link href="/opportunities">
-              <Button variant="outline" size="sm" className="group text-xs border-border cursor-pointer">
-                <span>Browse Opportunities</span>
-                <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </Link>
+            <div className="flex flex-wrap items-center gap-2">
+              <a
+                href="https://github.com/IST-ZenithenLab/ZenithenOpen/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button size="sm" variant="default" className="text-xs gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs cursor-pointer">
+                  <GithubIcon className="h-3.5 w-3.5" />
+                  <span>ZenithenOpen (Good First)</span>
+                  <ExternalLink className="h-3 w-3" />
+                </Button>
+              </a>
+              <Link href="/opportunities">
+                <Button variant="outline" size="sm" className="group text-xs border-border cursor-pointer">
+                  <span>Browse Opportunities</span>
+                  <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {featuredOpportunities.length === 0 ? (
@@ -228,45 +255,63 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredOpportunities.map((opp) => (
-                <Card
-                  key={opp.id}
-                  className="flex flex-col justify-between hover:shadow-md hover:border-primary/40 transition-all border-border bg-card p-5 group"
-                >
-                  <div>
-                    <div className="flex items-center justify-between text-[11px] font-mono text-primary mb-2">
-                      <span>{opp.repoFullName}#{opp.issueNumber}</span>
-                      <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-600 border-emerald-500/30 capitalize">
-                        {opp.difficulty}
-                      </Badge>
+              {featuredOpportunities.map((opp) => {
+                const targetIssueLink = opp.repoFullName.includes("ZenithenOpen")
+                  ? (opp.issueUrl || "https://github.com/IST-ZenithenLab/ZenithenOpen/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue")
+                  : (opp.issueUrl || "https://github.com/IST-ZenithenLab/First-PR");
+
+                const targetRepoLink = opp.repoFullName.includes("ZenithenOpen")
+                  ? "https://github.com/IST-ZenithenLab/ZenithenOpen/issues?q=is%3Aissue+is%3Aopen+label%3Agood-first-issue"
+                  : "https://github.com/IST-ZenithenLab/First-PR";
+
+                return (
+                  <Card
+                    key={opp.id}
+                    className="flex flex-col justify-between hover:shadow-md hover:border-primary/40 transition-all border-border bg-card p-5 group"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between text-[11px] font-mono text-primary mb-2">
+                        <a
+                          href={targetRepoLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline flex items-center gap-1 text-primary"
+                          title="Open on GitHub"
+                        >
+                          <span>{opp.repoFullName}#{opp.issueNumber}</span>
+                        </a>
+                        <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-600 border-emerald-500/30 capitalize">
+                          {opp.difficulty}
+                        </Badge>
+                      </div>
+                      <h3 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                        <a href={targetIssueLink} target="_blank" rel="noopener noreferrer">
+                          {opp.title}
+                        </a>
+                      </h3>
+                      <div className="mt-3 flex flex-wrap gap-1">
+                        {opp.labels.slice(0, 2).map((l) => (
+                          <span key={l.name} className="px-2 py-0.5 rounded text-[10px] bg-muted text-muted-foreground">
+                            {l.name}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <h3 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                      <a href={opp.issueUrl} target="_blank" rel="noopener noreferrer">
-                        {opp.title}
+                    <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs">
+                      <span className="font-semibold text-foreground">{opp.language}</span>
+                      <a
+                        href={targetIssueLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
+                      >
+                        <span>Take Issue</span>
+                        <ExternalLink className="h-3 w-3" />
                       </a>
-                    </h3>
-                    <div className="mt-3 flex flex-wrap gap-1">
-                      {opp.labels.slice(0, 2).map((l) => (
-                        <span key={l.name} className="px-2 py-0.5 rounded text-[10px] bg-muted text-muted-foreground">
-                          {l.name}
-                        </span>
-                      ))}
                     </div>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs">
-                    <span className="font-semibold text-foreground">{opp.language}</span>
-                    <a
-                      href={opp.issueUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
-                    >
-                      <span>Take Issue</span>
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                );
+              })}
             </div>
           )}
         </div>
