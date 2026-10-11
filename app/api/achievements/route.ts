@@ -109,7 +109,7 @@ export async function GET(req: NextRequest) {
 
     // 2. Query Prisma for Unlocked Badges & First PR Stories
     let dbStories: FirstPrStory[] = [];
-    let unlockCountsMap: Record<string, number> = {};
+    const unlockCountsMap: Record<string, number> = {};
     let totalUnlockedCount = 0;
 
     try {
