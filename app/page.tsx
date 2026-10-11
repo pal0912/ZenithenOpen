@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { HeroSection } from "@/components/dashboard/hero-section";
 import { LiveMetricsDashboard } from "@/components/dashboard/live-metrics";
+import { CampusEvolutionSection } from "@/components/dashboard/campus-evolution-section";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -65,8 +66,11 @@ export default function HomePage() {
       {/* 2. Live Metrics Dashboard */}
       <LiveMetricsDashboard />
 
+      {/* 2.5. Campus Genesis & Evolution 3D Chronicle */}
+      <CampusEvolutionSection />
+
       {/* 3. Featured Open-Source Projects */}
-      <section className="py-20 border-t border-border bg-card/30">
+      <section id="campus-catalog" className="py-20 border-t border-border bg-card/30">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
             <div>
