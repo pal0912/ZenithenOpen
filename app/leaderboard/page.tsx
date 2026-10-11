@@ -7,24 +7,22 @@ import {
   Info,
   ArrowRight,
   GitPullRequest,
-  CheckCircle2,
-  Award,
   Loader2,
   ExternalLink,
-  Flame,
   Sparkles,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GithubIcon } from "@/components/ui/icons";
 import { StudentContributor } from "@/lib/data/student-competition";
 
 export default function LeaderboardPage() {
   const [timeframe, setTimeframe] = React.useState<"week" | "month" | "overall">("month");
-  const [sortBy, setSortBy] = React.useState<"points" | "prs" | "reviews">("points");
+  const [sortBy, setSortBy] = React.useState<"merged" | "quality" | "prs">("merged");
   const [competitors, setCompetitors] = React.useState<StudentContributor[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [isSyncing, setIsSyncing] = React.useState(false);
 
   // Fetch live student rankings from API
   const fetchLeaderboard = React.useCallback(async () => {
@@ -49,19 +47,30 @@ export default function LeaderboardPage() {
     fetchLeaderboard();
   }, [fetchLeaderboard]);
 
+  const handleSyncAll = async () => {
+    setIsSyncing(true);
+    try {
+      await fetch("/api/students/sync", { method: "POST" });
+      await fetchLeaderboard();
+    } catch (err) {
+      console.error("Sync error:", err);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   // Sort competitors according to user selection
   const sortedCompetitors = React.useMemo(() => {
     return [...competitors].sort((a, b) => {
-      const statsA = a[timeframe];
-      const statsB = b[timeframe];
-      if (sortBy === "points") return statsB.points - statsA.points;
-      if (sortBy === "prs") return statsB.prs - statsA.prs;
-      return statsB.reviews - statsA.reviews;
+      const statsA = a[timeframe] as unknown as { mergedPrs?: number; qualityPrs?: number; prs?: number };
+      const statsB = b[timeframe] as unknown as { mergedPrs?: number; qualityPrs?: number; prs?: number };
+      if (sortBy === "merged") return (statsB.mergedPrs ?? statsB.prs ?? 0) - (statsA.mergedPrs ?? statsA.prs ?? 0);
+      if (sortBy === "quality") return (statsB.qualityPrs ?? 0) - (statsA.qualityPrs ?? 0);
+      return (statsB.prs ?? 0) - (statsA.prs ?? 0);
     });
   }, [competitors, timeframe, sortBy]);
 
   const topThree = sortedCompetitors.slice(0, 3);
-  const remainingCompetitors = sortedCompetitors.slice(3);
 
   return (
     <div className="py-16 bg-background text-foreground min-h-screen transition-colors">
@@ -78,23 +87,35 @@ export default function LeaderboardPage() {
                 Contributor Leaderboard
               </h1>
               <p className="mt-1 text-sm text-muted-foreground max-w-2xl leading-relaxed">
-                Celebrating IST student developers who contribute, review, and ship code across ZenithenOpen repositories.
+                Celebrating authentic IST student developers ranked by merged and quality pull requests across ZenithenOpen and global open-source repositories.
               </p>
             </div>
-            <Link href="/programs">
-              <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md text-xs shrink-0 cursor-pointer">
-                <Sparkles className="h-4 w-4" />
-                <span>Sprint Arena & Rules</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSyncAll}
+                disabled={isSyncing}
+                className="gap-2 text-xs border-border cursor-pointer"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? "animate-spin" : ""}`} />
+                <span>{isSyncing ? "Syncing..." : "Sync Live PRs"}</span>
               </Button>
-            </Link>
+              <Link href="/programs#student-competition">
+                <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md text-xs shrink-0 cursor-pointer">
+                  <Sparkles className="h-4 w-4" />
+                  <span>Sprint Arena & Rules</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Philosophy Banner */}
           <div className="mt-6 flex items-center space-x-2.5 text-xs text-foreground bg-card border border-border p-3.5 rounded-xl max-w-3xl">
             <Info className="h-4 w-4 text-primary shrink-0" />
             <span>
-              <strong>Fair Play & Quality Recognition:</strong> Merged PRs earn <strong>200 pts</strong>, verified Quality PRs earn an extra <strong>50 pts</strong>, and peer code reviews award <strong>35 pts</strong>.
+              <strong>Quality PR Standard:</strong> Contributions to campus repositories (<code>IST-ZenithenLab/ZenithenOpen</code>) or public repositories with ≥100 stars and ≥100 forks are recognized as Quality PRs.
             </span>
           </div>
 
@@ -138,14 +159,24 @@ export default function LeaderboardPage() {
             <div className="flex items-center space-x-2 text-xs text-muted-foreground self-start sm:self-auto">
               <span>Sort by:</span>
               <button
-                onClick={() => setSortBy("points")}
+                onClick={() => setSortBy("merged")}
                 className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
-                  sortBy === "points"
+                  sortBy === "merged"
                     ? "border-primary/40 bg-primary/15 text-primary font-semibold"
                     : "border-border bg-card text-muted-foreground hover:text-foreground"
                 }`}
               >
-                Sprint Points
+                Merged PRs
+              </button>
+              <button
+                onClick={() => setSortBy("quality")}
+                className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+                  sortBy === "quality"
+                    ? "border-primary/40 bg-primary/15 text-primary font-semibold"
+                    : "border-border bg-card text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Quality PRs
               </button>
               <button
                 onClick={() => setSortBy("prs")}
@@ -155,17 +186,7 @@ export default function LeaderboardPage() {
                     : "border-border bg-card text-muted-foreground hover:text-foreground"
                 }`}
               >
-                PRs Merged
-              </button>
-              <button
-                onClick={() => setSortBy("reviews")}
-                className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
-                  sortBy === "reviews"
-                    ? "border-primary/40 bg-primary/15 text-primary font-semibold"
-                    : "border-border bg-card text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Code Reviews
+                Total PRs
               </button>
             </div>
           </div>
@@ -188,7 +209,7 @@ export default function LeaderboardPage() {
               When student pull requests and code reviews are merged in GitHub repositories, rankings are computed automatically.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Link href="/programs">
+              <Link href="/programs#student-competition">
                 <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground text-xs shadow-xs cursor-pointer">
                   <span>Explore Programs & Competitions</span>
                   <ArrowRight className="h-4 w-4" />
@@ -202,7 +223,7 @@ export default function LeaderboardPage() {
             {topThree.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {topThree.map((student, idx) => {
-                  const stats = student[timeframe];
+                  const stats = (student[timeframe] as unknown as { mergedPrs?: number; qualityPrs?: number; prs?: number; topContribution?: { title: string; prUrl: string } }) || {};
                   const rankNum = idx + 1;
                   const medalEmoji = rankNum === 1 ? "🥇" : rankNum === 2 ? "🥈" : "🥉";
                   const borderAccent =
@@ -236,9 +257,6 @@ export default function LeaderboardPage() {
                           src={student.avatarUrl}
                           alt={student.name}
                           className="h-14 w-14 rounded-full border-2 border-border object-cover group-hover:scale-105 transition-transform"
-                          onError={(e) => {
-                            (e.target as HTMLElement).style.display = "none";
-                          }}
                         />
                         <div>
                           <h3 className="font-bold text-foreground text-lg leading-tight group-hover:text-primary transition-colors">
@@ -257,24 +275,24 @@ export default function LeaderboardPage() {
                         </div>
                       </div>
 
-                      {/* Points & Stats */}
+                      {/* Stats */}
                       <div className="mt-6 pt-4 border-t border-border grid grid-cols-3 gap-2 text-center">
-                        <div className="rounded-lg bg-muted/40 p-2">
-                          <p className="text-lg font-extrabold text-foreground">{stats.points}</p>
+                        <div className="rounded-lg bg-primary/10 p-2 border border-primary/20">
+                          <p className="text-lg font-extrabold text-primary">{stats.mergedPrs ?? stats.prs ?? 0}</p>
                           <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
-                            Points
+                            Merged
                           </p>
                         </div>
-                        <div className="rounded-lg bg-muted/40 p-2">
-                          <p className="text-lg font-extrabold text-foreground">{stats.prs}</p>
-                          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
-                            PRs
-                          </p>
-                        </div>
-                        <div className="rounded-lg bg-muted/40 p-2">
-                          <p className="text-lg font-extrabold text-foreground">{stats.qualityPrs}</p>
+                        <div className="rounded-lg bg-emerald-500/10 p-2 border border-emerald-500/20">
+                          <p className="text-lg font-extrabold text-emerald-500">{stats.qualityPrs ?? 0}</p>
                           <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
                             Quality
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-muted/40 p-2">
+                          <p className="text-lg font-extrabold text-foreground">{stats.prs ?? 0}</p>
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
+                            Total PRs
                           </p>
                         </div>
                       </div>
@@ -283,7 +301,7 @@ export default function LeaderboardPage() {
                       {stats.topContribution && (
                         <div className="mt-4 pt-3 border-t border-border/60 text-xs">
                           <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mb-1">
-                            Featured Contribution:
+                            Top Contribution:
                           </p>
                           <a
                             href={stats.topContribution.prUrl}
@@ -308,7 +326,7 @@ export default function LeaderboardPage() {
                 <div>
                   <h3 className="font-bold text-foreground text-base">All Contributor Rankings</h3>
                   <p className="text-xs text-muted-foreground">
-                    Real-time aggregated points and verified pull requests for {timeframe === "week" ? "this week" : timeframe === "month" ? "this month" : "all-time"}.
+                    Real-time verified pull requests for {timeframe === "week" ? "this week" : timeframe === "month" ? "this month" : "all-time"}.
                   </p>
                 </div>
                 <span className="text-xs font-mono text-muted-foreground">
@@ -323,15 +341,15 @@ export default function LeaderboardPage() {
                       <th className="py-3 px-4 w-16">Rank</th>
                       <th className="py-3 px-4">Contributor</th>
                       <th className="py-3 px-4">Department</th>
-                      <th className="py-3 px-4 text-center">PRs Merged</th>
+                      <th className="py-3 px-4 text-center">Merged PRs</th>
                       <th className="py-3 px-4 text-center">Quality PRs</th>
-                      <th className="py-3 px-4 text-center">Reviews</th>
-                      <th className="py-3 px-4 text-right">Sprint Points</th>
+                      <th className="py-3 px-4 text-center">Open PRs</th>
+                      <th className="py-3 px-4 text-center">Closed PRs</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
                     {sortedCompetitors.map((student, idx) => {
-                      const stats = student[timeframe];
+                      const stats = (student[timeframe] as unknown as { mergedPrs?: number; qualityPrs?: number; openPrs?: number; closedPrs?: number; prs?: number }) || {};
                       return (
                         <tr
                           key={student.id}
@@ -366,17 +384,17 @@ export default function LeaderboardPage() {
                           <td className="py-3.5 px-4 text-muted-foreground max-w-xs truncate">
                             {student.department}
                           </td>
-                          <td className="py-3.5 px-4 text-center font-semibold text-foreground">
-                            {stats.prs}
+                          <td className="py-3.5 px-4 text-center font-bold text-primary text-sm">
+                            {stats.mergedPrs ?? stats.prs ?? 0}
                           </td>
                           <td className="py-3.5 px-4 text-center text-emerald-600 font-semibold">
-                            {stats.qualityPrs}
+                            {stats.qualityPrs ?? 0}
                           </td>
                           <td className="py-3.5 px-4 text-center text-muted-foreground">
-                            {stats.reviews}
+                            {stats.openPrs ?? 0}
                           </td>
-                          <td className="py-3.5 px-4 text-right font-extrabold text-foreground text-sm font-mono">
-                            {stats.points}
+                          <td className="py-3.5 px-4 text-center text-muted-foreground">
+                            {stats.closedPrs ?? 0}
                           </td>
                         </tr>
                       );

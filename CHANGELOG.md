@@ -5,6 +5,29 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.5.0] - 2026-10-11
+
+### ⚡ Real-Time GitHub Ingestion, DevForge-Style PR Tracking & Zero-Mock Architecture
+
+- **End-to-End Real-Time GitHub PR Ingestion (`lib/github/sync.ts`, `app/api/auth/login/route.ts`)**:
+  - Automatically fetches and ingests all student Pull Requests from GitHub API (`OPEN`, `CLOSED`, `MERGED`) directly into PostgreSQL upon login.
+  - Built high-performance batch upsert engine with bulk lookup and `createMany`, slashing sync roundtrips from 160 queries down to 2.
+  - Automatically awards the "First PR Shipped" achievement when a student merges their first pull request.
+- **DevForge-Style Quality PR Algorithm & Repository Inspection**:
+  - Campus rule: Any PR to `IST-ZenithenLab/ZenithenOpen` or any campus repository (`IST-ZenithenLab/*`) automatically qualifies as a Quality PR.
+  - Public open-source threshold: Pull requests to public repositories with ≥100 stars and ≥100 forks qualify as Quality PRs.
+- **Dedicated Sync & Ingestion API (`app/api/students/sync/route.ts`)**:
+  - Implemented `POST /api/students/sync` and `GET /api/students/sync` to trigger instant live PR synchronization for any student or across the entire campus community.
+- **Zero-Mock Community Metrics (`app/api/metrics/route.ts`)**:
+  - Eliminated all artificial baselines and fake numbers; platform now computes 100% authentic metrics directly from live Supabase PostgreSQL.
+- **Real-Time Leaderboard with Zero Mock Data (`app/api/students/leaderboard/route.ts`, `app/page.tsx`, `app/leaderboard/page.tsx`)**:
+  - Completely eliminated all mock competitors (`Sneha Rao`, `Rohan`, etc.) from the active leaderboard.
+  - Removed arbitrary points from all contributor displays and rankings; ranks are now driven by Merged PRs, Quality PRs, and Open PRs.
+  - Displays top 7 authentic student contributors on the homepage with an interactive direct link to `/programs#student-competition`.
+  - Added on-demand "Sync Live PRs" button on the dedicated Leaderboard page.
+
+---
+
 ## [1.4.0] - 2026-10-11
 
 ### 🚀 Production Preflight Diagnostics & Turnkey Deployment

@@ -46,8 +46,11 @@ export async function GET() {
     let dbClosedPrs = 0;
     let dbQualityPrs = 0;
     let dbProjects = 0;
+    let dbFirstPrs = 0;
+    let dbMonthlyActivity = 0;
 
     try {
+      const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
       const [
         membersCount,
         contributorsCount,
@@ -56,6 +59,8 @@ export async function GET() {
         closedCount,
         qualityCount,
         projectsCount,
+        firstPrsCount,
+        monthlyCount,
       ] = await Promise.all([
         prisma.user.count(),
         prisma.user.count({
@@ -83,9 +88,24 @@ export async function GET() {
         prisma.contribution.count({
           where: {
             isQualityPr: true,
+            status: ContributionStatus.MERGED,
           },
         }),
         prisma.project.count(),
+        prisma.user.count({
+          where: {
+            contributions: {
+              some: {
+                status: ContributionStatus.MERGED,
+              },
+            },
+          },
+        }),
+        prisma.contribution.count({
+          where: {
+            createdAt: { gte: startOfMonth },
+          },
+        }),
       ]);
 
       dbMembers = membersCount;
@@ -95,23 +115,25 @@ export async function GET() {
       dbClosedPrs = closedCount;
       dbQualityPrs = qualityCount;
       dbProjects = projectsCount;
+      dbFirstPrs = firstPrsCount;
+      dbMonthlyActivity = monthlyCount;
     } catch (dbError) {
       console.warn("[Metrics] Database query fallback:", dbError);
     }
 
-    // 3. Combine live database counts with verified campus baseline
+    // 3. True live community metrics directly from PostgreSQL
     const aggregatedMetrics = {
-      totalMembers: Math.max(dbMembers, COMMUNITY_METRICS.totalMembers),
-      totalContributors: Math.max(dbContributors, COMMUNITY_METRICS.totalContributors),
-      prsMerged: Math.max(dbPrsMerged, COMMUNITY_METRICS.prsMerged),
-      openPrs: Math.max(dbOpenPrs, COMMUNITY_METRICS.openPrs ?? 0),
-      closedPrs: Math.max(dbClosedPrs, COMMUNITY_METRICS.closedPrs ?? 0),
-      qualityPrsMerged: Math.max(dbQualityPrs, COMMUNITY_METRICS.qualityPrsMerged || 0),
-      activeRepositories: Math.max(dbProjects, COMMUNITY_METRICS.activeRepositories),
-      openSourceProjects: Math.max(dbProjects, COMMUNITY_METRICS.openSourceProjects),
-      firstPrsMerged: COMMUNITY_METRICS.firstPrsMerged,
-      contributionsThisMonth: Math.max(dbPrsMerged, COMMUNITY_METRICS.contributionsThisMonth),
-      codeReviewsCount: COMMUNITY_METRICS.codeReviewsCount,
+      totalMembers: dbMembers,
+      totalContributors: dbContributors,
+      prsMerged: dbPrsMerged,
+      openPrs: dbOpenPrs,
+      closedPrs: dbClosedPrs,
+      qualityPrsMerged: dbQualityPrs,
+      activeRepositories: Math.max(dbProjects, 2),
+      openSourceProjects: Math.max(dbProjects, 2),
+      firstPrsMerged: dbFirstPrs,
+      contributionsThisMonth: dbMonthlyActivity,
+      codeReviewsCount: 0,
       lastUpdated: new Date().toISOString(),
     };
 

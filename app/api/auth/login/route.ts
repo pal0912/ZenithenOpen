@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyStudentUSN } from "@/lib/auth/usn-verification";
-import { db } from "@/lib/db";
+import { prisma } from "@/lib/db/prisma";
+import { isDatabaseConfigured } from "@/lib/db";
 import { checkRateLimit } from "@/lib/redis/client";
+import { syncStudentGitHubData } from "@/lib/github/sync";
 
 export interface LoginRequestBody {
   usn?: string;
@@ -65,11 +67,47 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Step 2: Database linkage hook
-    try {
-      await db.students.linkGithub(cleanUsn, cleanUsername);
-    } catch {
-      // Non-blocking if database is not configured
+    // Step 2: Database linkage & Real-Time GitHub Ingestion
+    let syncedStats = {
+      totalPrs: 0,
+      openPrs: 0,
+      mergedPrs: 0,
+      closedPrs: 0,
+      qualityPrs: 0,
+    };
+
+    if (isDatabaseConfigured()) {
+      try {
+        const user = await prisma.user.upsert({
+          where: { email: `${cleanUsn.toLowerCase()}@ist.edu.in` },
+          update: {
+            name: verification.student.name || cleanUsername,
+            department: verification.student.department,
+            yearOfStudy: verification.student.year,
+            updatedAt: new Date(),
+          },
+          create: {
+            name: verification.student.name || cleanUsername,
+            email: `${cleanUsn.toLowerCase()}@ist.edu.in`,
+            department: verification.student.department,
+            yearOfStudy: verification.student.year,
+          },
+        });
+
+        // Trigger real-time GitHub sync across open, merged, and closed PRs
+        const syncResult = await syncStudentGitHubData(user.id, cleanUsername);
+        if (syncResult.success) {
+          syncedStats = {
+            totalPrs: syncResult.totalPrs,
+            openPrs: syncResult.openPrs,
+            mergedPrs: syncResult.mergedPrs,
+            closedPrs: syncResult.closedPrs,
+            qualityPrs: syncResult.qualityPrs,
+          };
+        }
+      } catch (dbErr) {
+        console.warn("[Login API] DB linkage or sync notice:", dbErr);
+      }
     }
 
     // Step 3: Construct authenticated student session
@@ -83,6 +121,7 @@ export async function POST(req: NextRequest) {
       avatarUrl: `https://github.com/${cleanUsername}.png`,
       role: "MEMBER" as const,
       loggedInAt: new Date().toISOString(),
+      stats: syncedStats,
     };
 
     return NextResponse.json({
