@@ -153,6 +153,8 @@ export interface CommunityMetrics {
   totalMembers: number;
   totalContributors: number;
   prsMerged: number;
+  openPrs?: number;
+  closedPrs?: number;
   qualityPrsMerged?: number;
   activeRepositories: number;
   openSourceProjects: number;
