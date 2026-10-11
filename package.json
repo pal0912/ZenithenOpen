@@ -1,6 +1,6 @@
 {
   "name": "zenithen-open",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
@@ -9,6 +9,9 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",
+    "preflight": "tsx scripts/preflight.ts",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
     "test": "tsx tests/backend/run-all.ts",
     "test:backend": "tsx tests/backend/run-all.ts",
     "test:themes": "tsx tests/theme-system.test.ts"

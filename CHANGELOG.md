@@ -5,6 +5,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.4.0] - 2026-10-11
+
+### 🚀 Production Preflight Diagnostics & Turnkey Deployment
+
+- **Automated Production Preflight CLI (`scripts/preflight.ts`)**:
+  - Built comprehensive non-destructive pre-deployment diagnostic CLI (`npm run preflight`).
+  - Verifies runtime environment variables against Zod schema, checks PostgreSQL roundtrip latency and schema entity counts, probes Upstash Redis cache and TTL key writes, checks GitHub API authenticated rate-limit quota, and verifies the `/api/health` probe.
+  - Added `--strict` mode flag to enforce zero-warning policy on production release pipelines.
+- **Dynamic Health Probe Versioning (`app/api/health/route.ts`)**:
+  - Dynamically synchronized version reporting from `package.json`, ensuring `/api/health` stays in lockstep with releases.
+  - Updated health route test suite (`tests/backend/health-route.test.ts`) to validate against dynamic package version.
+- **Comprehensive Production Deployment Architecture Guide (`DEPLOYMENT.md`)**:
+  - Created complete deployment guide covering Vercel serverless deployment, Docker Compose on self-hosted VPS, Nginx reverse proxy with Let's Encrypt SSL, Prisma database synchronization (`npm run db:push`), and observability.
+  - Added developer convenience scripts in `package.json` (`preflight`, `db:push`, `db:studio`).
+
+---
+
 ## [1.3.0] - 2026-10-11
 
 ### 💎 Strict Typing & Lint Hygiene
