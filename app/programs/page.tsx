@@ -39,7 +39,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Project } from "@/types";
 import { GithubIcon } from "@/components/ui/icons";
-import { MOCK_PROJECTS } from "@/lib/data/mock-data";
 import {
   STUDENT_COMPETITORS,
   CompetitionTimeframe,
@@ -182,7 +181,7 @@ export default function ProgramsPage() {
   const currentProgram = PROGRAMS.find((p) => p.id === currentSelectedId) || PROGRAMS[0];
 
   const CurrentIcon = currentProgram.icon;
-  const [campusProjects, setCampusProjects] = React.useState<Project[]>(() => MOCK_PROJECTS.slice(0, 2));
+  const [campusProjects, setCampusProjects] = React.useState<Project[]>([]);
   const [isAddProjectOpen, setIsAddProjectOpen] = React.useState(false);
   const [newProjectName, setNewProjectName] = React.useState("");
   const [newProjectRepo, setNewProjectRepo] = React.useState("");
@@ -193,7 +192,24 @@ export default function ProgramsPage() {
   const [repoError, setRepoError] = React.useState("");
   const [submitSuccess, setSubmitSuccess] = React.useState(false);
 
-  const handleAddProjectSubmit = (e: React.FormEvent) => {
+  React.useEffect(() => {
+    async function loadProjects() {
+      try {
+        const res = await fetch("/api/projects", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.projects) && data.projects.length > 0) {
+            setCampusProjects(data.projects);
+          }
+        }
+      } catch (err) {
+        console.warn("[Programs] Live projects fetch error:", err);
+      }
+    }
+    loadProjects();
+  }, []);
+
+  const handleAddProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedRepo = newProjectRepo.trim().toLowerCase();
     const trimmedId = newProjectStudentId.trim().toLowerCase();
@@ -248,6 +264,24 @@ export default function ProgramsPage() {
       ],
       updatedAt: new Date().toISOString(),
     };
+
+    try {
+      await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slug: newProject.slug,
+          name: newProject.name,
+          tagline: newProject.tagline,
+          description: newProject.description,
+          repositoryUrl: newProject.repositoryUrl,
+          primaryLanguage: newProject.primaryLanguage,
+          tags: newProject.tags,
+        }),
+      });
+    } catch (err) {
+      console.warn("[Programs] Project registration notice:", err);
+    }
 
     setCampusProjects((prev) => [newProject, ...prev]);
     setSubmitSuccess(true);
