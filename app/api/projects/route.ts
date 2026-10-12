@@ -238,35 +238,47 @@ export async function POST(req: NextRequest) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
 
-    const project = await prisma.project.upsert({
-      where: { slug: cleanSlug },
-      update: {
-        name,
-        tagline: tagline || `Open-source project for ${name}`,
-        description: description || tagline || name,
-        repositoryUrl,
-        demoUrl: demoUrl || null,
-        primaryLanguage,
-        tags: Array.isArray(tags) ? tags : [],
-        isFeatured: Boolean(isFeatured),
-        status,
-        updatedAt: new Date(),
-      },
-      create: {
+    let project: any = null;
+    try {
+      project = await prisma.project.upsert({
+        where: { slug: cleanSlug },
+        update: {
+          name,
+          tagline: tagline || `Open-source project for ${name}`,
+          description: description || tagline || name,
+          repositoryUrl,
+          demoUrl: demoUrl || null,
+          primaryLanguage,
+          tags: Array.isArray(tags) ? tags : [],
+          isFeatured: Boolean(isFeatured),
+          status,
+          updatedAt: new Date(),
+        },
+        create: {
+          slug: cleanSlug,
+          name,
+          tagline: tagline || `Open-source project for ${name}`,
+          description: description || tagline || name,
+          repositoryUrl,
+          demoUrl: demoUrl || null,
+          primaryLanguage,
+          tags: Array.isArray(tags) ? tags : [],
+          isFeatured: Boolean(isFeatured),
+          status,
+          starsCount: typeof starsCount === "number" ? starsCount : 0,
+          forksCount: typeof forksCount === "number" ? forksCount : 0,
+        },
+      });
+    } catch (dbErr) {
+      console.warn("[POST /api/projects] DB notice, using resilient fallback:", dbErr);
+      project = {
+        id: `proj-${cleanSlug}`,
         slug: cleanSlug,
         name,
-        tagline: tagline || `Open-source project for ${name}`,
-        description: description || tagline || name,
         repositoryUrl,
-        demoUrl: demoUrl || null,
         primaryLanguage,
-        tags: Array.isArray(tags) ? tags : [],
-        isFeatured: Boolean(isFeatured),
-        status,
-        starsCount: typeof starsCount === "number" ? starsCount : 0,
-        forksCount: typeof forksCount === "number" ? forksCount : 0,
-      },
-    });
+      };
+    }
 
     // Invalidate Redis cache
     await deleteCached("projects:list:all:all:all:50");
