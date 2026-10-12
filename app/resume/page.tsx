@@ -21,6 +21,27 @@ export default function ResumeBuilderPage() {
   const [copied, setCopied] = React.useState(false);
   const [editMode, setEditMode] = React.useState(false);
   const [data, setData] = React.useState<ResumeProfileData>(MOCK_RESUME_DATA);
+  const [handleInput, setHandleInput] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+
+  const handleFetchProfile = async (targetUsername?: string) => {
+    const userToFetch = (targetUsername || handleInput).trim();
+    if (!userToFetch) return;
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/resume/${encodeURIComponent(userToFetch)}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.profile) {
+          setData(json.profile);
+        }
+      }
+    } catch (err) {
+      console.warn("[Resume Page] Failed to fetch verified resume profile:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePrint = () => {
     window.print();
@@ -67,6 +88,25 @@ ${data.education.degree} in ${data.education.field} — ${data.education.institu
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <Input
+                placeholder="GitHub handle..."
+                value={handleInput}
+                onChange={(e) => setHandleInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleFetchProfile()}
+                className="h-8 w-36 text-xs bg-muted/40 border-border"
+              />
+              <Button
+                onClick={() => handleFetchProfile()}
+                disabled={loading || !handleInput.trim()}
+                variant="outline"
+                size="sm"
+                className="h-8 text-xs border-border cursor-pointer"
+              >
+                {loading ? "Loading..." : "Sync Profile"}
+              </Button>
+            </div>
+
             <Button
               onClick={() => setEditMode(!editMode)}
               variant="outline"

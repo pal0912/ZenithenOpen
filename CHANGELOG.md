@@ -3,6 +3,24 @@
 All notable changes to **ZenithenOpen** are documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-10-12
+
+### 📄 Verified Proof-of-Work Resume Engine & Portfolio Controller
+
+- **Verified Proof-of-Work Resume Snapshot Controller (`app/api/resume/[username]/route.ts`)**:
+  - Implemented `GET /api/resume/[username]` with Next.js 15 async route parameters.
+  - Dynamically aggregates verified open-source pull requests, highlighted repositories with star counts, technical skills, education, and campus milestone achievements.
+  - Generates ATS-friendly, structured Markdown and JSON exports with Redis caching (`X-Cache: HIT / MISS`).
+- **Interactive Resume API Route (`app/api/resume/route.ts`)**:
+  - Implemented `GET /api/resume` default template and username delegation.
+  - Implemented `POST /api/resume` with Zod schema validation for customized student resume profiles.
+- **Frontend Live Sync Integration (`app/resume/page.tsx`)**:
+  - Added real-time GitHub handle sync bar to fetch verified student achievements directly into the interactive resume builder.
+- **Backend Test Suite Expansion (`tests/backend/resume-route.test.ts`)**:
+  - Added 23 assertions verifying baseline templates, username queries, 404 lookups, Markdown formatting, and Zod validation errors across 430 passing assertions.
+
+---
+
 ## [1.9.0] - 2026-10-12
 
 ### 📦 Project Slug Deep-Dive Dynamic Controller & Catalog Engine
