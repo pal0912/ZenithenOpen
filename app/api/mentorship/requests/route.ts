@@ -47,7 +47,7 @@ export interface MentorshipRequestRecord {
 }
 
 // Resilient in-memory fallback dataset for offline/test environments
-let fallbackMentorshipStore: MentorshipRequestRecord[] = [
+const fallbackMentorshipStore: MentorshipRequestRecord[] = [
   {
     id: "req-gsoc-001",
     mentorId: "user-alex-chen",
