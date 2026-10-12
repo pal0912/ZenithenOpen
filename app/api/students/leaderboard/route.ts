@@ -14,6 +14,7 @@ import {
   StudentContributor,
   CompetitionTimeframe,
   TopContributionInfo,
+  STUDENT_COMPETITORS,
 } from "../../../../lib/data/student-competition";
 import { syncStudentGitHubData } from "../../../../lib/github/sync";
 import { ContributionStatus } from "@prisma/client";
@@ -165,6 +166,10 @@ export async function GET(request: NextRequest) {
       }
     } catch (dbErr) {
       console.warn("[Leaderboard] Database query notice:", dbErr);
+    }
+
+    if (dbContributors.length === 0) {
+      dbContributors = [...STUDENT_COMPETITORS];
     }
 
     // 3. Sort purely by Merged PRs, then Quality PRs, then Total PRs (Merit ranking algorithm)

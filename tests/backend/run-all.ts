@@ -35,6 +35,7 @@ import { runAchievementsRouteTests } from "./achievements-route.test";
 import { runHealthRouteTests } from "./health-route.test";
 import { runGitHubWebhookTests } from "./github-webhook.test";
 import { runMemberProfileTests } from "./member-profile.test";
+import { runProjectSlugTests } from "./project-slug.test";
 import { SuiteResult } from "./test-utils";
 
 async function main() {
@@ -58,6 +59,7 @@ async function main() {
     results.push(await runContributionsRouteTests());
     results.push(await runMembersRouteTests());
     results.push(await runProjectsRouteTests());
+    results.push(await runProjectSlugTests());
     results.push(await runOpportunitiesRouteTests());
     results.push(await runAchievementsRouteTests());
     results.push(await runHealthRouteTests());

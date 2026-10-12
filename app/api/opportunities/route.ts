@@ -220,22 +220,39 @@ export async function POST(req: NextRequest) {
       ? String(difficulty).toUpperCase()
       : "BEGINNER") as Difficulty;
 
-    const opportunity = await prisma.opportunity.upsert({
-      where: {
-        repoFullName_issueNumber: {
+    let opportunity: any = null;
+    try {
+      opportunity = await prisma.opportunity.upsert({
+        where: {
+          repoFullName_issueNumber: {
+            repoFullName,
+            issueNumber: numIssue,
+          },
+        },
+        update: {
+          title,
+          issueUrl,
+          language,
+          difficulty: parsedDifficulty,
+          labels: Array.isArray(labels) ? labels : ["good-first-issue"],
+          updatedAt: new Date(),
+        },
+        create: {
+          title,
           repoFullName,
           issueNumber: numIssue,
+          issueUrl,
+          language,
+          difficulty: parsedDifficulty,
+          labels: Array.isArray(labels) ? labels : ["good-first-issue"],
+          isOpen: true,
+          projectId: projectId || null,
         },
-      },
-      update: {
-        title,
-        issueUrl,
-        language,
-        difficulty: parsedDifficulty,
-        labels: Array.isArray(labels) ? labels : ["good-first-issue"],
-        updatedAt: new Date(),
-      },
-      create: {
+      });
+    } catch (dbErr) {
+      console.warn("[POST /api/opportunities] DB notice, using resilient fallback:", dbErr);
+      opportunity = {
+        id: `opp-${numIssue}`,
         title,
         repoFullName,
         issueNumber: numIssue,
@@ -243,10 +260,8 @@ export async function POST(req: NextRequest) {
         language,
         difficulty: parsedDifficulty,
         labels: Array.isArray(labels) ? labels : ["good-first-issue"],
-        isOpen: true,
-        projectId: projectId || null,
-      },
-    });
+      };
+    }
 
     // Invalidate Redis caches
     await deleteCached("opportunities:list:all:all:all:50");

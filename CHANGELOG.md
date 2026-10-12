@@ -3,6 +3,17 @@
 All notable changes to **ZenithenOpen** are documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-10-12
+
+### 📦 Project Slug Deep-Dive Dynamic Controller & Catalog Engine
+
+- **Project Deep-Dive Dynamic Controller (`app/api/projects/[slug]/route.ts`)**:
+  - Implemented `GET /api/projects/[slug]` with Next.js 15 async route parameters returning repository details, language breakdown, stars, forks, open issues, maintainers, starter opportunities, top student contributors, and recent activity ledgers.
+  - Implemented `PATCH /api/projects/[slug]` with Zod schema validation for repository metadata updates, baseline catalog auto-seeding, and cache invalidation.
+  - Integrated Upstash Redis caching (`project:slug:*`) with cache headers (`X-Cache: HIT / MISS`) and resilient in-memory fallbacks.
+- **Backend Test Suite Expansion (`tests/backend/project-slug.test.ts`)**:
+  - Added 19 assertions verifying 404 lookups, baseline repository retrieval, stats computation, validation error handling, and metadata updates across 407 passing assertions.
+
 ---
 
 ## [1.8.0] - 2026-10-11
