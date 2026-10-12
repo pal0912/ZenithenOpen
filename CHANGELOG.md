@@ -3,6 +3,24 @@
 All notable changes to **ZenithenOpen** are documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-10-12
+
+### 🤝 Peer Mentorship Connection Controller & Match Engine
+
+- **Peer Mentorship Requests Controller (`app/api/mentorship/requests/route.ts`)**:
+  - Implemented `GET /api/mentorship/requests` with filtering by mentor, mentee, focus topic, and status (`PENDING`, `ACCEPTED`, `COMPLETED`, `DECLINED`).
+  - Implemented `POST /api/mentorship/requests` with Zod schema validation, student user resolution, and persistent Prisma `Mentorship` record creation with resilient fallback store.
+  - Implemented `PATCH /api/mentorship/requests` for mentor status transitions (`PENDING` -> `ACCEPTED` / `DECLINED` / `COMPLETED`) with cache invalidation.
+  - Integrated Upstash Redis caching with response headers (`X-Cache: HIT / MISS`) and resilient fallback mode.
+- **Frontend Live Form Integration (`app/mentorship/page.tsx`)**:
+  - Connected interactive mentorship modal to `POST /api/mentorship/requests`.
+  - Added dedicated mentor selection targeting specific student mentors with real-time submission feedback.
+- **Backend Test Suite Expansion (`tests/backend/mentorship-route.test.ts`)**:
+  - Added 28 comprehensive assertions verifying list retrieval, status filtering, topic search, Zod schema validation errors, submission creation, status updates, and 404 safety.
+  - Master test runner passes 458/458 assertions across 19 backend suites (100% pass rate).
+
+---
+
 ## [1.10.0] - 2026-10-12
 
 ### 📄 Verified Proof-of-Work Resume Engine & Portfolio Controller

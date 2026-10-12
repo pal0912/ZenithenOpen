@@ -24,6 +24,10 @@ export default function MentorshipPage() {
   const [allMentors, setAllMentors] = React.useState<Member[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
 
+  const [selectedMentor, setSelectedMentor] = React.useState<Member | null>(null);
+  const [submitting, setSubmitting] = React.useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
   const [formData, setFormData] = React.useState({
     name: "",
     email: "",
@@ -73,14 +77,40 @@ export default function MentorshipPage() {
     return matchTopic;
   });
 
-  const handleSendRequest = (e: React.FormEvent) => {
+  const handleSendRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRequestSent(true);
-    setTimeout(() => {
-      setRequestModalOpen(false);
-      setRequestSent(false);
-      setFormData({ name: "", email: "", topic: "GSoC Preparation", goal: "" });
-    }, 1800);
+    setSubmitting(true);
+    setErrorMessage(null);
+    try {
+      const res = await fetch("/api/mentorship/requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          menteeName: formData.name,
+          menteeEmail: formData.email,
+          topic: formData.topic,
+          message: formData.goal,
+          mentorId: selectedMentor?.id,
+          mentorUsername: selectedMentor?.username,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setRequestSent(true);
+        setTimeout(() => {
+          setRequestModalOpen(false);
+          setRequestSent(false);
+          setFormData({ name: "", email: "", topic: "GSoC Preparation", goal: "" });
+          setSelectedMentor(null);
+        }, 2000);
+      } else {
+        setErrorMessage(data.error || "Failed to submit request. Please verify the form fields.");
+      }
+    } catch (err: any) {
+      setErrorMessage(err?.message || "Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -102,7 +132,11 @@ export default function MentorshipPage() {
               </p>
             </div>
             <Button
-              onClick={() => setRequestModalOpen(true)}
+              onClick={() => {
+                setSelectedMentor(null);
+                setErrorMessage(null);
+                setRequestModalOpen(true);
+              }}
               className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md text-xs shrink-0 self-start md:self-auto cursor-pointer"
             >
               <UserCheck className="h-4 w-4" />
@@ -207,11 +241,13 @@ export default function MentorshipPage() {
                   </span>
                   <Button
                     onClick={() => {
+                      setSelectedMentor(mentor);
                       setFormData((prev) => ({ ...prev, topic: mentor.mentorshipTopics?.[0] || prev.topic }));
+                      setErrorMessage(null);
                       setRequestModalOpen(true);
                     }}
                     size="sm"
-                    className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+                    className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-semibold cursor-pointer"
                   >
                     Request Match
                   </Button>
@@ -227,13 +263,21 @@ export default function MentorshipPage() {
             <div className="relative w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl text-foreground">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-lg font-bold text-foreground">Request Open-Source Mentorship</h3>
+                  <h3 className="text-lg font-bold text-foreground">
+                    {selectedMentor ? `Request Mentorship: ${selectedMentor.name}` : "Request Open-Source Mentorship"}
+                  </h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Match with an IST student mentor for 1-on-1 code reviews.
+                    {selectedMentor
+                      ? `Direct match with @${selectedMentor.username} (${selectedMentor.department})`
+                      : "Match with an IST student mentor for 1-on-1 code reviews."}
                   </p>
                 </div>
                 <button
-                  onClick={() => setRequestModalOpen(false)}
+                  onClick={() => {
+                    setRequestModalOpen(false);
+                    setSelectedMentor(null);
+                    setErrorMessage(null);
+                  }}
                   className="text-muted-foreground hover:text-foreground p-1 text-sm cursor-pointer"
                 >
                   ✕
@@ -245,11 +289,19 @@ export default function MentorshipPage() {
                   <CheckCircle2 className="h-10 w-10 text-accent mx-auto" />
                   <p className="text-base font-bold text-foreground">Request Dispatched!</p>
                   <p className="text-xs text-muted-foreground">
-                    A mentor will review your topic and contact you via your university email.
+                    {selectedMentor
+                      ? `@${selectedMentor.username} will review your topic and contact you via your university email.`
+                      : "A mentor will review your topic and contact you via your university email."}
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleSendRequest} className="mt-5 space-y-4">
+                  {errorMessage && (
+                    <div className="p-2.5 rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-xs">
+                      {errorMessage}
+                    </div>
+                  )}
+
                   <div>
                     <label className="text-xs text-foreground font-semibold block mb-1">Your Full Name</label>
                     <Input
@@ -304,17 +356,22 @@ export default function MentorshipPage() {
                     <Button
                       type="button"
                       variant="ghost"
-                      onClick={() => setRequestModalOpen(false)}
+                      onClick={() => {
+                        setRequestModalOpen(false);
+                        setSelectedMentor(null);
+                        setErrorMessage(null);
+                      }}
                       className="text-xs text-muted-foreground hover:text-foreground"
                     >
                       Cancel
                     </Button>
                     <Button
                       type="submit"
-                      className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-1.5 shadow-xs cursor-pointer"
+                      disabled={submitting}
+                      className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-semibold gap-1.5 shadow-xs cursor-pointer disabled:opacity-50"
                     >
                       <Send className="h-3.5 w-3.5" />
-                      <span>Submit Request</span>
+                      <span>{submitting ? "Submitting..." : "Submit Request"}</span>
                     </Button>
                   </div>
                 </form>
