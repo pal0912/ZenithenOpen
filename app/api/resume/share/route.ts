@@ -14,7 +14,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { randomBytes } from "node:crypto";
 import { prisma } from "../../../../lib/db/prisma";
-import { getCached, setCached } from "../../../../lib/redis/client";
+import { setCached } from "../../../../lib/redis/client";
 import { ContributionStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";

@@ -39,7 +39,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
     // 1. Check Redis Cache
     const cacheKey = `resume:share:${cleanToken}`;
     let record = await getCached<SharedResumeSnapshot>(cacheKey);
-    let cacheHit = Boolean(record);
+    const cacheHit = Boolean(record);
 
     // 2. Fallback to resilient store if not in Redis
     if (!record) {

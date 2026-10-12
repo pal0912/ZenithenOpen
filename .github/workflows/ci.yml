@@ -45,9 +45,6 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: 1
           NODE_ENV: test
-          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/zenithen_test?schema=public"
-          UPSTASH_REDIS_REST_URL: "https://mock.upstash.io"
-          UPSTASH_REDIS_REST_TOKEN: "mock_token"
           GITHUB_TOKEN: "ghp_mock_token_for_ci_test_suite_execution"
 
       - name: Production Build
