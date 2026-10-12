@@ -10,6 +10,7 @@ import {
   Globe,
   Sparkles,
   Edit3,
+  Share2,
 } from "lucide-react";
 import { GithubIcon } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
@@ -19,10 +20,38 @@ import { ResumeProfileData } from "@/types";
 
 export default function ResumeBuilderPage() {
   const [copied, setCopied] = React.useState(false);
+  const [shareCopied, setShareCopied] = React.useState(false);
+  const [sharing, setSharing] = React.useState(false);
   const [editMode, setEditMode] = React.useState(false);
   const [data, setData] = React.useState<ResumeProfileData>(MOCK_RESUME_DATA);
   const [handleInput, setHandleInput] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+
+  const handleShareLink = async () => {
+    try {
+      setSharing(true);
+      const res = await fetch("/api/resume/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: data.githubUsername,
+          customHeadline: data.headline,
+          customSummary: data.summary,
+        }),
+      });
+      const json = await res.json();
+      if (res.ok && json.shareUrl) {
+        const fullUrl = `${window.location.origin}${json.shareUrl}`;
+        await navigator.clipboard.writeText(fullUrl);
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 3000);
+      }
+    } catch (err) {
+      console.warn("[Resume Page] Failed to generate share token:", err);
+    } finally {
+      setSharing(false);
+    }
+  };
 
   const handleFetchProfile = async (targetUsername?: string) => {
     const userToFetch = (targetUsername || handleInput).trim();
@@ -128,9 +157,24 @@ ${data.education.degree} in ${data.education.field} — ${data.education.institu
             </Button>
 
             <Button
+              onClick={handleShareLink}
+              disabled={sharing}
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs border-border cursor-pointer text-primary hover:bg-primary/10"
+            >
+              {shareCopied ? (
+                <Check className="h-3.5 w-3.5 text-accent" />
+              ) : (
+                <Share2 className="h-3.5 w-3.5" />
+              )}
+              <span>{sharing ? "Generating..." : shareCopied ? "Link Copied!" : "Share Link"}</span>
+            </Button>
+
+            <Button
               onClick={handlePrint}
               size="sm"
-              className="gap-1.5 text-xs bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs"
+              className="gap-1.5 text-xs bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs cursor-pointer"
             >
               <Printer className="h-3.5 w-3.5" />
               <span>Print / Save PDF</span>
