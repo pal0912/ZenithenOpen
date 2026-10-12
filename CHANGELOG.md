@@ -3,6 +3,26 @@
 All notable changes to **ZenithenOpen** are documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - 2026-10-12
+
+### 🔗 Shareable Resume Snapshot & Public Token Controller
+
+- **Shareable Resume Snapshot Generator (`app/api/resume/share/route.ts`)**:
+  - Implements Section 4, 5 & 6 of the Backend Architecture Guide (`ResumeSnapshot` model & token access).
+  - `POST /api/resume/share`: freezes student's verified open-source contributions, highlighted repos with star metrics, and technical skills into an unguessable public share token (`tok_*`) with configurable expiration (default: 90 days).
+  - `GET /api/resume/share`: lists active share tokens and view counts for a student.
+- **Public Share Token Resolver (`app/api/resume/share/[token]/route.ts`)**:
+  - `GET /api/resume/share/[token]`: Next.js 15 async route param handler allowing external recruiters and mentors to inspect authenticated proof-of-work without login.
+  - Supports ATS-friendly Markdown export via `?format=markdown`.
+  - Enforces expiration validation (returns 410 Gone if expired) and increments telemetry view counts with Redis caching (`X-Cache: HIT / MISS`).
+- **Interactive UI Integration (`app/resume/page.tsx`)**:
+  - Added **"Share Link"** button to the resume toolbar with automated clipboard copy and live feedback.
+- **Backend Test Suite Expansion (`tests/backend/resume-share.test.ts`)**:
+  - Added 28 comprehensive assertions verifying token listing, Zod payload validation errors, snapshot creation, public token resolution, Markdown export, and username filtering.
+  - Master test runner passes 510/510 assertions across 21 backend suites (100% pass rate).
+
+---
+
 ## [1.12.0] - 2026-10-12
 
 ### 🔄 Controlled GitHub Organization Sync & Admin Trigger Engine
