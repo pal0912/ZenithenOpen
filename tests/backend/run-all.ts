@@ -37,6 +37,7 @@ import { runGitHubWebhookTests } from "./github-webhook.test";
 import { runMemberProfileTests } from "./member-profile.test";
 import { runProjectSlugTests } from "./project-slug.test";
 import { runResumeRouteTests } from "./resume-route.test";
+import { runMentorshipRouteTests } from "./mentorship-route.test";
 import { SuiteResult } from "./test-utils";
 
 async function main() {
@@ -67,6 +68,7 @@ async function main() {
     results.push(await runGitHubWebhookTests());
     results.push(await runMemberProfileTests());
     results.push(await runResumeRouteTests());
+    results.push(await runMentorshipRouteTests());
   } catch (error) {
     console.error("\n[FATAL ERROR IN TEST RUNNER]:", error);
     process.exit(1);

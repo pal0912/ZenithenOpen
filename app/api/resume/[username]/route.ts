@@ -232,7 +232,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
         stars: c.project?.starsCount || 0,
         language: c.project?.primaryLanguage || "TypeScript",
         prsAuthored: 0,
-        impacts: [],
+        impacts: [] as string[],
       };
 
       existing.prsAuthored += 1;
