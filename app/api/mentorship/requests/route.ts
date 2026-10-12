@@ -213,6 +213,27 @@ export async function GET(req: NextRequest) {
       if (menteeParam) {
         records = records.filter((r) => r.menteeUsername.toLowerCase() === menteeParam);
       }
+
+      // If DB has no records, fallback to default seed requests
+      if (records.length === 0) {
+        let filtered = [...fallbackMentorshipStore];
+        if (statusParam !== "All") {
+          const norm = normalizeStatusTitle(statusParam);
+          filtered = filtered.filter((r) => r.status === norm);
+        }
+        if (topicParam) {
+          filtered = filtered.filter((r) => r.topic.toLowerCase().includes(topicParam));
+        }
+        if (mentorParam) {
+          filtered = filtered.filter((r) => r.mentorUsername.toLowerCase().includes(mentorParam));
+        }
+        if (menteeParam) {
+          filtered = filtered.filter((r) => r.menteeUsername.toLowerCase().includes(menteeParam));
+        }
+
+        totalCount = filtered.length;
+        records = filtered.slice((page - 1) * limit, page * limit);
+      }
     } catch (dbErr) {
       console.warn("[GET /api/mentorship/requests] Database query notice, using resilient fallback:", dbErr);
 

@@ -3,6 +3,23 @@
 All notable changes to **ZenithenOpen** are documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-10-12
+
+### 🔄 Controlled GitHub Organization Sync & Admin Trigger Engine
+
+- **Controlled GitHub Sync Controller (`app/api/github/sync/route.ts`)**:
+  - Implemented `GET /api/github/sync` returning engine telemetry, rate limit allowances, and last sync execution stats.
+  - Implemented `POST /api/github/sync` supporting scoped triggers (`all`, `members`, `projects`), single student targeting (`username`), and resilient fallback execution.
+  - Integrated Upstash Redis cache invalidation across `leaderboard:*`, `metrics:*`, `members:*`, and `projects:*`.
+- **Admin Dashboard Integration (`app/admin/page.tsx`)**:
+  - Wired live **"Trigger GitHub Sync"** button directly to `POST /api/github/sync`.
+  - Added real-time sync progress status and updated telemetry streaming on completion.
+- **Backend Test Suite Expansion (`tests/backend/github-sync-route.test.ts`)**:
+  - Added 24 comprehensive assertions verifying telemetry retrieval, Zod payload validation errors, single-student sync, project metric refresh, org-wide sync, and Redis cache invalidation.
+  - Master test runner passes 482/482 assertions across 20 backend suites (100% pass rate).
+
+---
+
 ## [1.11.0] - 2026-10-12
 
 ### 🤝 Peer Mentorship Connection Controller & Match Engine
