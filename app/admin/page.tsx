@@ -95,15 +95,25 @@ export default function AdminPage() {
   const handleSyncTrigger = async () => {
     try {
       setIsSyncing(true);
-      setSyncStatus("Triggering organization sync...");
+      setSyncStatus("Triggering organization GitHub sync...");
+
+      const res = await fetch("/api/github/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scope: "all" }),
+      });
+
+      const json = await res.json().catch(() => ({}));
 
       // Revalidate and fetch fresh telemetry
       await fetchAdminData();
 
-      setSyncStatus("Sync completed successfully!");
+      const memberCount = json.stats?.syncedMembersCount ?? members.length;
+      const prCount = json.stats?.totalPrsSynced ?? 0;
+      setSyncStatus(`Sync complete: ${memberCount} members & ${prCount} PRs updated!`);
       setTimeout(() => {
         setSyncStatus(null);
-      }, 3500);
+      }, 4000);
     } catch (err) {
       console.error("[AdminPage] Sync failed:", err);
       setSyncStatus("Sync failed. Check API logs.");
