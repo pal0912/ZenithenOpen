@@ -2,47 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyStudentUSN } from "@/lib/auth/usn-verification";
 import { prisma } from "@/lib/db/prisma";
 import { isDatabaseConfigured } from "@/lib/db";
-import { checkRateLimit } from "@/lib/redis/client";
-import { syncStudentGitHubData } from "@/lib/github/sync";
-
-export interface LoginRequestBody {
-  usn?: string;
-  githubUsername?: string;
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous";
-    const rateLimit = await checkRateLimit(`login:${ip}`, 30, 60);
-
-    if (!rateLimit.success) {
-      return NextResponse.json(
-        { success: false, error: "Too many login attempts. Please try again shortly." },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": String(rateLimit.resetSeconds),
-            "X-RateLimit-Limit": String(rateLimit.limit),
-            "X-RateLimit-Remaining": String(rateLimit.remaining),
+import g": String(rateLimit.remaining),
           },
         }
-      );
-    }
-
-    const body: LoginRequestBody = await req.json();
-    const { usn, githubUsername } = body;
-
-    if (!usn || typeof usn !== "string" || !usn.trim()) {
-      return NextResponse.json(
-        { success: false, error: "USN is required" },
-        { status: 400 }
-      );
-    }
-
-    if (!githubUsername || typeof githubUsername !== "string" || !githubUsername.trim()) {
-      return NextResponse.json(
-        { success: false, error: "GitHub username is required" },
-        { status: 400 }
       );
     }
 
