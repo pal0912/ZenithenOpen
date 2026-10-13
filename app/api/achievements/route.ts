@@ -9,32 +9,8 @@
 import { N;
 }
 
-const DEFAULT_BADGES: Omit<CommunityBadge, "unlockedCount">[] = [
-  {
-    code: "first-pr-shipped",
-    name: "First PR Shipped",
-    desc: "Successfully merged 1st pull request into a campus repo",
-    icon: "🌱",
-    criteria: "1 PR merged",
-    category: "Milestone",
-  },
-  {
-    code: "consistent-contributor",
-    name: "Consistent Contributor",
-    desc: "Contributions across 4 consecutive calendar weeks",
-    icon: "🔥",
-    criteria: "4-week streak",
-    category: "Streak",
-  },
-  {
-    code: "top-reviewer",
-    name: "Top Reviewer",
-    desc: "Reviewed and guided 15+ student pull requests with empathy",
-    icon: "💎",
-    criteria: "15 code reviews",
-    category: "Community",
-  },
-  {
+c
+    cri
     code: "project-maintainer",
     name: "Project Maintainer",
     desc: "Core release lead for a verified ZenithenOpen repo",
