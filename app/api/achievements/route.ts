@@ -6,20 +6,7 @@
  * with Supabase PostgreSQL persistence and Upstash Redis caching.
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../lib/db/prisma";
-import { getCached, setCached, deleteCached } from "../../../lib/redis/client";
-import { FirstPrStory } from "../../../types";
-import { MOCK_FIRST_PR_STORIES } from "../../../lib/data/mock-data";
-
-export interface CommunityBadge {
-  code: string;
-  name: string;
-  desc: string;
-  icon: string;
-  criteria: string;
-  category: string;
-  unlockedCount: number;
+import { N;
 }
 
 const DEFAULT_BADGES: Omit<CommunityBadge, "unlockedCount">[] = [
